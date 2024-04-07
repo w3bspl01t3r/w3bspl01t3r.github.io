@@ -36,10 +36,9 @@ This can happen in 2 ways 
 ### Using Parameters:
 Value must be between {min} and {max}
 ### Using Expression:
-Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}
+```Must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}```
 
-Bean Validation specification
-MethodNode(name=addBook, inIterable=false, index=null, key=null, kind=ElementKind.METHOD, parameterTypes=[Book.class])…beanvalidation.org
+
 
 So any data which has only {} , is going to be interpolated using Parameters and data which has ${} is going to be interpolated using expressions.
 PIC PIC PIC
