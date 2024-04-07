@@ -40,7 +40,7 @@ Value must be between {min} and {max}
 
 
 
-So any data which has only {} , is going to be interpolated using Parameters and data which has ${} is going to be interpolated using expressions.
+So any data which has only {} , is going to be interpolated using Parameters and data which has ```${}``` is going to be interpolated using expressions.
 PIC PIC PIC
 As you can see on the above code the InterpolationTerm class which has a parameterised Constructor ,checks if the data sent is an ELExpression or not, and the way it checks is simply by checking if the data starts with $
 PIC PIC PIC
