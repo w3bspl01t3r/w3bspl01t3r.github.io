@@ -41,7 +41,9 @@ Value must be between {min} and {max}
 
 
 So any data which has only {} , is going to be interpolated using Parameters and data which has ```${}``` is going to be interpolated using expressions.
+
 PIC PIC PIC
+
 As you can see on the above code the InterpolationTerm class which has a parameterised Constructor ,checks if the data sent is an ELExpression or not, and the way it checks is simply by checking if the data starts with $
 
 PIC PIC PIC
@@ -50,10 +52,12 @@ and if the the data starts with $ then the interpolation resolvers is going to b
 Checking the ELTermResolver class we see the method interpolate being implemented, which looks like below.
 
 PIC PIC PIC
+
 Keeping the SimplELContext() as the Context the ValueExpression.getvalue() is called on the provided expression which then results in our java expression code being executed.
 The full call stack looks like below.
 
 PIC PIC PIC
+
 As you can see on the stack trace , the code flow from the org.springframework.validation.beanvalidation jumps to org.hibernate.validator.engine and from there onwards every call is on the hibernate class files.
 
 ## Mitigation:
