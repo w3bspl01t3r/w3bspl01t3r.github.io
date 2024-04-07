@@ -11,16 +11,21 @@ the classes which have member variable declared , which have getters and setter
 Now when ever we fire any api that api needs to have certain body, and in spring we can set it by passing the Body type as class name.
 
   PIC PIC PIC
-Now each time we fire the request we often see that , the application validates the data before processing the request, and this is done by @Valid attribute .
+
+  Now each time we fire the request we often see that , the application validates the data before processing the request, and this is done by @Valid attribute .
 
   PIC PIC PIC
-As you can see above that we do not want specific variable not to be null or we want specific variable to be between certain numbers, and for these have added annotation such as @NotNull @Min and @Max .
+
+  As you can see above that we do not want specific variable not to be null or we want specific variable to be between certain numbers, and for these have added annotation such as @NotNull @Min and @Max .
 These are called Validators and depending on the application requirement we can also introduce our custom validators.
 
   PIC PIC PIC 
-   PIC PIC PIC
-   PIC PIC PIC
-Now each request we fire to the /validate endpoint when the data is anything other than the string &quot;Correct Data&quot; its going throw an Error stating that &quot;Wrong data sent&quot;.</p>
+  
+  PIC PIC PIC
+   
+  PIC PIC PIC
+
+  Now each request we fire to the /validate endpoint when the data is anything other than the string &quot;Correct Data&quot; its going throw an Error stating that &quot;Wrong data sent&quot;.</p>
 <h2 id="converting-to-code-execution">Converting To Code Execution:</h2>
 <p>If you pay attention to the above code you can see that the Message that gets displayed is partially Controlled by the attacker.
 What ever the String passed to the data variable is gets added to the message .
