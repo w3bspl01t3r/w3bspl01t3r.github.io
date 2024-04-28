@@ -60,6 +60,41 @@ The full call stack looks like below.</p>
     <h2 id="case-studies">Case Studies:</h2>
 <p>DropWizard Remote Code Execution Analysis(CVE-2020–5245 and CVE-2020–11002)</p>
 
+
+<p>CVE-2020-5245</p>
+<p>Lets Take a look into the advisory.</p>
+<p>Remote Code Execution (RCE) vulnerability in dropwizard-validation <2.0.3</p>
+<p>The advisory says the key culprit was the @SelfValidation and the @SelfValidating annotation.</p>
+<p>So lets build our own sample app and implement those and see how code flow occurs from these annotations using debugger and see how can we exploit it.
+</p>
+<p>We can find the Sample project used at</p>
+<p>https://github.com/w3bspl01t3r/VulnerableApps1DayAnalysis</p>
+<p>If you are not familiar with DropWizard then before moving forward its good to get familiar, as we will not be discussing on how to create and run the project.
+</p>
+<p>So we have 2 classes</p>
+<p><ul><li>Controller</li>
+<li>Pojo Class</li></ul></p>
+<p>The pojo class is a self validating class and have a selfValidation method called Validate.</p>
+<p><img src="images/BeanValidation/image11.webp"></p>
+<p><img src="images/BeanValidation/image12.webp"></p>
+<p>The validate method checks if the name is not equals it raises a violation with user value getting concatenated to the Message.</p>
+<p>Setting up the debugger and firing the /test endpoint we see the code first stops at col.addViolation as we have added the breakpoints there.
+</p>
+<p><img src=images/BeanValidation/image13.webp""></p>
+<p>And then the code flows to violationCollector.addViolation().</p>
+<p><img src="images/BeanValidation/image14.webp"></p>
+<p><img src="images/BeanValidation/image15.webp"></p>
+<p>
+  As you can see in the above code the code indeed flows to the</p>
+<p>this.context.buildConstraintViolationWithTemplate(msg).addConstraintViolation();</p>
+<p>which is our target sink function, thus if we provide the correct EL Expression , that expression will get evaluated and we will have a Remote Code Execution.</p>
+<p>We used the payload mentioned above and we can clearly see that we got a call back yo our listener thus confirming the code execution.</p>
+<p><img src="images/BeanValidation/image16.webp"></p>
+<p>Will take a look into CVE-2020-11002 on the next blog.</p>
+
+
+
+
 <p>Thats it for Today.</p>
 <p>Thanks For Reading.</p>
 <p>Happy Hacking.</p>
