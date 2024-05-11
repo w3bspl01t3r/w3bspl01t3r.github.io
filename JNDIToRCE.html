@@ -1,267 +1,287 @@
-<h2 style="text-align: left;">&nbsp;JNDI Injection To Remote Code Execution.</h2>
-<p>
-    <br />
-</p>
-<p>In this blog post we will talk about&nbsp;</p>
-<p></p>
-<ul style="text-align: left;">
-    <li>What is JNDI Injection</li>
-    <li>How does the vulnerable Code Looks like</li>
-    <li>How to exploit&nbsp; it</li>
-    <ul>
-        <li>Before JAVA 8u121</li>
-        <li>After Java 8u121</li>
-        <ul>
-            <li>Using Known Gadgets</li>
+
+---
+layout: default
+---
+<html>
+    <body>
+        <h2 style="text-align: left;">&nbsp;JNDI Injection To Remote Code Execution.</h2>
+        <p>
+            <br />
+        </p>
+        <p>In this blog post we will talk about&nbsp;</p>
+        <p></p>
+        <ul style="text-align: left;">
+            <li>What is JNDI Injection</li>
+            <li>How does the vulnerable Code Looks like</li>
+            <li>How to exploit&nbsp; it</li>
             <ul>
-                <li>Using Tomcat gadget</li>
-                <li>Using other gadgets present on ysoserial</li>
+                <li>Before JAVA 8u121</li>
+                <li>After Java 8u121</li>
+                <ul>
+                    <li>Using Known Gadgets</li>
+                    <ul>
+                        <li>Using Tomcat gadget</li>
+                        <li>Using other gadgets present on ysoserial</li>
+                    </ul>
+                </ul>
             </ul>
+            <li>How to fix it</li>
         </ul>
-    </ul>
-    <li>How to fix it</li>
-</ul>
-<h3 style="text-align: left;">What is JNDI Injection:</h3>
-<div>JNDI stands for Java Naming Directory.</div>
-<div>This is used on Java apps for various purposes which most of time includes to either search for something on ldap or the Corporate Active Directory.</div>
-<div>
-    <br />
-</div>
-<div>So lets say you have an application where you want the user ti be able to login with the corporate AD Creds.</div>
-<div>
-    <br />
-</div>
-<div>So to achieve this you have to integrate your enterprise JAVA application with your Corporate Active Directory or you can set it up with an LDAP server either used by the same Active direcotory or some other ldap server that you controll which have the
-    user identity with it.</div>
-<div>
-    <br />
-</div>
-<div>Now to achieve this you have to use the Java Naming Directory Libraries or the below list of packages</div>
-<div>
-    <ul style="text-align: left;">
-        <li>import javax.naming.InitialContext;</li>
-        <li>import javax.naming.Context;</li>
-        <li>import javax.naming.NamingEnumeration;</li>
-        <li>import javax.naming.NamingException;</li>
-        <li>import javax.naming.directory.*;</li>
-    </ul>
-    <h3 style="text-align: left;">How Does the Vulnerable Code Looks Like:</h3></div>
-<div>Before looking at the vulnerable code , lets look at how the actual use case code looks like.</div>
-<div>Now there 2 things primarily gets done by the JNDI.</div>
-<div>
-    <ul style="text-align: left;">
-        <li>Search for the entity</li>
-        <li>Look Up&nbsp;</li>
-    </ul>
-    <div>So on the first instance where you want to check if the user exist on the Ldap server or not, you will perform a search operation.</div>
-</div>
-<div>
-    <br />
-</div>
-<p><img src="images/jndiInjection/jndisearch.png"></p>
-<div>Similarly, lets say you have an application which takes and ldap server configuration , there the operation that primarily going to happen is a Ldap LoopUp.</div>
-<div>
-    <br />
-</div>
-<div>But why an application will take ldap server as input?</div>
-<div>
-    <br />
-</div>
-<div>Well there many reasons but lets take the below scenario into account .</div>
-<div>
-    <br />
-</div>
-<div>Lets say you have an application which allows you to use your ldap server for authentication,</div>
-<div>Now in order to do that the application first needs to take the ldap servicer configuration and perform a look up and once the lookup is successful then the rest of the process continures.</div>
-<div>
-    <br />
-</div>
-<div>Below is the sample code for the ldap lookup(or we can say a JNDI lookup)</div>
-<div>
-    <p><img src="images/jndiInjection/jndilookup.png"></p>
-<div>Now both the above code is vulnerable to JNDI Injection.</div>
-<h4 style="text-align: left;">For lookup():</h4>
-<div>if we can control the input for the ctx.lookup() then we can acieve JNDI injection and eventually a Remote Code Execution/</div>
-<h4 style="text-align: left;">For Search():</h4>
-<div>If we control the input for the search we can do nothing.</div>
-<div>But if you see the above , you will notice that on the ctx.search() we are sending an object of the searchControll class.</div>
-<div>
-    <br />
-</div>
-<div>This class has an attribute called setReturningObjectFlag().</div>
-<div>
-    <br />
-</div>
-<div>The setReturningObjFlag method of the SearchControls class in Java's JNDI API controls whether or not the search results include the objects bound to the names found in the directory. When using the javax.naming.directory package to perform searches in
-    a directory, you can configure SearchControls to dictate how the search should be conducted. This includes the scope of the search, which attributes to return, and whether the actual objects associated with the directory entries should be returned.</div>
-<div>
-    <br />
-</div>
-<div>So if this flag's value is set to True and the LDAP server returns a serialized Object then the JNDI api is going to deserialize the object resulting in potential remote code execution</div>
-<div>
-    <br />
-</div>
-<h3 style="text-align: left;">Exploitation:</h3>
-<div>The exploitation for both the sitatuion is same.</div>
-<div>
-    <br />
-</div>
-<div>To exploit this vulnerability we have to host a ldap server which can return a malicious Object which upon deserlisation can get us a code exuection.</div>
-<div>
-    <br />
-</div>
-<div>Now The exploitation differs slightly from JDK version to version:</div>
-<div>
-    <br />
-</div>
-<h4 style="text-align: left;">On JDK &lt;=8u121:</h4>
-<div>On JDK &lt;=8u121 the we can send serialized data in such a way that the JNDI loads a class from a remote server and if that class contains malicious code , then th.at code gets executed.</div>
-<div>
-    <br />
-</div>
-<div>This happens due to the fact that on JDK code before the specified version at</div>
-<div>
-    <br />
-</div>
-<div>com/sun/jndi/ldap/VersionHelper.java#55 sets the value of the&nbsp;com.sun.jndi.ldap.object.trustURLCodebase property to True and in later version this value has been made to False.</div>
-<div>
-    <br />
-</div>
-<div>Hence on JDK &lt;=8u121 you can directly load a remote class over LDAP or RMI</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <h4>On JDK &gt;=8u121:</h4></div>
-<div>
-    <br />
-</div>
-<div>Since on these version the value of the com.sun.jndi.ldap.object.trustURLCodebase property is set to false you can not load a malicious class from a remote server and achieve RCE.</div>
-<div>
-    <br />
-</div>
-<div>But to test if the vulnerability exist or not you can still get DNS pings backs.</div>
-<div>
-    <br />
-</div>
-<div>In order to get a Full RCE on these version you have to use the gadgets present on the Class Path.</div>
-<div>
-    <br />
-</div>
-<br />
-<br />
-<div>To Understand it better lets use a vulnerable application, set up our own malicious ldap server and try to exploit the vulnerability.</div>
-<div>
-    <br />
-</div>
-</div>
+        <h3 style="text-align: left;">What is JNDI Injection:</h3>
+        <div>JNDI stands for Java Naming Directory.</div>
+        <div>This is used on Java apps for various purposes which most of time includes to either search for something on ldap or the Corporate Active Directory.</div>
+        <div>
+            <br />
+        </div>
+        <div>So lets say you have an application where you want the user ti be able to login with the corporate AD Creds.</div>
+        <div>
+            <br />
+        </div>
+        <div>So to achieve this you have to integrate your enterprise JAVA application with your Corporate Active Directory or you can set it up with an LDAP server either used by the same Active direcotory or some other ldap server that you controll which have the
+            user identity with it.</div>
+        <div>
+            <br />
+        </div>
+        <div>Now to achieve this you have to use the Java Naming Directory Libraries or the below list of packages</div>
+        <div>
+            <ul style="text-align: left;">
+                <li>import javax.naming.InitialContext;</li>
+                <li>import javax.naming.Context;</li>
+                <li>import javax.naming.NamingEnumeration;</li>
+                <li>import javax.naming.NamingException;</li>
+                <li>import javax.naming.directory.*;</li>
+            </ul>
+            <h3 style="text-align: left;">How Does the Vulnerable Code Looks Like:</h3></div>
+        <div>Before looking at the vulnerable code , lets look at how the actual use case code looks like.</div>
+        <div>Now there 2 things primarily gets done by the JNDI.</div>
+        <div>
+            <ul style="text-align: left;">
+                <li>Search for the entity</li>
+                <li>Look Up&nbsp;</li>
+            </ul>
+            <div>So on the first instance where you want to check if the user exist on the Ldap server or not, you will perform a search operation.</div>
+        </div>
+        <div>
+            <br />
+        </div>
+        <p><img src="images/jndiInjection/jndisearch.png"></p>
+        <div>Similarly, lets say you have an application which takes and ldap server configuration , there the operation that primarily going to happen is a Ldap LoopUp.</div>
+        <div>
+            <br />
+        </div>
+        <div>But why an application will take ldap server as input?</div>
+        <div>
+            <br />
+        </div>
+        <div>Well there many reasons but lets take the below scenario into account .</div>
+        <div>
+            <br />
+        </div>
+        <div>Lets say you have an application which allows you to use your ldap server for authentication,</div>
+        <div>Now in order to do that the application first needs to take the ldap servicer configuration and perform a look up and once the lookup is successful then the rest of the process continures.</div>
+        <div>
+            <br />
+        </div>
+        <div>Below is the sample code for the ldap lookup(or we can say a JNDI lookup)</div>
+        <div>
+            <p><img src="images/jndiInjection/jndilookup.png"></p>
+        <div>Now both the above code is vulnerable to JNDI Injection.</div>
+        <h4 style="text-align: left;">For lookup():</h4>
+        <div>if we can control the input for the ctx.lookup() then we can acieve JNDI injection and eventually a Remote Code Execution/</div>
+        <h4 style="text-align: left;">For Search():</h4>
+        <div>If we control the input for the search we can do nothing.</div>
+        <div>But if you see the above , you will notice that on the ctx.search() we are sending an object of the searchControll class.</div>
+        <div>
+            <br />
+        </div>
+        <div>This class has an attribute called setReturningObjectFlag().</div>
+        <div>
+            <br />
+        </div>
+        <div>The setReturningObjFlag method of the SearchControls class in Java's JNDI API controls whether or not the search results include the objects bound to the names found in the directory. When using the javax.naming.directory package to perform searches in
+            a directory, you can configure SearchControls to dictate how the search should be conducted. This includes the scope of the search, which attributes to return, and whether the actual objects associated with the directory entries should be returned.</div>
+        <div>
+            <br />
+        </div>
+        <div>So if this flag's value is set to True and the LDAP server returns a serialized Object then the JNDI api is going to deserialize the object resulting in potential remote code execution</div>
+        <div>
+            <br />
+        </div>
+        <h3 style="text-align: left;">Exploitation:</h3>
+        <div>The exploitation for both the sitatuion is same.</div>
+        <div>
+            <br />
+        </div>
+        <div>To exploit this vulnerability we have to host a ldap server which can return a malicious Object which upon deserlisation can get us a code exuection.</div>
+        <div>
+            <br />
+        </div>
+        <div>Now The exploitation differs slightly from JDK version to version:</div>
+        <div>
+            <br />
+        </div>
+        <h4 style="text-align: left;">On JDK &lt;=8u121:</h4>
+        <div>On JDK &lt;=8u121 the we can send serialized data in such a way that the JNDI loads a class from a remote server and if that class contains malicious code , then th.at code gets executed.</div>
+        <div>
+            <br />
+        </div>
+        <div>This happens due to the fact that on JDK code before the specified version at</div>
+        <div>
+            <br />
+        </div>
+        <div>com/sun/jndi/ldap/VersionHelper.java#55 sets the value of the&nbsp;com.sun.jndi.ldap.object.trustURLCodebase property to True and in later version this value has been made to False.</div>
+        <div>
+            <br />
+        </div>
+        <div>Hence on JDK &lt;=8u121 you can directly load a remote class over LDAP or RMI</div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <h4>On JDK &gt;=8u121:</h4></div>
+        <div>
+            <br />
+        </div>
+        <div>Since on these version the value of the com.sun.jndi.ldap.object.trustURLCodebase property is set to false you can not load a malicious class from a remote server and achieve RCE.</div>
+        <div>
+            <br />
+        </div>
+        <div>But to test if the vulnerability exist or not you can still get DNS pings backs.</div>
+        <div>
+            <br />
+        </div>
+        <div>In order to get a Full RCE on these version you have to use the gadgets present on the Class Path.</div>
+        <div>
+            <br />
+        </div>
+        <br />
+        <br />
+        <div>To Understand it better lets use a vulnerable application, set up our own malicious ldap server and try to exploit the vulnerability.</div>
+        <div>
+            <br />
+        </div>
+        </div>
+        
+        <div>You can get the VulnerableApplication from&nbsp;</div>
+        <div>
+            <br />
+        </div>
+        <div>https://github.com/w3bspl01t3r/VulnerableApps</div>
+        <div>
+        <P>we will first exploit it on JDK 8u121</P>
+        <p>
+            you can first compile the app with JDK 8u121 by downloading the jdk8u121 from Oracle site and putting it in the class path.
+        </p>
+        <p>
+        
+            Now lets download the JNDI Exploit Kit from
+            <p>https://github.com/pimps/JNDI-Exploit-Kit/tree/master</p>
+        
+        </p>
+        <p>Lets Compile the JNDI Exploit Kit and start our malicious JNDI server</p>
+        <p>mvn clean package</p>
+        <p>java -jar JNDI-Exploit-Kit-1.0-SNAPSHOT-all.jar -C "touch /tmp/pwned.txt"</p>
+        <p>The above will generate some ldap and rmi urls, pick the right url and feed it to the app.</p>
+        <p>You will see the file /tmp/pwned.txt created</p>
+        <p><img src="images/jndiInjection/jndilookupExploit8u121.png"></p>
+        </div>
+        
+        <div><p>we will now exploit it on JDK version higher than 8u121</p>
+        
+            <p>Key point here is that we need to have to have a gadget on the class path to Get Full fledge RCE on JDK version
+                higher than 8u121+ and 8u191+
+            </p>
+            <p>
+                So we will take 2 cases 
+            </p>
+            <p>
+                <ul>
+                    <li>With 1 of the gadget Such as commonsCollections present on the class Path</li>
+                    <li>No gadget of ysoserial present but the app is deployed on tomcat</li>
+                </ul>
+            </p>
+            <br />
+            <br />
+            <p>Lets change the Ldap URL as follows</p>
+            <p><img src="images/jndiInjection/lookupExampleWIthCommonsCollections6.PNG"></p>
+            <p>Lets try the same above methods but this time we will compile the code by passing CommonsCollection3.2.1 on the class path
+         </p>
+         <p>javac -cp commons-collections-3.2.1.jar:. jntest.java</p>
+         <p>java -cp commons-collections-3.2.1.jar:. jntest</p>
+        
+         <p> you will see ,this time the operations on the ldap server is different.</p>
+         <p>instead of pointing to the remote class the ldap server has returned a serialised data which is for CommonsCollections6 gadget</p>
+         <P>and we have successfully exploited the vulnerablity</P>
+        </div>
+        <h3>Using Tomcat WebServer</h3>
+        <p> Now the way we exploit the vulnerablity in a tomcat server is by utilising a gadget present on the tomcat class Path</p>
+        <p>The gadget is tomcat version specific.THe last version i check where it was working was tomcat 8.0.75<NEEDS TO BE VERIFIED></p>
+        <p></p>
+        <h3>Why we need a gadget in higher version of JDK i.e after 8u121+ or 8u191+</h3>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <h3 style="text-align: left;">How to Fix:</h3>
+        <h4>For lookup():</h4>
+        <div>The vulnerability here lies on the Custom App written by the developer which passes the user controlled data to the initialContext.Lookup().</div>
+        <div>
+            <br />
+        </div>
+        <div>The url passed to the initialContext.Lookup() should not be user controlled,</div>
+        <div>
+            <br />
+        </div>
+        <h4 style="text-align: left;">For lookup():</h4>
+        <div>The default value of SearchControls.setReturningObjFlag () is set to False.</div>
+        <div>So unless the flag is explicitly set to True , the search() is not vulnerable and can be used as it is.</div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <div>
+            <br />
+        </div>
+        <p></p>
 
-<div>You can get the VulnerableApplication from&nbsp;</div>
-<div>
-    <br />
-</div>
-<div>https://github.com/w3bspl01t3r/VulnerableApps</div>
-<div>
-<P>we will first exploit it on JDK 8u121</P>
-<p>
-    you can first compile the app with JDK 8u121 by downloading the jdk8u121 from Oracle site and putting it in the class path.
-</p>
-<p>
 
-    Now lets download the JNDI Exploit Kit from
-    <p>https://github.com/pimps/JNDI-Exploit-Kit/tree/master</p>
 
-</p>
-<p>Lets Compile the JNDI Exploit Kit and start our malicious JNDI server</p>
-<p>mvn clean package</p>
-<p>java -jar JNDI-Exploit-Kit-1.0-SNAPSHOT-all.jar -C "touch /tmp/pwned.txt"</p>
-<p>The above will generate some ldap and rmi urls, pick the right url and feed it to the app.</p>
-<p>You will see the file /tmp/pwned.txt created</p>
-<p><img src="images/jndiInjection/jndilookupExploit8u121.png"></p>
-</div>
+        <p>Thats it for Today.</p>
+<p>Thanks For Reading.</p>
+<p>Happy Hacking.</p>
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
 
-<div><p>we will now exploit it on JDK version higher than 8u121</p>
 
-    <p>Key point here is that we need to have to have a gadget on the class path to Get Full fledge RCE on JDK version
-        higher than 8u121+ and 8u191+
-    </p>
-    <p>
-        So we will take 2 cases 
-    </p>
-    <p>
-        <ul>
-            <li>With 1 of the gadget Such as commonsCollections present on the class Path</li>
-            <li>No gadget of ysoserial present but the app is deployed on tomcat</li>
-        </ul>
-    </p>
-    <br />
-    <br />
-    <p>Lets change the Ldap URL as follows</p>
-    <p><img src="images/jndiInjection/lookupExampleWIthCommonsCollections6.PNG"></p>
-    <p>Lets try the same above methods but this time we will compile the code by passing CommonsCollection3.2.1 on the class path
- </p>
- <p>javac -cp commons-collections-3.2.1.jar:. jntest.java</p>
- <p>java -cp commons-collections-3.2.1.jar:. jntest</p>
 
- <p> you will see ,this time the operations on the ldap server is different.</p>
- <p>instead of pointing to the remote class the ldap server has returned a serialised data which is for CommonsCollections6 gadget</p>
- <P>and we have successfully exploited the vulnerablity</P>
-</div>
-<h3>Using Tomcat WebServer</h3>
-<p> Now the way we exploit the vulnerablity in a tomcat server is by utilising a gadget present on the tomcat class Path</p>
-<p>The gadget is tomcat version specific.THe last version i check where it was working was tomcat 8.0.75<NEEDS TO BE VERIFIED></p>
-<p></p>
-<h3>Why we need a gadget in higher version of JDK i.e after 8u121+ or 8u191+</h3>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<h3 style="text-align: left;">How to Fix:</h3>
-<h4>For lookup():</h4>
-<div>The vulnerability here lies on the Custom App written by the developer which passes the user controlled data to the initialContext.Lookup().</div>
-<div>
-    <br />
-</div>
-<div>The url passed to the initialContext.Lookup() should not be user controlled,</div>
-<div>
-    <br />
-</div>
-<h4 style="text-align: left;">For lookup():</h4>
-<div>The default value of SearchControls.setReturningObjFlag () is set to False.</div>
-<div>So unless the flag is explicitly set to True , the search() is not vulnerable and can be used as it is.</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<div>
-    <br />
-</div>
-<p></p>
+    </body>
+</html>
