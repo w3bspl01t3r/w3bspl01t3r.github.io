@@ -58,7 +58,7 @@
 <div>
     <br />
 </div>
-<p><img src="images/jndisearch.png"></p>
+<p><img src="images/jndiInjection/jndisearch.png"></p>
 <div>Similarly, lets say you have an application which takes and ldap server configuration , there the operation that primarily going to happen is a Ldap LoopUp.</div>
 <div>
     <br />
@@ -78,7 +78,7 @@
 </div>
 <div>Below is the sample code for the ldap lookup(or we can say a JNDI lookup)</div>
 <div>
-    <p><img src="images/jndilookup.png"></p>
+    <p><img src="images/jndiInjection/jndilookup.png"></p>
 <div>Now both the above code is vulnerable to JNDI Injection.</div>
 <h4 style="text-align: left;">For lookup():</h4>
 <div>if we can control the input for the ctx.lookup() then we can acieve JNDI injection and eventually a Remote Code Execution/</div>
@@ -180,7 +180,7 @@
 <p>java -jar JNDI-Exploit-Kit-1.0-SNAPSHOT-all.jar -C "touch /tmp/pwned.txt"</p>
 <p>The above will generate some ldap and rmi urls, pick the right url and feed it to the app.</p>
 <p>You will see the file /tmp/pwned.txt created</p>
-<p><img src="images/jndilookupExploit8u121.png"></p>
+<p><img src="images/jndiInjection/jndilookupExploit8u121.png"></p>
 </div>
 
 <div><p>we will now exploit it on JDK version higher than 8u121</p>
@@ -200,7 +200,7 @@
     <br />
     <br />
     <p>Lets change the Ldap URL as follows</p>
-    <p><img src="images/lookupExampleWIthCommonsCollections6.PNG"></p>
+    <p><img src="images/jndiInjection/lookupExampleWIthCommonsCollections6.PNG"></p>
     <p>Lets try the same above methods but this time we will compile the code by passing CommonsCollection3.2.1 on the class path
  </p>
  <p>javac -cp commons-collections-3.2.1.jar:. jntest.java</p>
