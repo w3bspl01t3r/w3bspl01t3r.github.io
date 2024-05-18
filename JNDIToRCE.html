@@ -58,7 +58,7 @@ layout: default
         <div>
             <br />
         </div>
-        <p><img src="images/jndiInjection/jndisearch.png"></p>
+        <p><img src="images/jndiInjection/jndisearch.PNG"></p>
         <div>Similarly, lets say you have an application which takes and ldap server configuration , there the operation that primarily going to happen is a Ldap Look Up.</div>
         <div>
             <br />
@@ -78,7 +78,7 @@ layout: default
         </div>
         <div>Below is the sample code for the ldap lookup(or we can say a JNDI lookup)</div>
         <div>
-            <p><img src="images/jndiInjection/jndilookup.png"></p>
+            <p><img src="images/jndiInjection/jndilookup.PNG"></p>
         <div>Now both the above code is vulnerable to JNDI Injection.</div>
         <h3 style="text-align: left;">Exploitation:</h3>
         <div>The exploitation for both the sitatuion is same.</div>
@@ -180,7 +180,7 @@ layout: default
         <p>java -jar JNDI-Exploit-Kit-1.0-SNAPSHOT-all.jar  -C "curl http://localhost:9001/ExploitWith8u121Success"</p>
         <p>The above will generate some ldap and rmi urls, pick the right url and feed it to the app.</p>
         <p>You will see that we got a http call back to our server as shown on the below image</p>
-        <p><img src="images/jndiInjection/jndilookupExploit8u121.png"></p>
+        <p><img src="images/jndiInjection/jndilookupExploit8u121.PNG"></p>
         </div>
         
         <div><p><i><b>we will now exploit it on JDK version higher than 8u121</b></i></p>
@@ -209,7 +209,7 @@ layout: default
          <p> you will see ,this time the operations on the ldap server is different.</p>
          <p>instead of pointing to the remote class the ldap server has returned a serialised data which is for CommonsCollections6 gadget</p>
          <P>and we have successfully exploited the vulnerablity</P>
-         <p><img src="images/jndiInjection/SuccessFulexploitWithGadget.png"></p>
+         <p><img src="images/jndiInjection/SuccessFulexploitWithGadget.PNG"></p>
         </div>
         <h3>Using Tomcat WebServer</h3>
         <p> Now the way we exploit the vulnerablity in a tomcat server is by utilising a gadget present on the tomcat class Path</p>
