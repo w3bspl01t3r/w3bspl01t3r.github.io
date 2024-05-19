@@ -237,12 +237,12 @@ layout: default
         <h3 style="text-align: left;">Root Cause Analysis:</h3>
         <h3 style="text-align: left;">Building your Own Malicious LDAP Server</h3>
         <i><b>Note:</b>In real life exploitation you may not find any of the ysoserial gadget working.
-        <br>At that time you need a custom gadget and should be able to integrate that gadget with your own malicous server or available tools.
+        <br>At that time you need to have  a custom gadget and should be able to integrate that gadget with your own malicous server or existing tools.
     <br>So learning how to build your own Malicious server can  help you with both the cases.</i>
         <div><p>The Ldap server can be built for 2 purpose</p>
         <ul><li>For remote class loading</li>
-        <li>For sending Seriliased Data that uses Gadgets present in the class path to Acived RCE</li></ul></div>
-        <div><h4>For sending Seriliased Data that uses Gadgets present in the class path to Acived RCE</h4></div>
+        <li>For sending serialized Data that uses Gadgets present in the class path to Acived RCE</li></ul></div>
+        <div><h4>For sending serialized Data that uses Gadgets present in the class path to Acived RCE</h4></div>
         <p>So lets breka the malicious ldap server into below steps</p>
         <p>We will be using <a href="https://mvnrepository.com/artifact/com.unboundid/unboundid-ldapsdk/7.0.0"> UnboundID LDAP SDK</a></p>
         <p>
@@ -262,7 +262,7 @@ layout: default
                             }
                         </pre> 
                 </code>
-                <li>Add entries that returns Serialised data for a particular search</li>
+                <li>Add entries that returns serialized data for a particular search</li>
                 <code>
                     <pre>
                         //Creating Malicous Entries TO send Serilised Data
@@ -326,7 +326,7 @@ layout: default
                     
                 </pre></code>
                 <div><p>
-                    <h3><i>Adding all up a sample malicious LDAP Server code Lokks like below</i></h3>
+                    <i>Adding all the above, a sample malicious LDAP Server code should look like below</i>
                 </p>
                 <p>
                     <code>
@@ -464,10 +464,10 @@ public class ldaptest {
 <p>
     we have added 4 new entires and removed the javaSerializedData attribute.
     <ol>
-        <li>objectClass=javaNamingReference</li>
-        <li>javaClassName=java.lang.String //could be any unknown</li>
-        <li>javaFactory",="testObject" //could be any unknown</li>
-        <li>javaCodebase"= "http://localhost:9004/"</li>
+        <li>objectClass="javaNamingReference"</li>
+        <li>javaClassName="java.lang.String" //could be any unknown</li>
+        <li>javaFactory="testObject" //could be any unknown</li>
+        <li>javaCodebase= "http://localhost:9004/"</li>
                             
     </ol>
 </p>
