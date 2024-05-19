@@ -476,7 +476,7 @@ public class ldaptest {
 <p>The testObject class should implement  javax.naming.spi.ObjectFactory and should override the getObjectInstance()</p>
 <p>The code you want to execute should be inside the default constructor.</p>
 
-<p>inshort the testObject.class code should look like below</p>
+<p>In short the testObject.class code should look like below</p>
 <p>
     <code>
         <pre>
@@ -509,25 +509,26 @@ public class testObject implements javax.naming.spi.ObjectFactory
 
 <h3 style="text-align: left;">Modifying Existing Tools</h3>
 <div>
-    <p>Although it is not difficult to build own malicious server , it is often easier to modify the exsting to full fill your exploitation Requirements </p>
+    <p>Although it is not difficult to build your own malicious server , it is often easier to modify the exsting tools to  fullfill your exploitation Requirements. </p>
 </div>
 <div><p>So lets analyse how to modify some existing tools such as <a href="https://github.com/veracode-research/rogue-jndi">Rogue JNDI server From Veracode</a></p></div>
-<p>Lets take WebSphere1.java to understand how to build our own Ldaper Mapper where we can add our gadget</p>
+<p>Lets take WebSphere1.java to understand how to build our own LDAP Mapper where we can add our own gadget</p>
 <div>
     If you see there few thing on the webSphere1.java
     <ol>
-        <li>An Custom Annotation @LdapMapping</li>
-        This attribute takes the url which is like the attribute the vulnrable application is either going to lookup() or search() for.
-        <li>The Class implements LDAPCOntroller and the sendReuslt Function takes InMemoryInterceptedSearchResult as input</li>
-        This result is then used to send the response back the user
-        <li>In side the sendResult() we see 2 key things
+        <li>A Custom Annotation @LdapMapping</li>
+        This attribute takes the url, which is like the input the vulnerable application is either going to lookup() or search() for.
+        <li>The Class implements LDAPController and the sendReuslt Function takes InMemoryInterceptedSearchResult as input</li>
+        This result is then used to send the response back to the user
+        <li>Inside the sendResult() we see 2 key things
             <ul>
                 <li><code><pre>e.addAttribute("javaClassName", "java.lang.String");</pre></code></li>
                 <li><code><pre>e.addAttribute("javaSerializedData", serialize(ref));</pre></code></li>
             </ul>
         </li>
-        The rest are the gadget used(WebSphere1 gadget).
-        javaSerializedData is being used to send the serialize ref which === Sending the serialized gadget data
+        <p>The rest are the gadget used(WebSphere1 gadget).</p>
+        <p>javaSerializedData is being used to send the serialize ref which === Sending the serialized gadget data.</p>
+        
     </ol>
 </div>
 <p>
