@@ -2,8 +2,18 @@
 layout: default
 ---
 <html>
+    <head>
+        <style type="text/css">
+            .tg  {border-collapse:collapse;border-spacing:0;}
+            .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+              overflow:hidden;padding:10px 5px;word-break:normal;}
+            .tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+              font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+            .tg .tg-0lax{text-align:left;vertical-align:top}
+            </style>
+    </head>
     <body>
-        <h2>JNDI Injection To Remote Code Execution.</h2>
+        <h1>JNDI Injection To Remote Code Execution.</h1>
         <p>
             <br />
         </p>
@@ -21,6 +31,12 @@ layout: default
             <li>Root Cause Analysis</li>
             <li>Building your Own Malicious LDAP Server</li>
             <li>Modifying Existing Tools</li>
+                <li>Beyond Java 8</li>
+                <ul>
+                    <li>Effectivness of Exploit on JDK Versions</li>
+                    <li>Restrictions from JDK 20 To 22</li>
+                </ul>
+            </li>
         </ul>
         <h3 style="text-align: left;">What is JNDI Injection:</h3>
         <div>JNDI stands for Java Naming Directory.</div>
@@ -214,13 +230,41 @@ layout: default
         </div>
         <h3>Using Tomcat WebServer</h3>
         <p> Now the way we exploit the vulnerablity in a tomcat server is by utilising a gadget present on the tomcat class Path</p>
-        <p>The gadget is tomcat version specific.THe last version i check where it was working was tomcat 8.0.75<NEEDS TO BE VERIFIED></p>
+        <p>The gadget is tomcat version specific.THe last version i check where it was working was tomcat 8.5.75</p>
+        <p>To understand what this gadget is, lets take a look into the Malicous LDap Code(we will see how to build you own later in this blog post)
+            <p>The gadget uses the org.apache.naming.factory.BeanFactory class along with javax.el.ELProcessor to send our malicous payload i.e 
+                <code><pre>String payload = ("{" +
+                    "\"\".getClass().forName(\"javax.script.ScriptEngineManager\")" +
+                    ".newInstance().getEngineByName(\"JavaScript\")" +
+                    ".eval(\"java.lang.Runtime.getRuntime().exec(${command})\")" +
+                    "}")
+                    .replace("${command}", makeJavaScriptString(Config.command));</pre></code>
+                    <p>Now why does this particular class is used is out side the scope of this blog </p>
+                    <p>Checkout <a href="https://www.veracode.com/blog/research/exploiting-jndi-injections-java">Exploiting JNDI Injection In Java Veracode</a> To learn about it.</p>
+            </i></p>
+        <p>So If the tomcat server uses the tomcat server with the below version then the above gadget can be used to get code execution</p>
+        <p>
+            <code>
+                <pre>
+                    8.5.x for 8.5.79 onwards
+                    9.0.x for 9.0.63 onwards
+                    10.0.x for 10.0.21 onwards
+                    10.1.x for 10.1.0-M14 onwards
+                </pre>
+            </code>
+        </p>
+        <p>So lets change our code to use the tomcat gadget</p>
+
+        <video width="900" controls><source src="videos/jnditomcatrce.mp4" type="video/mp4"></video>
         <div>
             <br />
         </div>
         <div>
             <br />
         </div>
+        
+
+
         <h3 style="text-align: left;">Mitigation:</h3>
         <h4>For lookup():</h4>
         <div>The vulnerability here lies on the Custom App written by the developer which passes the user controlled data to the initialContext.Lookup().</div>
@@ -576,11 +620,66 @@ public class testObject implements javax.naming.spi.ObjectFactory
 <p>Now you can see that our custom mapper is ready to exploit.</p>
 <p><img src="images/jndiInjection/CustomRogueJNDICode.PNG"></p>
 
+<h2 style="text-align: left;">Bonus</h3>
+<h3 style="text-align: left;">Beyond Java 8:</h3>
+        <p>So currently there are JDK versions till 21.</p>
+        <p>The above discussed Techniques differs from JDK versions to versions</p>
+        <p>Checkout the table below.</p>
+        <table class="tg"><thead>
+            <tr>
+              <th class="tg-0lax">Exploit Technique</th>
+              <th class="tg-0lax">JDK Version Range</th>
+              <th class="tg-0lax">Impact</th>
+            </tr></thead>
+          <tbody>
+            <tr>
+              <td class="tg-0lax">Remote Class Loading</td>
+              <td class="tg-0lax">JDK <8u121</td>
+              <td class="tg-0lax">works</td>
+            </tr>
+            <tr>
+              <td class="tg-0lax">Using Third party Gadgets</td>
+              <td class="tg-0lax">JDK <=19 </td>
+              <td class="tg-0lax">works</td>
+            </tr>
+            <tr>
+                <td class="tg-0lax">Tomcat Gadget</td>
+                <td class="tg-0lax">JDK <=14 </td>
+                <td class="tg-0lax">works</td>
+              </tr>
+          </tbody>
+          </table>
+<div>
+    <p>
+        But what about JDK 14 to 19 , why tomcat gadget will not work there?
+    </p>
+</div>
+<div>
+    <h3>Restrictions from JDK 20 To 22</h3>
+    <p>on JDK above 19 i.e from JDK version 20 Onwards we can not even use the Thrid Party Gadgets(Such as gadgets available on ysoserial) because the Deserialisation from Java naming apis are blocked by default.</p>
+    <p>Let's take a look into the below code to understand why</p>
+    <p>If you try to exploit on JDK above 19 you will see the below stack trace</p>
+    <p>
+        <img src="images/jndiInjection/jdkabove19.PNG">
+    </p>
+    <p>Lets examine the code from Obj.java</p>
+    <p>Backtracking the code we see the Code have a if else condition which checks for if serialData is allowed</p>
+    <p><img src="images/jndiInjection/objjava.PNG"></p>
+    <p>Lets check the VersionHelper.java</p>
+    <p><img src="images/jndiInjection/isserallowed.PNG"></p>
+    <p><img src="images/jndiInjection/defaultserial.PNG"></p>
+    <p>As you can see above,  the default value of the trustSerialData is set to false which is responsible for allowing the JDK to deserilize the data</p>
+    <p>So unless the target application is not explicitly setting the value of this system property to True , the exploitation is not possible.</p>
+    <p>So if the target app is using JDK version higher than 19, its a good idea to check if this property being explicitly set somewhere</p>
 
-
+    <p>Similary even if the application is using JDK version less than 19 you may not be able to exploit it if the application is explicitly setting this value to false.</p>
+</div>
+<div>
+    <p></p>
+</div>
 <br>
 <br>
-<p><b>Thats it For Today.</b></p>
+<p><b>Thats it For this Blog.</b></p>
 <p><b>Thanks For Reading.</b></p>
 <p><b>Happy Hacking.</b></p>
 <p><b>You can connect with me at:</b></p>
