@@ -279,6 +279,97 @@ layout: default
         <div>The default value of SearchControls.setReturningObjFlag () is set to False.</div>
         <div>So unless the flag is explicitly set to True , the search() is not vulnerable and can be used as it is.</div>
         <h3 style="text-align: left;">Root Cause Analysis:</h3>
+        <p>So to analyse the Root cause the best way is to use a debugger and an ide</p>
+        <p>So after debugging the entire flow with vulnerable exploitation we found the follwoing code flow.</p>
+       
+       <h3>For Remote Class Loading</h3>
+       <p>
+        <code>
+            <pre>
+    org.struts2Test.jndiTestAction.execute
+        javax.naming.InitialContext.lookup(409)
+            com.sun.jndi.url.ldap.ldapURLContext.lookup(ldapURLContext.java:94)
+                com.sun.jndi.toolkit.url.GenericURLContext.lookup(GenericURLContext.java:220)
+                    com.sun.jndi.toolkit.ctx.PartialCompositeContext.lookup(PartialCompositeContext.java:177)
+                        com.sun.jndi.toolkit.ctx.ComponentContext.p_lookup(ComponentContext.java:542)
+                            com.sun.jndi.ldap.LdapCtx.c_lookup(LdapCtx.java:1115)
+                                com.sun.naming.internal.getDirObjectInstance(NamingManagerHelper.java:105)
+                                    com.sun.naming.internal.getObjectFactoryFromReference(NamingManagerHelper.java:206)
+                                        com.sun.naming.internal.VersionHelper.loadclass(VersionHelper.java:110)
+
+            </pre>
+        </code>
+    </p>
+       <h3>For exploit using 3rd party gadgets</h3>
+        <p>
+            <code>
+                <pre>
+    org.struts2Test.jndiTestAction.execute
+        javax.naming.InitialContext.lookup(409)
+            com.sun.jndi.url.ldap.ldapURLContext.lookup(ldapURLContext.java:94)
+                com.sun.jndi.toolkit.url.GenericURLContext.lookup(GenericURLContext.java:220)
+                    com.sun.jndi.toolkit.ctx.PartialCompositeContext.lookup(PartialCompositeContext.java:177)
+                        com.sun.jndi.toolkit.ctx.ComponentContext.p_lookup(ComponentContext.java:542)
+                            com.sun.jndi.ldap.LdapCtx.c_lookup(LdapCtx.java:1081)
+                                com.sun.jndi.ldap.Obj.decodeObject(Obj.java:240)
+                                    com.sun.jndi.ldap.Obj.deserializeObject(Obj.java:532)
+                                        com.sun.jndi.ldap.Obj.deserializeObject(Obj.java:532)
+
+                                    
+                </pre>
+            </code>
+        </p>
+        <div>
+            Now lets answer few of our questions via this code flow.
+            <ol>
+                <li>Why above JDK 8u121 the Remote Class loading is not possible</li>
+                <li>How does the third party gadget exploits are working and till which versions of JDK and why</li>
+            </ol>
+            <p>So to answer the first question we have to anayluse the first flow.</p>
+            
+            <p>The code flow changes from the LdapCtx.java as shown Above.</p>
+            <p>If you check the last sink fucntion you will see there is conditional check if we can TRUST_URL_CODE_BASE</p>
+            <p><img src="images/jndiInjection/trusturlcodebasecheck.PNG"></p>
+            <p>tracing the variable back</p>
+            <p><img src="images/jndiInjection/trusturlcodebasedefaultvalue.PNG"></p>
+            <p>As you can see the default value is set to false and if the value is set to false , the condition is failed and we can not trust the Code base and from the loadclass() returns null</p>
+            <p>Hence we can not exploit this vulnerability on JDK higher than 8u121 as till 8u121 the value of the com.sun.jndi.ldap.object.trustURLCodebase was true by default.</p>
+            <p> So if the target application is using JDK higher than 8u121 but explicitly setting this property to true then we can still load the remote class and achieve RCE Via this way.</p>
+            
+            <p>Lets answer the 2nd question now</p>
+            <p>Now if you analyse the 2nd flow's 2nd last sink function() i.e decodeObject() Obj.java(227), you will see the function is calling deserializeObject() with a classLoader and some attributes.</p>
+            <p><img src="images/jndiInjection/decodeObjectCallingDesr.PNG"></p>
+            <p>These attributes are the attribute that we will be sending from our Ldap server and the get() just makes sure that only the value is being passed to the function</p>
+            <p>Now deserializeObject() eventually passes this byte array to ObjectInputStream or LoaderInputStream(which any way sends it back to ObjectInputStream using inheritance) and calls the readObject() on it.</p>
+            <p><img src="images/jndiInjection/readObjectCall.PNG"></p>
+            <p>As you are well aware this is a classic java Deserialisation attack scenario</p>
+            <p>Hence we are able to send serialised gadget chain of the 3rd party libraries and achieve RCE Via this.</p>
+
+            <p>Then why this is not working after JDK 19.</p>
+            <p>Play close attention to decodeObject() line 236</p>
+            <p><img src="images/jndiInjection/desrcheck.PNG"></p>
+            <p>As you can see it checks if isSerialData is allowed</p>
+            <p>Examining the function at VersionHelper and backtracking as we did above for the Remote Class loading we see the below</p>
+            <p>
+                <img src="images/jndiInjection/isserallowed.PNG">
+            </p>
+            <p><img src="images/jndiInjection/defaultserial.PNG"></p>
+            <p>So since the default value of com.sun.jndi.ldap.object.trustSerialData is set to false and based on this Value the check at decodeObject() either moves to deserializeObject() or throws an error, we are not able to exploit this on JDK above 19.</p>
+            <p>So if the application is explicitly setting this property value to be True then we can again exploit it even on JDK 22 which is the latest JDK Released at the time of writing.</p>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
         <h3 style="text-align: left;">Building your Own Malicious LDAP Server</h3>
         <i><b>Note:</b>In real life exploitation you may not find any of the ysoserial gadget working.
         <br>At that time you need to have  a custom gadget and should be able to integrate that gadget with your own malicous server or existing tools.
