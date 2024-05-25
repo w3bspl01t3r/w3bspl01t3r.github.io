@@ -744,6 +744,19 @@ public class testObject implements javax.naming.spi.ObjectFactory
     <p>
         But what about JDK 14 to 19 , why tomcat gadget will not work there?
     </p>
+    <p> To answer the above question lets take a close into the gadget</p>
+    <p>The gagdet uses the javax.el.ELProcessor.eval() to execute a expression language written on the payload variable.</p>
+    <p>This expression language uses ScripEngine which is not available after JDK 14 (nashorm script engine is absent).</p>
+    <p>And hence the expression language never succeeds to give us a shell</p>
+    <p>Chaning the expression language on the payload variable to below will give you code execution.</p>
+    <p>
+        <code>
+            <pre>
+                {''.getClass().forName('java.lang.ProcessBuilder').getDeclaredConstructors()[0].newInstance(['calc.exe']).start()}
+            </pre>
+        </code>
+    </p>
+    <p>The above code will pop a calculator.If you application is in a linux env you have change the binary accordingly.</p>
 </div>
 <div>
     <h3>Restrictions from JDK 20 To 22</h3>
