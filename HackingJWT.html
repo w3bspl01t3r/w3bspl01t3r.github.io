@@ -1,105 +1,669 @@
+---
+layout: default
+---
 <html>
     <body>
-        <p>This article is all about pentesting JWT. You can practice all of these techniques on vulnerable target availabe at burp Suite webacademy labs. I will try to make the article as easy as possible and will try to make you understand in very layman language.</span></span>
-        </p>
-        <p>What is JWT: JWT is a token mechanism which is actually designed as a means of checking authorization. Though in certain situation we will see this being used for authentication. A JWT looks like this. As you can see it has 3 parts. The red part is called</span></span>
-        </p>
-        <p>header the purple part is called body/payload and the 3rd part is signature. This entire string(apart from the last part)is base64 encoded which on decoding will result something like The key value pairs are called claims.ideally the header part must</span></span>
-        </p>
-        <p>have alg and typ claim. The body part can have any thing as claim. There are couple of standard claims but we can also add our custom claim both in header and body.(Almost all libraries let you do this). Here are some of the standard claims. Vulnerabilities:</span></span>
-        </p>
-        <p>Weak signing algo(none algorithm): The alg claim specifies the type of algorithm that is used to sign the token. There are 2 standard algorithms HS and RS But often the token claim has none algorithm. In simple meaning the token do not require any signature.That</span></span>
-        </p>
-        <p>means if we change the payload part there is no mechanism in place to stop us. So if the payload has claims like “role”:”user” we can simply change it become admin. Lets see a quick demo Will Publish Soon Vulnerable Code Pattern: The above is a vulnerable</span></span>
-        </p>
-        <p>code written in java And the below in python. Mitigation: Always use strong algorithms like HS256 or RS256 or may 512 version. Weak Secret: This vulnerability is specific to the HS256 algorithm.So if you see RS being used in alg claim you can skip this</span></span>
-        </p>
-        <p>test. HS256 is a symmetric key algorithm.Meaning the same key is used to both encrypt and decrypt.We call it secret. So while using this algorithm we should keep in mind that the secret need be long and strong enough.Else it can be either guessed or brute-forced.</span></span>
-        </p>
-        <p>Consider this token. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.dQknU80__AHPVDmZPFavWdML1XKrwPLeOXnCmoVY3AY The secret of the above token can be easily brute-forced with the jwt_tool</span></span>
-        </p>
-        <p>or even with hashcat. Mitigation: Always use long and strong secrets with HS256. Key Confusion Attack: This attack happens in case of RS256 algorithm. When the underlying library do not mandate the expected alg type while verifying the signature of the</span></span>
-        </p>
-        <p>token this kind of vulnerability may arise.The library , upon not specifying an expected alg type fall backs to default alg type Let’s say the application has issued a token with “alg”:”RS256". RS256 used private key to sign the token and the public key</span></span>
-        </p>
-        <p>to verify the token.So to successfully tamper the token the attacker needs to have the private key that is used to sign the token. Now let’s say the default alg type is HS256.Now if the developer do not specify an alg type explicitly the application will</span></span>
-        </p>
-        <p>use HS256 to verify the token. Considering HS256 uses the same key to sign and verify if the attacker is able to sign his malicious token with the public key , then the application will simply allow the access to the attacker. If the above is confusing</span></span>
-        </p>
-        <p>take look at the below pictures. Library that enforces to specify alg while verifying Libraries that do not enforce the alg type while verifying DEMO: Will Publish Soon Mitigation: Always explicitly set the alg type while verifying the token. Critical</span></span>
-        </p>
-        <p>vulnerabilities in JSON Web Token libraries TL;DR: If you are using node-jsonwebtoken, pyjwt, namshi/jose, php-jwt or jsjwt with asymmetric keys (RS256, RS384… auth0.com https://www.sourceclear.com/vulnerability-database/security/key-confusion-attacks/python/sid-4916</span></span>
-        </p>
-        <p>https://seclists.org/oss-sec/2021/q3/92 Exploiting KID Header: If we see the picture that bit above in the article the KID header is a key identifier.It helps to identify the right key/secret when we have a bunch of them.Its specially used with JWKS(will</span></span>
-        </p>
-        <p>discuss what is jwks and how to hack them). The below vulnerabilities are possible depending on the way its programmed to be used. SQL Injection Directory Traversal Command Execution If the KID header is used to fetch a key from the database then there</span></span>
-        </p>
-        <p>is chance of sql injection. If the sql queries are not handled properly. DEMO: Vulnerable Code: Mitigation: Sanitise the user input and use prepared statements and parameter bindings. Similarly if the key is stored in a file system we can either achieve</span></span>
-        </p>
-        <p>Directory Traversal or command execution. If the os level commands such as cat is used and the input from the header is not being sanitised then this can lead to RCE. DEMO: Vulnerable Code: Mitigation: Sanitise the user input and use code level libraries</span></span>
-        </p>
-        <p>to read the file contents. In other case if the input is not being passed to something like cat but even if the libraries are used to read the file content if the user input is not sanitised this can lead to directory traversal and hence we bypass the</span></span>
-        </p>
-        <p>AuthoriZation DEMO: Vulnerable Code: Mitigation: Sanitise the user input for directory traversal. The best way to deal with this is to keep the keys inside a vault and in the filesystem or in db. Exploiting JKU Header: The jku header is used to fetch</span></span>
-        </p>
-        <p>a jwks file and this file is used to select the correct public key or we can say the correct key identifier and its values that can be usd to build back the public key and verify the token. But what is jwks. The full form is obviously Json Web Keys 😅</span></span>
-        </p>
-        <p>but what this actually is a json file that contains a number for keys or some key value pairs using which we can build the key. Here is how a JWKS file looks like. As you can see we can use the n and e to build a rsa public key. If you are not familiar</span></span>
-        </p>
-        <p>with RSA public key and private key check out this article. https://sectigostore.com/blog/public-key-vs-private-key-how-do-they-work/ The main reason here for the issue is the application have to decode the token and use it in order to fetch the jwks</span></span>
-        </p>
-        <p>so that it can build the public key and verify the token. So if the application simply trusts the jku with out any validation then this can be abused. We can simply host our own JWKS file and point he jku to our server. Steps to exploit Create your public</span></span>
-        </p>
-        <p>and private key pair. openssl genrsa -out private.pem 2048 openssl rsa -in private.pem -outform PEM -pubout -out public.pem 2.Create your JWK You can either use python or this online tool JWK Creator Edit description russelldavies.github.io Make sure</span></span>
-        </p>
-        <p>you make your own jwk identical to the jwk used by the target application.Specially the KID part. 3.host he JWK 4.Change the payload part and sign it with your private key You can use the jwt.io or python as usual to sign the token. Note: if the above</span></span>
-        </p>
-        <p>technique doesn’t work try putting the jwk that you created inside an array shown below. { “keys”:[Content_OF_JWK] } DEMO: Vulnerable Code: Mitigation: Use a whilteList to check if the jku received from the token is in the allowed list or not.DONOT USE</span></span>
-        </p>
-        <p>STARTSWITH, INDEXOF OR ENDSWITH FUNCTION WHILE COMPARING WITH THE WHITE LIST.MATCH THE FULL JKU WITH THE ENTITY OF THE ALLOWED LIST. We will see later how even using the allowed list may be vulnerable and bypassed. Exploiting X5C Header: x5c header contains</span></span>
-        </p>
-        <p>the x509certificate/x509certificate chain that can be used to verify the token. Ideally the public key of the certificate is first gets extracted and then used to verify the token. This is how an x5c header looks like.But it can also have those — -BEGIN</span></span>
-        </p>
-        <p>CERTIFICATE — — and end certificate strings. Now if the application simply trusts the x5c that is there in the token without any validation then this can be abused. We can put our own certificate and modify the body as required and we can bypass the Authorization.</span></span>
-        </p>
-        <p>Steps To Exploit: Create x509 certificate and extract the public and private key out of them openssl req -x509 -nodes -days -newkey rsa:2048 -keyout attacker.key -out attacker.crt openssl x509 -pubkey -noout -in attacker.crt &gt; publicKey.pem 2.Tamper the</span></span>
-        </p>
-        <p>token and put your x509 certificate in place of x5c claim. 3.Modify the token and sign it with the private key. You can either use python3 or jwt.io for this. DEMO: Vulnerable Code: Mitigation: We should not validate the jwt like this in the first place.But</span></span>
-        </p>
-        <p>still if we want to then we should use x5u instead of x5c header.x5u is similar to jku .The only difference is the jku holds a JWK and an x5u holds a x5c link. Exploiting x5u Header: This header works exactly same as the jku.But its used to fetch a x5c</span></span>
-        </p>
-        <p>certificate from a web server that wil be used to create a pubic key out of them and verify the token. This is how a token with x5u looks like. The issue here is same as JKU. If the application simply trusts the x5u without any validation we can abuse</span></span>
-        </p>
-        <p>this. Steps to Exploit: Create a certificate and public, private rsa key pair openssl req -x509 -nodes -days -newkey rsa:2048 -keyout attacker.key -out attacker.crt openssl x509 -pubkey -noout -in attacker.crt &gt; publicKey.pem 2.Host the certificate 3.Tamper</span></span>
-        </p>
-        <p>the token and sign it with the private key You can either use the python3 or jwt.io to do this. DEMO: Vulnerable Code: Mitigation: Maintain a whitelist and perform a full match with the elements of the list and the url from token.DO NOT USE STARTSWITH,</span></span>
-        </p>
-        <p>INDEXOF OR ENDSWITH FUNCTION WHILE COMPARING WITH THE WHITE LIST.MATCH THE FULL JKU WITH THE ENTITY OF THE ALLOWED LIST. SOME OTHER IMP BUGS TO CHECK: Token having no expiration date. If a jwt token do not have any expiration claim set , tis can be vulnerable</span></span>
-        </p>
-        <p>to replay attack.Meaning if the token got captured once(MITM,Info Disclosure) then it can be used repeatedly. Consider the below code. This code uses HS256 alg and have quite a good secret.How ever this code will produce the token which will not have</span></span>
-        </p>
-        <p>any expiration date.To fix this we can use exp claim. As you can see in the above code the exp claim is set.Now this token wont work once the expiration is over. Obviously we need to check this thing while verifying. 2.Cross Service Relay Attack: Consider</span></span>
-        </p>
-        <p>a scenario where there are 3 components. Token Service, appliance Management and Life Cycle Management. It might happen that the LCM and applmgmt uses token service to issue and verify the jwt token. Now let’s say the LCM has a user called Robin and the</span></span>
-        </p>
-        <p>applmgmt allows user registration. If the Token service do not put due diligence and the necessary claim wile creating and verifying token it might happen that the attacker can create a user having same username as Robin in the applmgmt — → which will</span></span>
-        </p>
-        <p>give him a jwt token — — -&gt;and that jwt token when sent to LCM — →LCM will send this to the token service to verify and as the token service is misconfigured it may simply ended up giving access to Robin’s account to the attacker. This attack is called</span></span>
-        </p>
-        <p>cross service relay attack. Thanks For reading, Happy Hacking You can connect with me at linkedin:https://www.linkedin.com/in/swagatkumar/</span></span>
-        </p>
+        <p  id="a97d" >This article is all about&nbsp;
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">pentesting</mark>&nbsp;JWT. You can practice all of these techniques on vulnerable target availabe at burp Suite webacademy labs.</p>
     
-        <div>
-            <p></p>
+        <p  id="8d92" >I will try to make the article as easy as possible and will try to make you understand in very&nbsp;
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">layman</mark>&nbsp;language.</p>
+        <p  id="14d2" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;"><em class="nm" style="box-sizing: inherit;">What is JWT:</em></span></p>
+        <p 
+         id="3387" >JWT is a token mechanism which is actually designed as a means of checking authorization. Though in certain situation we will see this being used for authentication.</p>
+        <p 
+         id="fd23" >A JWT looks like this.</p>
+        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+            <div class="my mz nn" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 533px;">
+                <picture style="box-sizing: inherit;">
+                    <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 533px"
+                    srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*ftL8KefwQXcnEAt-tNnMUQ.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*ftL8KefwQXcnEAt-tNnMUQ.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*ftL8KefwQXcnEAt-tNnMUQ.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*ftL8KefwQXcnEAt-tNnMUQ.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*ftL8KefwQXcnEAt-tNnMUQ.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*ftL8KefwQXcnEAt-tNnMUQ.png 1100w, https://miro.medium.com/v2/resize:fit:1066/format:webp/1*ftL8KefwQXcnEAt-tNnMUQ.png 1066w"
+                    style="box-sizing: inherit;" type="image/webp"></source>
+                    <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 533px"
+                    srcset="https://miro.medium.com/v2/resize:fit:640/1*ftL8KefwQXcnEAt-tNnMUQ.png 640w, https://miro.medium.com/v2/resize:fit:720/1*ftL8KefwQXcnEAt-tNnMUQ.png 720w, https://miro.medium.com/v2/resize:fit:750/1*ftL8KefwQXcnEAt-tNnMUQ.png 750w, https://miro.medium.com/v2/resize:fit:786/1*ftL8KefwQXcnEAt-tNnMUQ.png 786w, https://miro.medium.com/v2/resize:fit:828/1*ftL8KefwQXcnEAt-tNnMUQ.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*ftL8KefwQXcnEAt-tNnMUQ.png 1100w, https://miro.medium.com/v2/resize:fit:1066/1*ftL8KefwQXcnEAt-tNnMUQ.png 1066w"
+                    style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="157" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:933/1*ftL8KefwQXcnEAt-tNnMUQ.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 533px;"
+                    width="533" /></picture>
+            </div>
+        </figure>
+        <p  id="78fe" >As you can see it has 3 parts. The red part is called header the purple part is called body/payload and the 3rd part is signature.</p>
+        <p 
+         id="9ce5" >This entire string(apart from the last part)is base64 encoded which on decoding will result something like</p>
+        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+            <div class="my mz no" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 296px;">
+                <picture style="box-sizing: inherit;">
+                    <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 296px"
+                    srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*Zar_OhFUu9HECQymWpheXg.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*Zar_OhFUu9HECQymWpheXg.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*Zar_OhFUu9HECQymWpheXg.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*Zar_OhFUu9HECQymWpheXg.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*Zar_OhFUu9HECQymWpheXg.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*Zar_OhFUu9HECQymWpheXg.png 1100w, https://miro.medium.com/v2/resize:fit:592/format:webp/1*Zar_OhFUu9HECQymWpheXg.png 592w"
+                    style="box-sizing: inherit;" type="image/webp"></source>
+                    <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 296px"
+                    srcset="https://miro.medium.com/v2/resize:fit:640/1*Zar_OhFUu9HECQymWpheXg.png 640w, https://miro.medium.com/v2/resize:fit:720/1*Zar_OhFUu9HECQymWpheXg.png 720w, https://miro.medium.com/v2/resize:fit:750/1*Zar_OhFUu9HECQymWpheXg.png 750w, https://miro.medium.com/v2/resize:fit:786/1*Zar_OhFUu9HECQymWpheXg.png 786w, https://miro.medium.com/v2/resize:fit:828/1*Zar_OhFUu9HECQymWpheXg.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*Zar_OhFUu9HECQymWpheXg.png 1100w, https://miro.medium.com/v2/resize:fit:592/1*Zar_OhFUu9HECQymWpheXg.png 592w"
+                    style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="349" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:518/1*Zar_OhFUu9HECQymWpheXg.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 296px;"
+                    width="296" /></picture>
+            </div>
+        </figure>
+        <p  id="123e" >The key value pairs are called claims.ideally the header part must have alg and typ claim.</p>
+        <p  id="5d4e" >The body part can have any thing as claim.</p>
+        <p  id="795f" >There are couple of standard claims but we can also add our custom claim both in header and body.(Almost all libraries let you do this).</p>
+        <p 
+         id="d4ca" >Here are some of the standard
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">&nbsp;claims.</mark>
+        </p>
+        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+            <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                <div class="my mz np" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1726px;">
+                    <picture style="box-sizing: inherit;">
+                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*UO6RN_EkM8wpdv9_yLRQ0g.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*UO6RN_EkM8wpdv9_yLRQ0g.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*UO6RN_EkM8wpdv9_yLRQ0g.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*UO6RN_EkM8wpdv9_yLRQ0g.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*UO6RN_EkM8wpdv9_yLRQ0g.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*UO6RN_EkM8wpdv9_yLRQ0g.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*UO6RN_EkM8wpdv9_yLRQ0g.png 1400w"
+                        style="box-sizing: inherit;" type="image/webp"></source>
+                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/1*UO6RN_EkM8wpdv9_yLRQ0g.png 640w, https://miro.medium.com/v2/resize:fit:720/1*UO6RN_EkM8wpdv9_yLRQ0g.png 720w, https://miro.medium.com/v2/resize:fit:750/1*UO6RN_EkM8wpdv9_yLRQ0g.png 750w, https://miro.medium.com/v2/resize:fit:786/1*UO6RN_EkM8wpdv9_yLRQ0g.png 786w, https://miro.medium.com/v2/resize:fit:828/1*UO6RN_EkM8wpdv9_yLRQ0g.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*UO6RN_EkM8wpdv9_yLRQ0g.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*UO6RN_EkM8wpdv9_yLRQ0g.png 1400w"
+                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="318" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*UO6RN_EkM8wpdv9_yLRQ0g.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                        width="700" /></picture>
+                </div>
+            </div>
+        </figure>
+        <p  id="ae81" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;"><em class="nm" style="box-sizing: inherit;">Vulnerabilities:</em></span></p>
+        <p 
+         id="07ad" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Weak signing algo(none algorithm):</span></p>
+        <p  
+        id="4b39" >The alg claim specifies the type of algorithm that is used to sign the token.</p>
+        <p  id="072c" >There are 2 standard algorithms</p>
+        <p  id="a346" >HS and RS</p>
+        <p  id="5090" >But often the token claim has&nbsp;<span class="mc fs" style="box-sizing: inherit; font-weight: 700;">none</span>&nbsp;algorithm.</p>
+        <p  
+        id="e8ad" >In simple meaning the token do not require any signature.That means if we change the payload part there is no mechanism in place to stop us.</p>
+        <p 
+         id="20ad" >So if the payload has claims like “role”:”user” we can simply change it become admin.</p>
+        <p  id="ab77" >Lets see a quick demo</p>
+        <p  id="fb8c" >Will Publish Soon</p>
+        <p  id="d4da" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Vulnerable Code Pattern:</span></p>
+        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+            <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                <div class="my mz nq" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 2184px;">
+                    <picture style="box-sizing: inherit;">
+                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*YDi03Zrnyt-S8F4b9lPEAw.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*YDi03Zrnyt-S8F4b9lPEAw.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*YDi03Zrnyt-S8F4b9lPEAw.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*YDi03Zrnyt-S8F4b9lPEAw.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*YDi03Zrnyt-S8F4b9lPEAw.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*YDi03Zrnyt-S8F4b9lPEAw.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*YDi03Zrnyt-S8F4b9lPEAw.png 1400w"
+                        style="box-sizing: inherit;" type="image/webp"></source>
+                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/1*YDi03Zrnyt-S8F4b9lPEAw.png 640w, https://miro.medium.com/v2/resize:fit:720/1*YDi03Zrnyt-S8F4b9lPEAw.png 720w, https://miro.medium.com/v2/resize:fit:750/1*YDi03Zrnyt-S8F4b9lPEAw.png 750w, https://miro.medium.com/v2/resize:fit:786/1*YDi03Zrnyt-S8F4b9lPEAw.png 786w, https://miro.medium.com/v2/resize:fit:828/1*YDi03Zrnyt-S8F4b9lPEAw.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*YDi03Zrnyt-S8F4b9lPEAw.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*YDi03Zrnyt-S8F4b9lPEAw.png 1400w"
+                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="377" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*YDi03Zrnyt-S8F4b9lPEAw.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                        width="700" /></picture>
+                </div>
+            </div>
+        </figure>
+        <p  id="bf27" >The above is a vulnerable code written in java</p>
+        <p  id="00c4" >And the below in python.</p>
+        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+            <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                <div class="my mz nr" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 2622px;">
+                    <picture style="box-sizing: inherit;">
+                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 1400w"
+                        style="box-sizing: inherit;" type="image/webp"></source>
+                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 640w, https://miro.medium.com/v2/resize:fit:720/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 720w, https://miro.medium.com/v2/resize:fit:750/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 750w, https://miro.medium.com/v2/resize:fit:786/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 786w, https://miro.medium.com/v2/resize:fit:828/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*NLDu1FAcWfsAoPZ1jeY0gQ.png 1400w"
+                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="77" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*NLDu1FAcWfsAoPZ1jeY0gQ.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                        width="700" /></picture>
+                </div>
+            </div>
+        </figure>
+        <p  id="f647" ><b>Mitigation:</b></p>
+        <p  id="05fb" >
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">Always use strong algorithms like HS256 or RS256 or may 512 version.</mark>
+        </p>
+        <p  id="906d" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Weak Secret:</span></p>
+        <p  id="95f9" >This vulnerability is specific to the HS256 algorithm.So if you see RS being used in alg claim you can skip this test.</p>
+        <p  
+        id="cbc3" >
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">HS256 is a symmetric key algorithm.</mark>
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">Meaning&nbsp;</mark>
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">the same key is used to both encrypt and decrypt.We call it secret.</mark>
+        </p>
+        <p  id="c6c4" >So while using this algorithm we should keep in mind that the secret need be long and strong enough.Else it can be either guessed or brute-forced.</p>
+        <p 
+         id="d3d9" >Consider this token.</p>
+        <p  id="a08a" >eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.dQknU80__AHPVDmZPFavWdML1XKrwPLeOXnCmoVY3AY</p>
+        <p 
+         id="da54" >The secret of the above token can be easily brute-forced with the
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">&nbsp;jwt_tool or even with hashcat.</mark>
+        </p>
+        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+            <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                <div class="my mz ns" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 3414px;">
+                    <picture style="box-sizing: inherit;">
+                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 1400w"
+                        style="box-sizing: inherit;" type="image/webp"></source>
+                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 640w, https://miro.medium.com/v2/resize:fit:720/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 720w, https://miro.medium.com/v2/resize:fit:750/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 750w, https://miro.medium.com/v2/resize:fit:786/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 786w, https://miro.medium.com/v2/resize:fit:828/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*TS1nsx-x8NyyJ3kTCM5s7Q.png 1400w"
+                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="205" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*TS1nsx-x8NyyJ3kTCM5s7Q.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                        width="700" /></picture>
+                </div>
+            </div>
+        </figure>
+        <p  id="0764" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Mitigation:</span></p>
+        <p  id="5bd3" >
+            <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">Always use long and strong secrets with HS256</mark>.</p>
+        <p  id="e7ed" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;"><em class="nm" style="box-sizing: inherit;">Key Confusion Attack:</em></span></p>
+        <p 
+         id="cd16" >This attack happens in case of RS256 algorithm.</p>
+        <p  id="efe4" >When the underlying library do not mandate the expected alg type while verifying the signature of the token this kind of vulnerability may arise.The library , upon not specifying an expected alg type fall backs to default alg type</p>
+        <p 
+         id="448d" >Let’s say the application has issued a token with “alg”:”RS256".</p>
+        <p  id="cbd4" >RS256 used private key to sign the token and the public key to verify the token.So to successfully tamper the token the attacker needs to have the private key that is used to sign the token.</p>
+        <p 
+         id="34fb" >Now let’s say the default alg type is HS256.Now if the developer do not specify an alg type explicitly the application will use HS256 to verify the token.</p>
+        <p 
+         id="4b9f" >Considering HS256 uses the same key to sign and verify if the attacker is able to sign his malicious token with the public key , then the application will simply allow the access to the attacker.</p>
+        <p 
+         id="eca1" >If the above is confusing take look at the below pictures.</p>
+        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+            <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                <div class="my mz nt" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 2086px;">
+                    <picture style="box-sizing: inherit;">
+                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*p0GWC-uz1WhziWSAzBhg0g.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*p0GWC-uz1WhziWSAzBhg0g.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*p0GWC-uz1WhziWSAzBhg0g.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*p0GWC-uz1WhziWSAzBhg0g.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*p0GWC-uz1WhziWSAzBhg0g.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*p0GWC-uz1WhziWSAzBhg0g.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*p0GWC-uz1WhziWSAzBhg0g.png 1400w"
+                        style="box-sizing: inherit;" type="image/webp"></source>
+                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/1*p0GWC-uz1WhziWSAzBhg0g.png 640w, https://miro.medium.com/v2/resize:fit:720/1*p0GWC-uz1WhziWSAzBhg0g.png 720w, https://miro.medium.com/v2/resize:fit:750/1*p0GWC-uz1WhziWSAzBhg0g.png 750w, https://miro.medium.com/v2/resize:fit:786/1*p0GWC-uz1WhziWSAzBhg0g.png 786w, https://miro.medium.com/v2/resize:fit:828/1*p0GWC-uz1WhziWSAzBhg0g.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*p0GWC-uz1WhziWSAzBhg0g.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*p0GWC-uz1WhziWSAzBhg0g.png 1400w"
+                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="292" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*p0GWC-uz1WhziWSAzBhg0g.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                        width="700" /></picture>
+                </div>
+            </div>
+            <figcaption class="nu nv nw my mz nx ny be b bf z dw"  style="box-sizing: inherit; color: #6b6b6b; font-family: sohne, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; margin-left: auto; margin-right: auto; margin-top: 10px; max-width: 728px; text-align: center;">Library that enforces to specify alg while verifying</figcaption>
+        </figure>
+        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+            <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                <div class="my mz nt" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 2086px;">
+                    <picture style="box-sizing: inherit;">
+                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*SgOIKogtfvO72NPUMjCmMA.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*SgOIKogtfvO72NPUMjCmMA.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*SgOIKogtfvO72NPUMjCmMA.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*SgOIKogtfvO72NPUMjCmMA.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*SgOIKogtfvO72NPUMjCmMA.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*SgOIKogtfvO72NPUMjCmMA.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*SgOIKogtfvO72NPUMjCmMA.png 1400w"
+                        style="box-sizing: inherit;" type="image/webp"></source>
+                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/1*SgOIKogtfvO72NPUMjCmMA.png 640w, https://miro.medium.com/v2/resize:fit:720/1*SgOIKogtfvO72NPUMjCmMA.png 720w, https://miro.medium.com/v2/resize:fit:750/1*SgOIKogtfvO72NPUMjCmMA.png 750w, https://miro.medium.com/v2/resize:fit:786/1*SgOIKogtfvO72NPUMjCmMA.png 786w, https://miro.medium.com/v2/resize:fit:828/1*SgOIKogtfvO72NPUMjCmMA.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*SgOIKogtfvO72NPUMjCmMA.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*SgOIKogtfvO72NPUMjCmMA.png 1400w"
+                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="292" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*SgOIKogtfvO72NPUMjCmMA.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                        width="700" /></picture>
+                </div>
+            </div>
+            <figcaption class="nu nv nw my mz nx ny be b bf z dw"  style="box-sizing: inherit; color: #6b6b6b; font-family: sohne, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; margin-left: auto; margin-right: auto; margin-top: 10px; max-width: 728px; text-align: center;">Libraries that do not enforce the alg type while verifying</figcaption>
+        </figure>
+        <p  id="fa92" ><b>DEMO:</b></p></p>
+        <p  id="81a5" >Will Publish Soon</p>
+        <p  id="2e05" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Mitigation:</span></p>
+        <p  id="2391" >Always explicitly set the alg type while verifying the token.</p>
+        <div class="nz oa ob oc od oe" style="background-color: white; box-shadow: rgb(242, 242, 242) 0px 0px 0px 1px inset; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin-top: 32px;">
+            <a href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/?source=post_page-----d29f39e202d5--------------------------------" rel="noopener  ugc nofollow" style="-webkit-tap-highlight-color: transparent; box-sizing: inherit; text-decoration-line: none;"
+            target="_blank">
+                <div class="of ab ht" style="box-sizing: inherit; display: flex; flex: 0 0 auto; padding: 0px;">
+                    <div class="og ab cn ca oh oi" style="box-sizing: inherit; display: flex; flex-direction: column; flex: 1 1 auto; justify-content: center; padding: 16px 20px;">
+                        <h2 class="be fs hq z ib oj id ie ok ig ii fq bj" style="-webkit-box-orient: vertical; -webkit-line-clamp: 2; box-sizing: inherit; color: #242424; display: -webkit-box; font-family: sohne, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; letter-spacing: 0px; line-height: 20px; margin: 0px; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">Critical vulnerabilities in JSON Web Token libraries</h2>
+                        <div class="ol l" style="box-sizing: inherit; margin-top: 8px;">
+                            <h3 class="be b hq z ib oj id ie ok ig ii dw" style="-webkit-box-orient: vertical; -webkit-line-clamp: 2; box-sizing: inherit; color: #6b6b6b; display: -webkit-box; font-family: sohne, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 20px; margin: 0px; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">TL;DR: If you are using node-jsonwebtoken, pyjwt, namshi/jose, php-jwt or jsjwt with asymmetric keys (RS256, RS384…</h3></div>
+                        <div class="om l" style="box-sizing: inherit; margin-top: 12px;">
+                            <p class="be b dx z ib oj id ie ok ig ii dw" style="-webkit-box-orient: vertical; -webkit-line-clamp: 2; box-sizing: inherit; color: #6b6b6b; display: -webkit-box; font-family: sohne, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 20px; margin: 0px; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">auth0.com</p>
+                        </div>
+                    </div>
+                    <div class="on l" style="box-sizing: inherit; width: 160px;">
+                        <div class="oo l op oq or on os li oe" style="background-image: url(&quot;https://miro.medium.com/v2/da:true/resize:fit:320/0*ixv3C-vmmrklUacp&quot;); background-origin: border-box; background-position: 50% 50%; background-size: cover; box-shadow: rgb(242, 242, 242) 0px 0px 0px 1px inset; box-sizing: inherit; height: 167px; max-width: 100%; width: 160px;"></div>
+                    </div>
+                </div>
+            </a>
         </div>
-        <br>
-        <br>
-        <p><b>Thats it For this Blog.</b></p>
-        <p><b>Thanks For Reading.</b></p>
-        <p><b>Happy Hacking.</b></p>
-        <p><b>You can connect with me at:</b></p>
-        <p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
-        <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
-    
+        <p  id="7428" ><a class="af ot" href="https://www.sourceclear.com/vulnerability-database/security/key-confusion-attacks/python/sid-4916" rel="noopener ugc nofollow" style="-webkit-tap-highlight-color: transparent; box-sizing: inherit;" target="_blank">https://www.sourceclear.com/vulnerability-database/security/key-confusion-attacks/python/sid-4916</a></p>
+        <p
+          id="9b61" ><a class="af ot" href="https://seclists.org/oss-sec/2021/q3/92" rel="noopener ugc nofollow" style="-webkit-tap-highlight-color: transparent; box-sizing: inherit;" target="_blank">https://seclists.org/oss-sec/2021/q3/92</a></p>
+            <p 
+             id="418d" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Exploiting KID Header:</span></p>
+            <p  id="61ae"
+            >If we see the picture that bit above in the article the&nbsp;
+                <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">KID header is a key identifier</mark>.It helps to identify the right key/secret when we have a bunch of them.Its specially used with JWKS(will discuss what is jwks and how to hack them).</p>
+            <p 
+             id="f45e" >The below vulnerabilities are possible depending on the way its programmed to be used.</p>
+            <ol class="" style="background-color: white; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; list-style: none none; margin: 0px; padding: 0px;">
+                <li class="ma mb fr mc b md me mf mg mh mi mj mk ml mm mn mo mp mq mr ms mt mu mv mw mx ou ov ow bj"  id="7b5c" style="box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 2.14em; padding-left: 0px;">SQL Injection</li>
+                <li class="ma mb fr mc b md ox mf mg mh oy mj mk ml oz mn mo mp pa mr ms mt pb mv mw mx ou ov ow bj"  id="65b0" style="box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 1.14em; padding-left: 0px;">Directory Traversal</li>
+                <li class="ma mb fr mc b md ox mf mg mh oy mj mk ml oz mn mo mp pa mr ms mt pb mv mw mx ou ov ow bj"  id="074d" style="box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 1.14em; padding-left: 0px;">Command Execution</li>
+            </ol>
+            <p  id="5b84" >If the KID header is used to fetch a key from the database then there is chance of sql injection. If the sql queries are not handled properly.</p>
+            <p 
+             id="a6a9" ><b>DEMO:</b></p></p>
+            <figure class="nb nc nd ne nf ng" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                <div class="pc ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                    <div class="pd pe l" style="box-sizing: inherit; height: 0px; padding-bottom: 510px;">
+                        <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FIEhdhKKGNKY%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DIEhdhKKGNKY&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FIEhdhKKGNKY%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                        style="box-sizing: inherit; height: 510px; left: 0px; position: absolute; top: 0px; width: 680px;" title="KID SQL ISSUE" width="640"></iframe>
+                    </div>
+                </div>
+            </figure>
+            <p  id="d11d" ><b>Vulnerable Code:</b></p>
+            <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                <div class="my mz cg" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 680px;">
+                    <picture style="box-sizing: inherit;">
+                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 680px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*hhZ5FY0gJ6e68qvE5ifpwA.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*hhZ5FY0gJ6e68qvE5ifpwA.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*hhZ5FY0gJ6e68qvE5ifpwA.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*hhZ5FY0gJ6e68qvE5ifpwA.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*hhZ5FY0gJ6e68qvE5ifpwA.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*hhZ5FY0gJ6e68qvE5ifpwA.png 1100w, https://miro.medium.com/v2/resize:fit:1360/format:webp/1*hhZ5FY0gJ6e68qvE5ifpwA.png 1360w"
+                        style="box-sizing: inherit;" type="image/webp"></source>
+                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 680px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/1*hhZ5FY0gJ6e68qvE5ifpwA.png 640w, https://miro.medium.com/v2/resize:fit:720/1*hhZ5FY0gJ6e68qvE5ifpwA.png 720w, https://miro.medium.com/v2/resize:fit:750/1*hhZ5FY0gJ6e68qvE5ifpwA.png 750w, https://miro.medium.com/v2/resize:fit:786/1*hhZ5FY0gJ6e68qvE5ifpwA.png 786w, https://miro.medium.com/v2/resize:fit:828/1*hhZ5FY0gJ6e68qvE5ifpwA.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*hhZ5FY0gJ6e68qvE5ifpwA.png 1100w, https://miro.medium.com/v2/resize:fit:1360/1*hhZ5FY0gJ6e68qvE5ifpwA.png 1360w"
+                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="150" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1190/1*hhZ5FY0gJ6e68qvE5ifpwA.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                        width="680" /></picture>
+                </div>
+            </figure>
+            <p  id="6378" ><b>Mitigation:</b></p>
+            <p  id="cb43" >Sanitise the user input and use prepared statements and parameter bindings.</p>
+            <p  id="60a1" >Similarly if the key is stored in a file system we can either achieve Directory Traversal or command execution.</p>
+            <p  
+            id="ebc1" >If the os level commands such as cat is used and the input from the header is not being sanitised then this can lead to RCE.</p>
+            <p  
+            id="2072" ><b>DEMO:</b></p></p>
+            <figure class="nb nc nd ne nf ng" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                <div class="pc ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                    <div class="pd pe l" style="box-sizing: inherit; height: 0px; padding-bottom: 510px;">
+                        <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2F1bxtpGtpxRc%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D1bxtpGtpxRc&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2F1bxtpGtpxRc%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                        style="box-sizing: inherit; height: 510px; left: 0px; position: absolute; top: 0px; width: 680px;" title="KID RCE ISSUE" width="640"></iframe>
+                    </div>
+                </div>
+            </figure>
+            <p  id="e1f0" ><b>Vulnerable Code:</b></p>
+            <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                <div class="my mz cg" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 680px;">
+                    <picture style="box-sizing: inherit;">
+                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 680px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*GmLHv4suxEEAHDAcl_v0Hg.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*GmLHv4suxEEAHDAcl_v0Hg.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*GmLHv4suxEEAHDAcl_v0Hg.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*GmLHv4suxEEAHDAcl_v0Hg.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*GmLHv4suxEEAHDAcl_v0Hg.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*GmLHv4suxEEAHDAcl_v0Hg.png 1100w, https://miro.medium.com/v2/resize:fit:1360/format:webp/1*GmLHv4suxEEAHDAcl_v0Hg.png 1360w"
+                        style="box-sizing: inherit;" type="image/webp"></source>
+                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 680px"
+                        srcset="https://miro.medium.com/v2/resize:fit:640/1*GmLHv4suxEEAHDAcl_v0Hg.png 640w, https://miro.medium.com/v2/resize:fit:720/1*GmLHv4suxEEAHDAcl_v0Hg.png 720w, https://miro.medium.com/v2/resize:fit:750/1*GmLHv4suxEEAHDAcl_v0Hg.png 750w, https://miro.medium.com/v2/resize:fit:786/1*GmLHv4suxEEAHDAcl_v0Hg.png 786w, https://miro.medium.com/v2/resize:fit:828/1*GmLHv4suxEEAHDAcl_v0Hg.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*GmLHv4suxEEAHDAcl_v0Hg.png 1100w, https://miro.medium.com/v2/resize:fit:1360/1*GmLHv4suxEEAHDAcl_v0Hg.png 1360w"
+                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="179" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1190/1*GmLHv4suxEEAHDAcl_v0Hg.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                        width="680" /></picture>
+                </div>
+            </figure>
+            <p  id="86e3" ><b>Mitigation:</b></p>
+            <p  id="d569" >Sanitise the user input and use code level libraries to read the file contents.</p>
+            <p  id="3101" >In other case if the input is not being passed to something like cat but even if the libraries are used to read the file content if the user input is not sanitised this can lead to directory traversal and hence we bypass the AuthoriZation</p>
+            <p 
+             id="d9cf" ><b>DEMO:</b></p></p>
+            <figure class="nb nc nd ne nf ng" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                <div class="pc ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                    <div class="pd pe l" style="box-sizing: inherit; height: 0px; padding-bottom: 510px;">
+                        <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2Fi_ndRhhmtsg%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Di_ndRhhmtsg&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2Fi_ndRhhmtsg%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                        style="box-sizing: inherit; height: 510px; left: 0px; position: absolute; top: 0px; width: 680px;" title="KID TRAVERSAL" width="640"></iframe>
+                    </div>
+                </div>
+            </figure>
+            <p  id="5d7d" ><b>Vulnerable Code:</b></p>
+            <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                    <div class="my mz pf" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 661px;">
+                        <picture style="box-sizing: inherit;">
+                            <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 661px"
+                            srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*z7SXHgvplHd4oXC50omquQ.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*z7SXHgvplHd4oXC50omquQ.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*z7SXHgvplHd4oXC50omquQ.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*z7SXHgvplHd4oXC50omquQ.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*z7SXHgvplHd4oXC50omquQ.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*z7SXHgvplHd4oXC50omquQ.png 1100w, https://miro.medium.com/v2/resize:fit:1322/format:webp/1*z7SXHgvplHd4oXC50omquQ.png 1322w"
+                            style="box-sizing: inherit;" type="image/webp"></source>
+                            <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 661px"
+                            srcset="https://miro.medium.com/v2/resize:fit:640/1*z7SXHgvplHd4oXC50omquQ.png 640w, https://miro.medium.com/v2/resize:fit:720/1*z7SXHgvplHd4oXC50omquQ.png 720w, https://miro.medium.com/v2/resize:fit:750/1*z7SXHgvplHd4oXC50omquQ.png 750w, https://miro.medium.com/v2/resize:fit:786/1*z7SXHgvplHd4oXC50omquQ.png 786w, https://miro.medium.com/v2/resize:fit:828/1*z7SXHgvplHd4oXC50omquQ.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*z7SXHgvplHd4oXC50omquQ.png 1100w, https://miro.medium.com/v2/resize:fit:1322/1*z7SXHgvplHd4oXC50omquQ.png 1322w"
+                            style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="455" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1157/1*z7SXHgvplHd4oXC50omquQ.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 661px;"
+                            width="661" /></picture>
+                    </div>
+                </div>
+            </figure>
+            <p  id="54a3" ><b>Mitigation:</b></p>
+            <p  id="785e" >Sanitise the user input for directory traversal.</p>
+            <p  id="5a9d" >The best way to deal with this is to keep the keys inside a vault and in the filesystem or in db.</p>
+            <p  
+            id="42b9" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Exploiting JKU Header:</span></p>
+            <p  id="c8c9"
+            >The jku header is used to fetch a jwks file and this file is used to select the correct public key or we can say the correct key identifier and its values that can be usd to build back the public key and verify the token.</p>
+            <figure class="nb nc nd ne nf ng my mz paragraph-image"
+            style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                    <div class="my mz nt" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 2086px;">
+                        <picture style="box-sizing: inherit;">
+                            <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                            srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*OfGvQto8LC8kUUF67db2wg.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*OfGvQto8LC8kUUF67db2wg.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*OfGvQto8LC8kUUF67db2wg.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*OfGvQto8LC8kUUF67db2wg.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*OfGvQto8LC8kUUF67db2wg.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*OfGvQto8LC8kUUF67db2wg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*OfGvQto8LC8kUUF67db2wg.png 1400w"
+                            style="box-sizing: inherit;" type="image/webp"></source>
+                            <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                            srcset="https://miro.medium.com/v2/resize:fit:640/1*OfGvQto8LC8kUUF67db2wg.png 640w, https://miro.medium.com/v2/resize:fit:720/1*OfGvQto8LC8kUUF67db2wg.png 720w, https://miro.medium.com/v2/resize:fit:750/1*OfGvQto8LC8kUUF67db2wg.png 750w, https://miro.medium.com/v2/resize:fit:786/1*OfGvQto8LC8kUUF67db2wg.png 786w, https://miro.medium.com/v2/resize:fit:828/1*OfGvQto8LC8kUUF67db2wg.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*OfGvQto8LC8kUUF67db2wg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*OfGvQto8LC8kUUF67db2wg.png 1400w"
+                            style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="234" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*OfGvQto8LC8kUUF67db2wg.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                            width="700" /></picture>
+                    </div>
+                </div>
+            </figure>
+            <p  id="552e" >But what is jwks.</p>
+            <p  id="98a2" >The full form is obviously Json Web Keys 😅 but what this actually is a json file that contains a number for keys or some key value pairs using which we can build the key.</p>
+            <p 
+             id="575c" >Here is how a JWKS file looks like.</p>
+            <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                    <div class="my mz pg" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 2436px;">
+                        <picture style="box-sizing: inherit;">
+                            <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                            srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*vPJVyc50adXOJHF5GTGSIw.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*vPJVyc50adXOJHF5GTGSIw.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*vPJVyc50adXOJHF5GTGSIw.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*vPJVyc50adXOJHF5GTGSIw.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*vPJVyc50adXOJHF5GTGSIw.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*vPJVyc50adXOJHF5GTGSIw.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*vPJVyc50adXOJHF5GTGSIw.png 1400w"
+                            style="box-sizing: inherit;" type="image/webp"></source>
+                            <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                            srcset="https://miro.medium.com/v2/resize:fit:640/1*vPJVyc50adXOJHF5GTGSIw.png 640w, https://miro.medium.com/v2/resize:fit:720/1*vPJVyc50adXOJHF5GTGSIw.png 720w, https://miro.medium.com/v2/resize:fit:750/1*vPJVyc50adXOJHF5GTGSIw.png 750w, https://miro.medium.com/v2/resize:fit:786/1*vPJVyc50adXOJHF5GTGSIw.png 786w, https://miro.medium.com/v2/resize:fit:828/1*vPJVyc50adXOJHF5GTGSIw.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*vPJVyc50adXOJHF5GTGSIw.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*vPJVyc50adXOJHF5GTGSIw.png 1400w"
+                            style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="359" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*vPJVyc50adXOJHF5GTGSIw.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                            width="700" /></picture>
+                    </div>
+                </div>
+            </figure>
+            <p  id="2955" >As you can see we can use the n and e to build a rsa public key.</p>
+            <p  id="a135" >If you are not familiar with RSA public key and private key check out this article.</p>
+            <p  id="fec7" ><a class="af ot" href="https://sectigostore.com/blog/public-key-vs-private-key-how-do-they-work/" rel="noopener ugc nofollow" style="-webkit-tap-highlight-color: transparent; box-sizing: inherit;" target="_blank">https://sectigostore.com/blog/public-key-vs-private-key-how-do-they-work/</a></p>
+            <p
+              id="75dc" >The main reason here for the issue is the application have to decode the token and use it in order to fetch the jwks so that it can build the public key and verify the token.</p>
+                <p 
+                 id="687f" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">So if the application simply trusts the jku with out any validation then this can be abused.</span></p>
+                <p 
+                 id="481d" >We can simply host our own JWKS file and point he jku to our server.</p>
+                <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                    <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                        <div class="my mz ph" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 2318px;">
+                            <picture style="box-sizing: inherit;">
+                                <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*1h-ylz4cGkEQO8xRSbhSHw.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*1h-ylz4cGkEQO8xRSbhSHw.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*1h-ylz4cGkEQO8xRSbhSHw.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*1h-ylz4cGkEQO8xRSbhSHw.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*1h-ylz4cGkEQO8xRSbhSHw.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*1h-ylz4cGkEQO8xRSbhSHw.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*1h-ylz4cGkEQO8xRSbhSHw.png 1400w"
+                                style="box-sizing: inherit;" type="image/webp"></source>
+                                <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                srcset="https://miro.medium.com/v2/resize:fit:640/1*1h-ylz4cGkEQO8xRSbhSHw.png 640w, https://miro.medium.com/v2/resize:fit:720/1*1h-ylz4cGkEQO8xRSbhSHw.png 720w, https://miro.medium.com/v2/resize:fit:750/1*1h-ylz4cGkEQO8xRSbhSHw.png 750w, https://miro.medium.com/v2/resize:fit:786/1*1h-ylz4cGkEQO8xRSbhSHw.png 786w, https://miro.medium.com/v2/resize:fit:828/1*1h-ylz4cGkEQO8xRSbhSHw.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*1h-ylz4cGkEQO8xRSbhSHw.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*1h-ylz4cGkEQO8xRSbhSHw.png 1400w"
+                                style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="205" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*1h-ylz4cGkEQO8xRSbhSHw.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                width="700" /></picture>
+                        </div>
+                    </div>
+                </figure>
+                <p  id="5fc3" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Steps to exploit</span></p>
+                <ol class="" style="background-color: white; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; list-style: none none; margin: 0px; padding: 0px;">
+                    <li class="ma mb fr mc b md me mf mg mh mi mj mk ml mm mn mo mp mq mr ms mt mu mv mw mx ou ov ow bj"  id="150d" style="box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 2.14em; padding-left: 0px;">Create your public and private key pair.</li>
+                </ol><pre class="nb nc nd ne nf pi pj pk pl ax pm bj" style="background: rgb(242, 242, 242); border-radius: 0px; border: none; box-sizing: inherit; color: #242424; font-family: source-code-pro, Menlo, Monaco, &quot;Courier New&quot;, Courier, monospace; margin-bottom: 0px; margin-top: 56px; overflow-x: auto; padding: 20px;"><span class="pn po fr pj b hq pp pq l hz pr"  id="71da" style="box-sizing: inherit; display: block; font-size: 16px; letter-spacing: -0.022em; line-height: 1.18; margin-bottom: -0.09em; margin-top: -0.09em; min-width: fit-content; text-wrap: wrap;">openssl genrsa -out private.pem 2048</span><span class="pn po fr pj b hq ps pq l hz pr"  id="eb10" style="box-sizing: inherit; display: block; font-size: 16px; letter-spacing: -0.022em; line-height: 1.18; margin-bottom: -0.09em; margin-top: 0.91em; min-width: fit-content; text-wrap: wrap;">openssl rsa -in private.pem -outform PEM -pubout -out public.pem</span></pre>
+                <p
+                  id="09f7" >2.Create your JWK</p>
+                    <p  id="e6a8" >You can either use python or this online tool</p>
+                    <div class="nz oa ob oc od oe" style="background-color: white; box-shadow: rgb(242, 242, 242) 0px 0px 0px 1px inset; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin-top: 32px;">
+                        <a href="https://russelldavies.github.io/jwk-creator/?source=post_page-----d29f39e202d5--------------------------------" rel="noopener  ugc nofollow" style="-webkit-tap-highlight-color: transparent; box-sizing: inherit; text-decoration-line: none;"
+                        target="_blank">
+                            <div class="of ab ht" style="box-sizing: inherit; display: flex; flex: 0 0 auto; padding: 0px;">
+                                <div class="og ab cn ca oh oi" style="box-sizing: inherit; display: flex; flex-direction: column; flex: 1 1 auto; justify-content: center; padding: 16px 20px;">
+                                    <h2 class="be fs hq z ib oj id ie ok ig ii fq bj" style="-webkit-box-orient: vertical; -webkit-line-clamp: 2; box-sizing: inherit; color: #242424; display: -webkit-box; font-family: sohne, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; letter-spacing: 0px; line-height: 20px; margin: 0px; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">JWK Creator</h2>
+                                    <div class="ol l" style="box-sizing: inherit; margin-top: 8px;">
+                                        <h3 class="be b hq z ib oj id ie ok ig ii dw" style="-webkit-box-orient: vertical; -webkit-line-clamp: 2; box-sizing: inherit; color: #6b6b6b; display: -webkit-box; font-family: sohne, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 20px; margin: 0px; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">Edit description</h3></div>
+                                    <div class="om l" style="box-sizing: inherit; margin-top: 12px;">
+                                        <p class="be b dx z ib oj id ie ok ig ii dw" style="-webkit-box-orient: vertical; -webkit-line-clamp: 2; box-sizing: inherit; color: #6b6b6b; display: -webkit-box; font-family: sohne, &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 20px; margin: 0px; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">russelldavies.github.io</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <p  id="83c5" >Make sure you make your own jwk identical to the jwk used by the target application.Specially the KID part.</p>
+                    <p  
+                    id="8bce" >3.host he JWK</p>
+                    <p  id="146f" >4.Change the payload part and sign it with your private key</p>
+                    <p  id="7199" >You can use the jwt.io or python as usual to sign the token.</p>
+                    <p  id="ce7d" >Note: if the above technique doesn’t work try putting the jwk that you created inside an array shown below.</p>
+                    <p  
+                    id="a4af" >{
+                        <br style="box-sizing: inherit;" />“keys”:[Content_OF_JWK]
+                        <br style="box-sizing: inherit;" />}</p>
+                    <p  id="1a6d" ><b>DEMO:</b></p></p>
+                    <figure class="nb nc nd ne nf ng" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                        <div class="pc ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                            <div class="pd pe l" style="box-sizing: inherit; height: 0px; padding-bottom: 510px;">
+                                <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2Fm_9ZgcoKGlk%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm_9ZgcoKGlk&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2Fm_9ZgcoKGlk%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                                style="box-sizing: inherit; height: 510px; left: 0px; position: absolute; top: 0px; width: 680px;" title="JKU ISSUE" width="640"></iframe>
+                            </div>
+                        </div>
+                    </figure>
+                    <p  id="aa4f" ><b>Vulnerable Code:</b></p>
+                    <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                        <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                            <div class="my mz pt" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1038px;">
+                                <picture style="box-sizing: inherit;">
+                                    <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                    srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*R8izGeIRDzOm1hpnvpZSHA.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*R8izGeIRDzOm1hpnvpZSHA.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*R8izGeIRDzOm1hpnvpZSHA.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*R8izGeIRDzOm1hpnvpZSHA.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*R8izGeIRDzOm1hpnvpZSHA.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*R8izGeIRDzOm1hpnvpZSHA.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*R8izGeIRDzOm1hpnvpZSHA.png 1400w"
+                                    style="box-sizing: inherit;" type="image/webp"></source>
+                                    <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                    srcset="https://miro.medium.com/v2/resize:fit:640/1*R8izGeIRDzOm1hpnvpZSHA.png 640w, https://miro.medium.com/v2/resize:fit:720/1*R8izGeIRDzOm1hpnvpZSHA.png 720w, https://miro.medium.com/v2/resize:fit:750/1*R8izGeIRDzOm1hpnvpZSHA.png 750w, https://miro.medium.com/v2/resize:fit:786/1*R8izGeIRDzOm1hpnvpZSHA.png 786w, https://miro.medium.com/v2/resize:fit:828/1*R8izGeIRDzOm1hpnvpZSHA.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*R8izGeIRDzOm1hpnvpZSHA.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*R8izGeIRDzOm1hpnvpZSHA.png 1400w"
+                                    style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="420" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*R8izGeIRDzOm1hpnvpZSHA.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                    width="700" /></picture>
+                            </div>
+                        </div>
+                    </figure>
+                    <p  id="fe02" >Mitigation:
+                        <br style="box-sizing: inherit;" />Use a whilteList to check if the jku received from the token is in the allowed list or not.DONOT USE STARTSWITH, INDEXOF OR ENDSWITH FUNCTION WHILE COMPARING WITH THE WHITE LIST.MATCH THE FULL JKU WITH THE ENTITY OF THE ALLOWED LIST.</p>
+                    <figure
+                    class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                        <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                            <div class="my mz pu" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 2534px;">
+                                <picture style="box-sizing: inherit;">
+                                    <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                    srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*Brmu5OFImBwl753FF_htIg.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*Brmu5OFImBwl753FF_htIg.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*Brmu5OFImBwl753FF_htIg.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*Brmu5OFImBwl753FF_htIg.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*Brmu5OFImBwl753FF_htIg.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*Brmu5OFImBwl753FF_htIg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*Brmu5OFImBwl753FF_htIg.png 1400w"
+                                    style="box-sizing: inherit;" type="image/webp"></source>
+                                    <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                    srcset="https://miro.medium.com/v2/resize:fit:640/1*Brmu5OFImBwl753FF_htIg.png 640w, https://miro.medium.com/v2/resize:fit:720/1*Brmu5OFImBwl753FF_htIg.png 720w, https://miro.medium.com/v2/resize:fit:750/1*Brmu5OFImBwl753FF_htIg.png 750w, https://miro.medium.com/v2/resize:fit:786/1*Brmu5OFImBwl753FF_htIg.png 786w, https://miro.medium.com/v2/resize:fit:828/1*Brmu5OFImBwl753FF_htIg.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*Brmu5OFImBwl753FF_htIg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*Brmu5OFImBwl753FF_htIg.png 1400w"
+                                    style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="387" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*Brmu5OFImBwl753FF_htIg.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                    width="700" /></picture>
+                            </div>
+                        </div>
+                        </figure>
+                        <p  id="5406" >We will see later how even using the allowed list may be vulnerable and bypassed.</p>
+                        <p  id="18ca"
+                        ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Exploiting X5C Header:</span></p>
+                        <p  
+                        id="38b1" >x5c header contains the x509certificate/x509certificate chain that can be used to verify the token.</p>
+                        <p  
+                        id="5cc6" >Ideally the public key of the certificate is first gets extracted and then used to verify the token.</p>
+                        <p  
+                        id="4e38" >This is how an x5c header looks like.But it can also have those — -BEGIN CERTIFICATE — — and end certificate strings.</p>
+                        <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                            <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                                <div class="my mz pv" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1018px;">
+                                    <picture style="box-sizing: inherit;">
+                                        <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                        srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*nG8-kWWxha4ckbEzJz7ohg.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*nG8-kWWxha4ckbEzJz7ohg.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*nG8-kWWxha4ckbEzJz7ohg.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*nG8-kWWxha4ckbEzJz7ohg.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*nG8-kWWxha4ckbEzJz7ohg.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*nG8-kWWxha4ckbEzJz7ohg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*nG8-kWWxha4ckbEzJz7ohg.png 1400w"
+                                        style="box-sizing: inherit;" type="image/webp"></source>
+                                        <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                        srcset="https://miro.medium.com/v2/resize:fit:640/1*nG8-kWWxha4ckbEzJz7ohg.png 640w, https://miro.medium.com/v2/resize:fit:720/1*nG8-kWWxha4ckbEzJz7ohg.png 720w, https://miro.medium.com/v2/resize:fit:750/1*nG8-kWWxha4ckbEzJz7ohg.png 750w, https://miro.medium.com/v2/resize:fit:786/1*nG8-kWWxha4ckbEzJz7ohg.png 786w, https://miro.medium.com/v2/resize:fit:828/1*nG8-kWWxha4ckbEzJz7ohg.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*nG8-kWWxha4ckbEzJz7ohg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*nG8-kWWxha4ckbEzJz7ohg.png 1400w"
+                                        style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="1125" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*nG8-kWWxha4ckbEzJz7ohg.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                        width="700" /></picture>
+                                </div>
+                            </div>
+                        </figure>
+                        <p  id="9cc6" >Now if the application simply trusts the x5c that is there in the token without any validation then this can be abused.</p>
+                        <p 
+                         id="f197" >We can put our own certificate and modify the body as required and we can bypass the Authorization.</p>
+                        <p  
+                        id="8f82" >Steps To Exploit:</p>
+                        <ol class="" style="background-color: white; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; list-style: none none; margin: 0px; padding: 0px;">
+                            <li class="ma mb fr mc b md me mf mg mh mi mj mk ml mm mn mo mp mq mr ms mt mu mv mw mx ou ov ow bj"  id="6c62" style="box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 2.14em; padding-left: 0px;">Create x509 certificate and extract the public and private key out of them</li>
+                        </ol><pre class="nb nc nd ne nf pi pj pk pl ax pm bj" style="background: rgb(242, 242, 242); border-radius: 0px; border: none; box-sizing: inherit; color: #242424; font-family: source-code-pro, Menlo, Monaco, &quot;Courier New&quot;, Courier, monospace; margin-bottom: 0px; margin-top: 56px; overflow-x: auto; padding: 20px;"><span class="pn po fr pj b hq pp pq l hz pr"  id="5a3d" style="box-sizing: inherit; display: block; font-size: 16px; letter-spacing: -0.022em; line-height: 1.18; margin-bottom: -0.09em; margin-top: -0.09em; min-width: fit-content; text-wrap: wrap;">openssl req -x509 -nodes -days -newkey rsa:2048 -keyout attacker.key -out attacker.crt</span><span class="pn po fr pj b hq ps pq l hz pr"  id="175d" style="box-sizing: inherit; display: block; font-size: 16px; letter-spacing: -0.022em; line-height: 1.18; margin-bottom: -0.09em; margin-top: 0.91em; min-width: fit-content; text-wrap: wrap;">openssl x509 -pubkey -noout -in attacker.crt &gt; publicKey.pem</span></pre>
+                        <p
+                          id="05a3" >2.Tamper the token and put your x509 certificate in place of x5c claim.</p>
+                            <p  id="1918" >3.Modify the token and sign it with the private key.</p>
+                            <p  id="a09f" >You can either use python3 or jwt.io for this.</p>
+                            <p  id="5dcd" ><b>DEMO:</b></p></p>
+                            <figure class="nb nc nd ne nf ng" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                                <div class="pc ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                                    <div class="pd pe l" style="box-sizing: inherit; height: 0px; padding-bottom: 510px;">
+                                        <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FXRktUrjC_NI%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DXRktUrjC_NI&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FXRktUrjC_NI%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                                        style="box-sizing: inherit; height: 510px; left: 0px; position: absolute; top: 0px; width: 680px;" title="X5C POC" width="640"></iframe>
+                                    </div>
+                                </div>
+                            </figure>
+                            <p  id="4b11" ><b>Vulnerable Code:</b></p>
+                            <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                                <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                                    <div class="my mz pw" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1190px;">
+                                        <picture style="box-sizing: inherit;">
+                                            <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                            srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*Hi87tglMRTiUEdzIafP-dA.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*Hi87tglMRTiUEdzIafP-dA.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*Hi87tglMRTiUEdzIafP-dA.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*Hi87tglMRTiUEdzIafP-dA.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*Hi87tglMRTiUEdzIafP-dA.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*Hi87tglMRTiUEdzIafP-dA.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*Hi87tglMRTiUEdzIafP-dA.png 1400w"
+                                            style="box-sizing: inherit;" type="image/webp"></source>
+                                            <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                            srcset="https://miro.medium.com/v2/resize:fit:640/1*Hi87tglMRTiUEdzIafP-dA.png 640w, https://miro.medium.com/v2/resize:fit:720/1*Hi87tglMRTiUEdzIafP-dA.png 720w, https://miro.medium.com/v2/resize:fit:750/1*Hi87tglMRTiUEdzIafP-dA.png 750w, https://miro.medium.com/v2/resize:fit:786/1*Hi87tglMRTiUEdzIafP-dA.png 786w, https://miro.medium.com/v2/resize:fit:828/1*Hi87tglMRTiUEdzIafP-dA.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*Hi87tglMRTiUEdzIafP-dA.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*Hi87tglMRTiUEdzIafP-dA.png 1400w"
+                                            style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="377" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*Hi87tglMRTiUEdzIafP-dA.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                            width="700" /></picture>
+                                    </div>
+                                </div>
+                            </figure>
+                            <p  id="9ce0" ><b>Mitigation:</b></p>
+                            <p  id="f1ea" >We should not validate the jwt like this in the first place.But still if we want to then we should use x5u instead of x5c header.x5u is similar to jku .The only difference is the jku holds a JWK and an x5u holds a x5c link.</p>
+                            <p 
+                             id="be26" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Exploiting x5u Header:</span></p>
+                            <p  
+                            id="fc70" >This header works exactly same as the jku.But its used to fetch a x5c certificate from a web server that wil be used to create a pubic key out of them and verify the token.</p>
+                            <figure class="nb nc nd ne nf ng my mz paragraph-image"
+                            style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                                <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                                    <div class="my mz px" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1149px;">
+                                        <picture style="box-sizing: inherit;">
+                                            <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                            srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*IVDazjVGsCJoZ8FxcF-V1g.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*IVDazjVGsCJoZ8FxcF-V1g.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*IVDazjVGsCJoZ8FxcF-V1g.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*IVDazjVGsCJoZ8FxcF-V1g.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*IVDazjVGsCJoZ8FxcF-V1g.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*IVDazjVGsCJoZ8FxcF-V1g.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*IVDazjVGsCJoZ8FxcF-V1g.png 1400w"
+                                            style="box-sizing: inherit;" type="image/webp"></source>
+                                            <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                            srcset="https://miro.medium.com/v2/resize:fit:640/1*IVDazjVGsCJoZ8FxcF-V1g.png 640w, https://miro.medium.com/v2/resize:fit:720/1*IVDazjVGsCJoZ8FxcF-V1g.png 720w, https://miro.medium.com/v2/resize:fit:750/1*IVDazjVGsCJoZ8FxcF-V1g.png 750w, https://miro.medium.com/v2/resize:fit:786/1*IVDazjVGsCJoZ8FxcF-V1g.png 786w, https://miro.medium.com/v2/resize:fit:828/1*IVDazjVGsCJoZ8FxcF-V1g.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*IVDazjVGsCJoZ8FxcF-V1g.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*IVDazjVGsCJoZ8FxcF-V1g.png 1400w"
+                                            style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="134" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*IVDazjVGsCJoZ8FxcF-V1g.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                            width="700" /></picture>
+                                    </div>
+                                </div>
+                            </figure>
+                            <p  id="f144" >This is how a token with x5u looks like.</p>
+                            <p  id="9f4e" >The issue here is same as JKU.</p>
+                            <p  id="ed4f" >If the application simply trusts the x5u without any validation we can abuse this.</p>
+                            <p  
+                            id="4208" >Steps to Exploit:</p>
+                            <ol class="" style="background-color: white; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; list-style: none none; margin: 0px; padding: 0px;">
+                                <li class="ma mb fr mc b md me mf mg mh mi mj mk ml mm mn mo mp mq mr ms mt mu mv mw mx ou ov ow bj"  id="c420" style="box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 2.14em; padding-left: 0px;">Create a certificate and public, private rsa key pair</li>
+                            </ol><pre class="nb nc nd ne nf pi pj pk pl ax pm bj" style="background: rgb(242, 242, 242); border-radius: 0px; border: none; box-sizing: inherit; color: #242424; font-family: source-code-pro, Menlo, Monaco, &quot;Courier New&quot;, Courier, monospace; margin-bottom: 0px; margin-top: 56px; overflow-x: auto; padding: 20px;"><span class="pn po fr pj b hq pp pq l hz pr"  id="26ca" style="box-sizing: inherit; display: block; font-size: 16px; letter-spacing: -0.022em; line-height: 1.18; margin-bottom: -0.09em; margin-top: -0.09em; min-width: fit-content; text-wrap: wrap;">openssl req -x509 -nodes -days -newkey rsa:2048 -keyout attacker.key -out attacker.crt</span><span class="pn po fr pj b hq ps pq l hz pr"  id="d58d" style="box-sizing: inherit; display: block; font-size: 16px; letter-spacing: -0.022em; line-height: 1.18; margin-bottom: -0.09em; margin-top: 0.91em; min-width: fit-content; text-wrap: wrap;">openssl x509 -pubkey -noout -in attacker.crt &gt; publicKey.pem</span></pre>
+                            <p
+                              id="8609" >2.Host the certificate</p>
+                                <p  id="7a9d" >3.Tamper the token and sign it with the private key</p>
+                                <p  id="e4f5" >You can either use the python3 or jwt.io to do this.</p>
+                                <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                                    <div class="my mz py" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 549px;">
+                                        <picture style="box-sizing: inherit;">
+                                            <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 549px"
+                                            srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*yfYQjS1Dqa_nADtqLzCu6A.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*yfYQjS1Dqa_nADtqLzCu6A.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*yfYQjS1Dqa_nADtqLzCu6A.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*yfYQjS1Dqa_nADtqLzCu6A.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*yfYQjS1Dqa_nADtqLzCu6A.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*yfYQjS1Dqa_nADtqLzCu6A.png 1100w, https://miro.medium.com/v2/resize:fit:1098/format:webp/1*yfYQjS1Dqa_nADtqLzCu6A.png 1098w"
+                                            style="box-sizing: inherit;" type="image/webp"></source>
+                                            <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 549px"
+                                            srcset="https://miro.medium.com/v2/resize:fit:640/1*yfYQjS1Dqa_nADtqLzCu6A.png 640w, https://miro.medium.com/v2/resize:fit:720/1*yfYQjS1Dqa_nADtqLzCu6A.png 720w, https://miro.medium.com/v2/resize:fit:750/1*yfYQjS1Dqa_nADtqLzCu6A.png 750w, https://miro.medium.com/v2/resize:fit:786/1*yfYQjS1Dqa_nADtqLzCu6A.png 786w, https://miro.medium.com/v2/resize:fit:828/1*yfYQjS1Dqa_nADtqLzCu6A.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*yfYQjS1Dqa_nADtqLzCu6A.png 1100w, https://miro.medium.com/v2/resize:fit:1098/1*yfYQjS1Dqa_nADtqLzCu6A.png 1098w"
+                                            style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="219" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:961/1*yfYQjS1Dqa_nADtqLzCu6A.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 549px;"
+                                            width="549" /></picture>
+                                    </div>
+                                </figure>
+                                <p  id="a3a7" ><b>DEMO:</b></p></p>
+                                <figure class="nb nc nd ne nf ng" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                                    <div class="pc ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                                        <div class="pd pe l" style="box-sizing: inherit; height: 0px; padding-bottom: 510px;">
+                                            <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FyN4PB-f90Ic%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DyN4PB-f90Ic&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FyN4PB-f90Ic%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                                            style="box-sizing: inherit; height: 510px; left: 0px; position: absolute; top: 0px; width: 680px;" title="X5U POC" width="640"></iframe>
+                                        </div>
+                                    </div>
+                                </figure>
+                                <p  id="49de" ><b>Vulnerable Code:</b></p>
+                                <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                                    <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                                        <div class="my mz pw" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1190px;">
+                                            <picture style="box-sizing: inherit;">
+                                                <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*wWyunNZkZ-cE95h8RRTMGA.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*wWyunNZkZ-cE95h8RRTMGA.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*wWyunNZkZ-cE95h8RRTMGA.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*wWyunNZkZ-cE95h8RRTMGA.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*wWyunNZkZ-cE95h8RRTMGA.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*wWyunNZkZ-cE95h8RRTMGA.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*wWyunNZkZ-cE95h8RRTMGA.png 1400w"
+                                                style="box-sizing: inherit;" type="image/webp"></source>
+                                                <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/1*wWyunNZkZ-cE95h8RRTMGA.png 640w, https://miro.medium.com/v2/resize:fit:720/1*wWyunNZkZ-cE95h8RRTMGA.png 720w, https://miro.medium.com/v2/resize:fit:750/1*wWyunNZkZ-cE95h8RRTMGA.png 750w, https://miro.medium.com/v2/resize:fit:786/1*wWyunNZkZ-cE95h8RRTMGA.png 786w, https://miro.medium.com/v2/resize:fit:828/1*wWyunNZkZ-cE95h8RRTMGA.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*wWyunNZkZ-cE95h8RRTMGA.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*wWyunNZkZ-cE95h8RRTMGA.png 1400w"
+                                                style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="462" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*wWyunNZkZ-cE95h8RRTMGA.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                                width="700" /></picture>
+                                        </div>
+                                    </div>
+                                </figure>
+                                <p  id="2bac" ><b>Mitigation:</b></p>
+                                <p  id="cf9a" >Maintain a whitelist and perform a full match with the elements of the list and the url from token.DO NOT USE STARTSWITH, INDEXOF OR ENDSWITH FUNCTION WHILE COMPARING WITH THE WHITE LIST.MATCH THE FULL JKU WITH THE ENTITY OF THE
+                                    ALLOWED LIST.</p>
+                                <p  id="ac20" ><span class="mc fs" style="box-sizing: inherit; font-weight: 700;">SOME OTHER IMP BUGS TO CHECK:</span></p>
+                                <ol class="" style="background-color: white; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; list-style: none none; margin: 0px; padding: 0px;">
+                                    <li class="ma mb fr mc b md me mf mg mh mi mj mk ml mm mn mo mp mq mr ms mt mu mv mw mx ou ov ow bj"  id="d839" style="box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 2.14em; padding-left: 0px;">Token having no expiration date.</li>
+                                </ol>
+                                <p  id="b9e6" >If a jwt token do not have any expiration claim set , tis can be vulnerable to replay attack.Meaning if the token got captured once(MITM,Info Disclosure) then it can be used repeatedly.</p>
+                                <p 
+                                 id="0f32" >Consider the below code.</p>
+                                <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                                    <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                                        <div class="my mz pz" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1123px;">
+                                            <picture style="box-sizing: inherit;">
+                                                <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*YCtJEW-50urQritb6bdNPg.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*YCtJEW-50urQritb6bdNPg.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*YCtJEW-50urQritb6bdNPg.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*YCtJEW-50urQritb6bdNPg.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*YCtJEW-50urQritb6bdNPg.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*YCtJEW-50urQritb6bdNPg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*YCtJEW-50urQritb6bdNPg.png 1400w"
+                                                style="box-sizing: inherit;" type="image/webp"></source>
+                                                <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/1*YCtJEW-50urQritb6bdNPg.png 640w, https://miro.medium.com/v2/resize:fit:720/1*YCtJEW-50urQritb6bdNPg.png 720w, https://miro.medium.com/v2/resize:fit:750/1*YCtJEW-50urQritb6bdNPg.png 750w, https://miro.medium.com/v2/resize:fit:786/1*YCtJEW-50urQritb6bdNPg.png 786w, https://miro.medium.com/v2/resize:fit:828/1*YCtJEW-50urQritb6bdNPg.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*YCtJEW-50urQritb6bdNPg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*YCtJEW-50urQritb6bdNPg.png 1400w"
+                                                style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="207" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*YCtJEW-50urQritb6bdNPg.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                                width="700" /></picture>
+                                        </div>
+                                    </div>
+                                </figure>
+                                <p  id="508b" >This code uses HS256 alg and have quite a good secret.How ever&nbsp;
+                                    <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">this&nbsp;</mark>code will produce the token which will not have any expiration date.To fix this we can use exp claim.</p>
+                                <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                                    <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                                        <div class="my mz pt" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1038px;">
+                                            <picture style="box-sizing: inherit;">
+                                                <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*p1kLSS3nhgq4yaUnRXKjQg.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*p1kLSS3nhgq4yaUnRXKjQg.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*p1kLSS3nhgq4yaUnRXKjQg.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*p1kLSS3nhgq4yaUnRXKjQg.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*p1kLSS3nhgq4yaUnRXKjQg.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*p1kLSS3nhgq4yaUnRXKjQg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*p1kLSS3nhgq4yaUnRXKjQg.png 1400w"
+                                                style="box-sizing: inherit;" type="image/webp"></source>
+                                                <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/1*p1kLSS3nhgq4yaUnRXKjQg.png 640w, https://miro.medium.com/v2/resize:fit:720/1*p1kLSS3nhgq4yaUnRXKjQg.png 720w, https://miro.medium.com/v2/resize:fit:750/1*p1kLSS3nhgq4yaUnRXKjQg.png 750w, https://miro.medium.com/v2/resize:fit:786/1*p1kLSS3nhgq4yaUnRXKjQg.png 786w, https://miro.medium.com/v2/resize:fit:828/1*p1kLSS3nhgq4yaUnRXKjQg.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*p1kLSS3nhgq4yaUnRXKjQg.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*p1kLSS3nhgq4yaUnRXKjQg.png 1400w"
+                                                style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="177" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*p1kLSS3nhgq4yaUnRXKjQg.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                                width="700" /></picture>
+                                        </div>
+                                    </div>
+                                </figure>
+                                <p  id="485f" >As you can see in the above code the exp claim is set.Now this token wont work once the expiration is over. Obviously we need to check this thing while verifying.</p>
+                                <p 
+                                 id="236f" >2.<span class="mc fs" style="box-sizing: inherit; font-weight: 700;">Cross Service Relay Attack:</span></p>
+                                <p  
+                                id="5249" >Consider a scenario where there are 3 components.</p>
+                                <p  id="bb4e" >Token Service, appliance Management and Life Cycle Management.</p>
+                                <p  id="bc4a" >It might happen that the LCM and applmgmt uses token service to issue and verify the jwt token.</p>
+                                <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                                    <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                                        <div class="my mz qa" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 858px;">
+                                            <picture style="box-sizing: inherit;">
+                                                <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*mLwBwpbk_m6OryhzXeswFw.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*mLwBwpbk_m6OryhzXeswFw.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*mLwBwpbk_m6OryhzXeswFw.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*mLwBwpbk_m6OryhzXeswFw.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*mLwBwpbk_m6OryhzXeswFw.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*mLwBwpbk_m6OryhzXeswFw.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*mLwBwpbk_m6OryhzXeswFw.png 1400w"
+                                                style="box-sizing: inherit;" type="image/webp"></source>
+                                                <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/1*mLwBwpbk_m6OryhzXeswFw.png 640w, https://miro.medium.com/v2/resize:fit:720/1*mLwBwpbk_m6OryhzXeswFw.png 720w, https://miro.medium.com/v2/resize:fit:750/1*mLwBwpbk_m6OryhzXeswFw.png 750w, https://miro.medium.com/v2/resize:fit:786/1*mLwBwpbk_m6OryhzXeswFw.png 786w, https://miro.medium.com/v2/resize:fit:828/1*mLwBwpbk_m6OryhzXeswFw.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*mLwBwpbk_m6OryhzXeswFw.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*mLwBwpbk_m6OryhzXeswFw.png 1400w"
+                                                style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="399" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*mLwBwpbk_m6OryhzXeswFw.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                                width="700" /></picture>
+                                        </div>
+                                    </div>
+                                </figure>
+                                <p  id="1dd9" >Now let’s say the LCM has a user called Robin and the applmgmt allows user registration.</p>
+                                <p  
+                                id="73f0" >If the Token service do not put due diligence and the necessary claim wile creating and verifying token it might happen that the attacker can create a user having same username as Robin in the applmgmt — → which will give him a
+                                    jwt token — — -&gt;and&nbsp;
+                                    <mark class="vp vq ao" style="background-color: #edf1fc; box-sizing: inherit; cursor: pointer;">that jwt token when sent to LCM — →LCM will send this to the token service to verify and as the token service is misconfigured it may simply ended up giving</mark>&nbsp;access to Robin’s account to the attacker.</p>
+                                <p 
+                                 id="6a5c" >This attack is called cross service relay attack.</p>
+                                <figure class="nb nc nd ne nf ng my mz paragraph-image" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px auto 0px;">
+                                    <div class="nh ni ee nj bg nk" role="button" style="box-sizing: inherit; cursor: zoom-in; position: relative; transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) 0s; width: 680px; z-index: auto;" tabindex="0">
+                                        <div class="my mz qb" style="box-sizing: inherit; margin-left: auto; margin-right: auto; max-width: 1037px;">
+                                            <picture style="box-sizing: inherit;">
+                                                <source sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/format:webp/1*DHbx3ylWcEW9gon3do_gqQ.png 640w, https://miro.medium.com/v2/resize:fit:720/format:webp/1*DHbx3ylWcEW9gon3do_gqQ.png 720w, https://miro.medium.com/v2/resize:fit:750/format:webp/1*DHbx3ylWcEW9gon3do_gqQ.png 750w, https://miro.medium.com/v2/resize:fit:786/format:webp/1*DHbx3ylWcEW9gon3do_gqQ.png 786w, https://miro.medium.com/v2/resize:fit:828/format:webp/1*DHbx3ylWcEW9gon3do_gqQ.png 828w, https://miro.medium.com/v2/resize:fit:1100/format:webp/1*DHbx3ylWcEW9gon3do_gqQ.png 1100w, https://miro.medium.com/v2/resize:fit:1400/format:webp/1*DHbx3ylWcEW9gon3do_gqQ.png 1400w"
+                                                style="box-sizing: inherit;" type="image/webp"></source>
+                                                <source data-testid="og" sizes="(min-resolution: 4dppx) and (max-width: 700px) 50vw, (-webkit-min-device-pixel-ratio: 4) and (max-width: 700px) 50vw, (min-resolution: 3dppx) and (max-width: 700px) 67vw, (-webkit-min-device-pixel-ratio: 3) and (max-width: 700px) 65vw, (min-resolution: 2.5dppx) and (max-width: 700px) 80vw, (-webkit-min-device-pixel-ratio: 2.5) and (max-width: 700px) 80vw, (min-resolution: 2dppx) and (max-width: 700px) 100vw, (-webkit-min-device-pixel-ratio: 2) and (max-width: 700px) 100vw, 700px"
+                                                srcset="https://miro.medium.com/v2/resize:fit:640/1*DHbx3ylWcEW9gon3do_gqQ.png 640w, https://miro.medium.com/v2/resize:fit:720/1*DHbx3ylWcEW9gon3do_gqQ.png 720w, https://miro.medium.com/v2/resize:fit:750/1*DHbx3ylWcEW9gon3do_gqQ.png 750w, https://miro.medium.com/v2/resize:fit:786/1*DHbx3ylWcEW9gon3do_gqQ.png 786w, https://miro.medium.com/v2/resize:fit:828/1*DHbx3ylWcEW9gon3do_gqQ.png 828w, https://miro.medium.com/v2/resize:fit:1100/1*DHbx3ylWcEW9gon3do_gqQ.png 1100w, https://miro.medium.com/v2/resize:fit:1400/1*DHbx3ylWcEW9gon3do_gqQ.png 1400w"
+                                                style="box-sizing: inherit;"></source><img alt="" class="bg li nl c" height="369" loading="lazy" role="presentation" src="https://miro.medium.com/v2/resize:fit:1225/1*DHbx3ylWcEW9gon3do_gqQ.png" style="box-sizing: inherit; height: auto; max-width: 100%; vertical-align: middle; width: 680px;"
+                                                width="700" /></picture>
+                                        </div>
+                                    </div>
+                                </figure>
+
+                                <div>
+                                    <p></p>
+                                </div>
+                                <br>
+                                <br>
+                                <p><b>Thats it For this Blog.</b></p>
+                                <p><b>Thanks For Reading.</b></p>
+                                <p><b>Happy Hacking.</b></p>
+                                <p><b>You can connect with me at:</b></p>
+                                <p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+                                <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
     </body>
 </html>
+
+
+
+
