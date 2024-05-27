@@ -1,0 +1,177 @@
+---
+layout: default
+---
+<html>
+    <body>
+        <h1>Insecure Java Deserialization</h1>
+        In this blog post we will learn what is Deserialisation .Why we need it .How it works and how can we abuse it.All in the context of java.</p>
+        <h3>What is deserialisation:</h3>
+        <p 
+         id="9a79" >If you google deserialisation it says</p><pre nm nn no np nq nr ns nt nu ax nv bj" "background: rgb(242, 242, 242); border-radius: 0px; border: none; box-sizing: inherit; color: #242424; font-family: source-code-pro, Menlo, Monaco, &quot;Courier New&quot;, Courier, monospace; margin-bottom: 0px; margin-top: 56px; overflow-x: auto; padding: 20px;"><span nw nx fr ns b hq ny nz l hz oa"  id="a9ce" "box-sizing: inherit; display: block; font-size: 16px; letter-spacing: -0.022em; line-height: 1.18; margin-bottom: -0.09em; margin-top: -0.09em; min-width: fit-content; text-wrap: wrap;">Deserialisation is <span ns fs" "box-sizing: inherit; font-weight: 700;">the process of reconstructing a data structure or object from a series of bytes or a string in order to instantiate the object for consumption</span>.</span></pre>
+        <p
+         id="94db" >Let's understand with an example.</p>
+            <p  id="5a8c" >Consider a class called session</p>
+            <p  id="c9fe" >This class is responsible for checking the session tokens from the user.Whether the token is valid or not , which level of permission this user has(may be the role is just user or may be admin) etc etc.</p>
+            <p>Now this class has multiple variables and functions in place that can be used by another class lets say checkUser.java to verify the above stuff.Now the developers thought lets create a serialised object out of the class and send it to the user as
+                a session_token after a successful authentication.</p>
+            <p  id="280d" >When the user calls an authenticated endpoint this token gets submitted. Now the application recreates the class , takes all the required data out of it and then decides what to do.</p>
+            <p 
+             id="bf8d">The last phase i.e recreating the class , taking the data and deciding what to do is what we call as deserialisation . Basically we are reconstructing the object or the strings , so that we can create the object and consume it.</p>
+            <p><b><i>Why we need it:</i></b></p>
+            <p >The reason we needed serialisation and deserialisation in the past is we want to store the state of the objects or we want to transfer objects that can be used some where else(may be from one JVM to another JVM).</p>
+            <p>Considering the variety of Content-types we have now like JSON,XML we don't really need serialisation and deserialisation but still there are systems that uses it and thats where we need to know how it works.</p>
+            <p><b>Example:</b></p>
+            <p  id="40f2" >Consider the below class</p>
+           <p><img src="images/insecuredesr/pic1.png"></p>
+            <p  id="4714" >This class has pretty much all the things you will see in a class typically.</p>
+            <p  id="bbc9" >We have a constructor here ,variables and a function. Inside the function we also have another variable</p>
+            <p 
+            id="007e" >Let's create a serialised object</p>
+            <p><img src="images/insecuredesr/pic2.png"></p>
+            <p  id="bc5e" >The above class will serialise the helloWorld class and will create a serialised object out of it.</p>
+            <p><img src="images/insecuredesr/pic3.png"></p>
+            <p  id="d1b4" >This is how the hex representation of the serialised class looks like.if you will base64 encode it you will see the string starts with r00.This r00 is symbol you can say to identify that the gibberish thing you are seeing is nothing but a serialised
+                object.</p>
+            <p  id="6686" >Now let's deserialise the code and call the Display() function.</p>
+            <p><img src="images/insecuredesr/pic4.png"></p>
+            <p  id="3b33" >As you can see we successfully deserialised the byte-stream and called the display() function.</p>
+            <p  id="c02e"
+            >One main thing to note here is the line number 25.See how the class casting is happening.</p>
+            <p  id="3d29"
+            ><span mp fs" "box-sizing: inherit; font-weight: 700;">Exploitation:</span></p>
+            <p  id="1f4c"
+            >The Exploitation of vanila deserialisation can be in 2 ways.</p>
+            <ol " "background-color: white; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; list-style: none none; margin: 0px; padding: 0px;">
+                <li mn mo fr mp b mq mr ms mt mu mv mw mx my mz na nb nc nd ne nf ng nh ni nj nk of og oh bj"  id="d340" "box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 2.14em; padding-left: 0px;">Either change some variables value that may lead to elevated privileges</li>
+                <li mn mo fr mp b mq oi ms mt mu oj mw mx my ok na nb nc ol ne nf ng om ni nj nk of og oh bj"  id="ad93" "box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 1.14em; padding-left: 0px;">RCE by gadget Chaining.</li>
+            </ol>
+            <p  id="c337" >If you see the helloworld.java there is a variable called is_admin whose value is set to be false.If this value is responsible for setting the user role we can exploit this and can become admin.</p>
+            <p 
+             id="ded2" >let's do a little modifications and observe how this happens.</p>
+            <p><img src="images/insecuredesr/pic5.png"></p>
+            <p  id="55aa" >As you can see the is_admin value is set to False. Considering the fact that we can control the serialised object lets create our own custom exploit class and change the value.</p>
+            <p 
+             id="3f8d" >To do so here are the steps:</p>
+            <ol " "background-color: white; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; list-style: none none; margin: 0px; padding: 0px;">
+                <li mn mo fr mp b mq mr ms mt mu mv mw mx my mz na nb nc nd ne nf ng nh ni nj nk of og oh bj"  id="254d" "box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 2.14em; padding-left: 0px;">Copy the exact code of the class and paste it into a java file achieving the same name as the target.(do not forget the package)</li>
+                <li mn mo fr mp b mq oi ms mt mu oj mw mx my ok na nb nc ol ne nf ng om ni nj nk of og oh bj" 
+                id="041c" "box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 1.14em; padding-left: 0px;">Now change the value of the variable you want.</li>
+                <li mn mo fr mp b mq oi ms mt mu oj mw mx my ok na nb nc ol ne nf ng om ni nj nk of og oh bj"  id="6e6d" "box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 1.14em; padding-left: 0px;">Create another class with main function and serialise the 1st class</li>
+                <li mn mo fr mp b mq oi ms mt mu oj mw mx my ok na nb nc ol ne nf ng om ni nj nk of og oh bj"  id="61e9" "box-sizing: inherit; color: #242424; font-family: source-serif-pro, Georgia, Cambria, &quot;Times New Roman&quot;, Times, serif; font-size: 20px; letter-spacing: -0.003em; line-height: 32px; list-style-type: decimal; margin-bottom: -0.46em; margin-left: 30px; margin-top: 1.14em; padding-left: 0px;">Send it to the target.</li>
+            </ol>
+            <p><b>Video POC</b></p>
+            <figure class="nm nn no np nq mh" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                <div class="oo ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                    <div class="op oq l" style="box-sizing: inherit; height: 0px; padding-bottom: 510px;">
+                        <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FJOPcZT66Y74%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DJOPcZT66Y74&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FJOPcZT66Y74%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                        style="box-sizing: inherit; height: 510px; left: 0px; position: absolute; top: 0px; width: 680px;" title="Priv Esc Java Desr" width="640"></iframe>
+                    </div>
+                </div>
+            </figure>
+            <p  id="d412" >Now You might be thinking, well if this is the case i can change the contents of the display() function and if the target application is calling display() anywhere I can get a RCE out of it.</p>
+            <p 
+             id="8cde" >Well that can't happen and the reason is when we serialise the class we don't serialise everything .<span mp fs" "box-sizing: inherit; font-weight: 700;">We serialise the variables, values supplied to constructors and the object&nbsp;</span>(the
+                minimal,&nbsp;<span mp fs" "box-sizing: inherit; font-weight: 700;">and</span>&nbsp;<span mp fs" "box-sizing: inherit; font-weight: 700;">these are the things we can modify and make an effect on the workflow of the application</span>.)so
+                that we can reinstantiate the class.</p>
+            <p  id="f71a" >How ever if you see line number 25 where the class cast is happening , readObject() is being called.So if the serialised class have a readObject() implementation that will be get executed as part this line.</p>
+            <p 
+             id="4784" >Check out the video</p>
+             <figure class="nm nn no np nq mh" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                <div class="oo ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                    <div class="or oq l" style="box-sizing: inherit; height: 0px; padding-bottom: 382.196px;">
+                        <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FjuKZkRb9HOg%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DjuKZkRb9HOg&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FjuKZkRb9HOg%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                        style="box-sizing: inherit; height: 382.196px; left: 0px; position: absolute; top: 0px; width: 680px;" title="Custom ReadObject" width="854"></iframe>
+                    </div>
+                </div>
+            </figure>
+            <p  id="02bf" >To get an RCE out of this we have to find a class which has the custom implementation of readObject() and that takes argument from the user.</p>
+            <p 
+             id="8ed3" >Let's take a look into below code.</p>
+           <p><img src="images/insecuredesr/pic6.png"></p>
+            <p  id="0195" >But the above scenario cant happen all the time. In fact there is a very good chance that you will not get this anywhere.</p>
+            <p><img src="images/insecuredesr/pic7.png"></p>
+            <p  id="7022" >Remember the line where the class cast is happening.What if you put a serialised object of a different class present in the class path of the application?</p>
+            <p>The answer is it will throw a ClassCastException but if that class has a custom implementation of readObject&nbsp;<span mp fs" "box-sizing: inherit; font-weight: 700;">it will also get executed.</span></p>
+            <p>Let's take a look.</p>
+             <figure class="nm nn no np nq mh" style="background-color: white; box-sizing: inherit; clear: both; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin: 56px 0px 0px;">
+                <div class="oo ib l ee" style="box-sizing: inherit; margin: auto; overflow: hidden; position: relative;">
+                    <div class="op oq l" style="box-sizing: inherit; height: 0px; padding-bottom: 510px;">
+                        <iframe allowfullscreen="" class="eo n ff dy bg" frameborder="0" height="480" scrolling="no" src="https://cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FB_vEodyQBlY%3Ffeature%3Doembed&amp;display_name=YouTube&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DB_vEodyQBlY&amp;image=https%3A%2F%2Fi.ytimg.com%2Fvi%2FB_vEodyQBlY%2Fhqdefault.jpg&amp;key=a19fcc184b9711e1b4764040d3dc5c07&amp;type=text%2Fhtml&amp;schema=youtube"
+                        style="box-sizing: inherit; height: 510px; left: 0px; position: absolute; top: 0px; width: 680px;" title="java Desr(Soemthing)" width="640"></iframe>
+                    </div>
+                </div>
+            </figure>
+            <p  id="6325" >But how all the above things make sense to get an RCE.</p>
+           <p><img src="images/insecuredesr/pic8.png"></p>
+            <p  id="b7b3" >Well the thing is in the application class path there are certain classes which have the custom implementation of readObject() and it executes the command.</p>
+            <p 
+             id="2f86" >But there is another issue.We cant reach those classes directly in other words they don't execute the input sent by the user directly.So we have to reach them via other classes.And this is what we call a&nbsp;<span mp fs" "box-sizing: inherit; font-weight: 700;">Gadget Chain.</span></p>
+            <p
+             id="1b43" ><span mp fs" "box-sizing: inherit; font-weight: 700;">Here we chain a number of classes to reach a certain class which have the custom readObject() implementation and it executes code.</span></p>
+                <p 
+                 id="b216" >Take a look into the below picture.</p>
+               <p><img src="images/insecuredesr/pic9.png"></p>
+                <p  id="9115" >This is a gadget chain is called CommonCollections1.</p>
+                <p  id="7268" ><em nl" "box-sizing: inherit;">Note:Will write a separate blog on how to trace the gadget Chain.</em></p>
+                <p 
+                id="9010" >If the environment where the target application is running have these classes present then we can exploit an RCE via this gadget chain.</p>
+                <p 
+                 id="72d0" >Just like this there are number of other gadget Chains. Each can execute code depending on the target application's environment.</p>
+                <p><a af ow" href="https://github.com/frohoff/ysoserial" rel="noopener ugc nofollow" "-webkit-tap-highlight-color: transparent; box-sizing: inherit;" target="_blank">ysoserial</a>&nbsp;to create these gadget
+                    chains for us that can execute our code on the target server.</p>
+                <div ox oy oz pa pb pc" "background-color: white; box-shadow: rgb(242, 242, 242) 0px 0px 0px 1px inset; box-sizing: inherit; color: rgba(0, 0, 0, 0.8); font-family: medium-content-sans-serif-font, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Open Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif; margin-top: 32px;">
+                    <a href="https://github.com/frohoff/ysoserial?source=post_page-----d1fee11f49b1--------------------------------" rel="noopener  ugc nofollow" "-webkit-tap-highlight-color: transparent; box-sizing: inherit; text-decoration-line: none;" target="_blank">
+                       
+                    </a>
+                </div>
+                <p  id="694b" >Let's try to exploit our application with&nbsp;<a af ow" href="https://github.com/frohoff/ysoserial" rel="noopener ugc nofollow" "-webkit-tap-highlight-color: transparent; box-sizing: inherit;" target="_blank">ysoserial</a>.</p>
+                <p
+                 id="8c34" >If we are engaged in a white-box pentest we can easily find-out which gadget chain will work for us(By looking into all the dependencies).But in case of blackbox pentest we have to either take the help of information disclosure bug or try out
+                    all the possible chains.</p>
+                    <p  id="c130" >Sometimes base64 decoding the serialised object may give you an idea about the chain you need to use.</p>
+                    <p 
+                    id="0094" >To gain an rce as I mentioned we need gadget chains.And as our application is just a demo application it don't have any gadget chains.So let's add CommonCollections 3.2.1 to our class path.</p>
+                    <p 
+                     id="b811" >But wait if these classes are not there by default what is the point then.</p>
+                    <p  id="9d2a" >The thing is when we use some libraries of java those libraries at some point use these classes or gadgets .So in a real world application you will definitely find one of the gadget mentioned on the ysoserial.jar file.</p>
+                    <p><img src="images/insecuredesr/pic10.png"></p>
+                    <p  id="54fc" >Let's use the ysoserial.jar and get a simple curl request.</p>
+                    <p><img src="images/insecuredesr/pic11.png"></p>
+                    <p  id="be9d" >As you can see we got call back at our listener.</p>
+                    <p  id="d7f8" >One thing to notice here is even if i added commonCollection 3.x.x i am using commonCollections5 for my payload.If you will use CommonCollections3 it wont work and the reason is&nbsp;<a af ow" href="https://github.com/frohoff/ysoserial/issues/65"
+                        rel="noopener ugc nofollow" "-webkit-tap-highlight-color: transparent; box-sizing: inherit;" target="_blank">https://github.com/frohoff/ysoserial/issues/65</a>.</p>
+                    <p 
+                     id="65f1" >So if we are in a white box approach we can always check the logs and findout why our payload didn't worked and get it working quickly by googling.</p>
+                    <p 
+                     id="066c" >But in case of a black-box test all we can do is hit-n-trial.</p>
+                    <p  id="bc2f" >One thing we can do in case of blackbox testing is to use the burp extension called Java Deserialisation Scanner.Its a free extension.</p>
+                    <p><img src="images/insecuredesr/pic12.png"></p>
+                    <p  id="6f89" >As you can see it quickly identified the possible gadget chains to exploit.</p>
+                    <p  id="7c3c" >So this is how we can exploit the insecure implementation of readObject().</p>
+                    <h3>Mitigation:</h3>
+                    <p  id="d46b"
+                    >To mitigate this the best approach is to not deserialise the data from the user.</p>
+                    <p>But if that is not possible we can do something called lookupAhead technique This is basically checking which class we. are trying to deserialise before deserialising it.</p>
+                    <p>The idea here is to overwrite the ObjectInputStream#resolveClass().Since this is the class that gets executed before redObject().</p>
+                    <p>Take a look .</p>
+<p><img src="images/insecuredesr/pic13.png"></p>
+                    <p  id="9be1" >If you see the stoprce() implementation</p>
+                    <p><img src="images/insecuredesr/pic14.png"></p>
+                    <p  id="ad98" >Now when we try to exploit the deserialisation</p>
+                    <p><img src="images/insecuredesr/pic15.png"></p>
+                    <p >So this is how we can mitigate the risk if we had to deserialise the untrusted user data.</p>
+   
+   
+                    <div>
+                        <p></p>
+                    </div>
+                    <br>
+                    <br>
+                    <p><b>Thats it For this Blog.</b></p>
+                    <p><b>Thanks For Reading.</b></p>
+                    <p><b>Happy Hacking.</b></p>
+                    <p><b>You can connect with me at:</b></p>
+                    <p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+                    <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+                </body>
+</html>

@@ -1,0 +1,105 @@
+<html>
+    <body>
+        <p>This article is all about pentesting JWT. You can practice all of these techniques on vulnerable target availabe at burp Suite webacademy labs. I will try to make the article as easy as possible and will try to make you understand in very layman language.</span></span>
+        </p>
+        <p>What is JWT: JWT is a token mechanism which is actually designed as a means of checking authorization. Though in certain situation we will see this being used for authentication. A JWT looks like this. As you can see it has 3 parts. The red part is called</span></span>
+        </p>
+        <p>header the purple part is called body/payload and the 3rd part is signature. This entire string(apart from the last part)is base64 encoded which on decoding will result something like The key value pairs are called claims.ideally the header part must</span></span>
+        </p>
+        <p>have alg and typ claim. The body part can have any thing as claim. There are couple of standard claims but we can also add our custom claim both in header and body.(Almost all libraries let you do this). Here are some of the standard claims. Vulnerabilities:</span></span>
+        </p>
+        <p>Weak signing algo(none algorithm): The alg claim specifies the type of algorithm that is used to sign the token. There are 2 standard algorithms HS and RS But often the token claim has none algorithm. In simple meaning the token do not require any signature.That</span></span>
+        </p>
+        <p>means if we change the payload part there is no mechanism in place to stop us. So if the payload has claims like “role”:”user” we can simply change it become admin. Lets see a quick demo Will Publish Soon Vulnerable Code Pattern: The above is a vulnerable</span></span>
+        </p>
+        <p>code written in java And the below in python. Mitigation: Always use strong algorithms like HS256 or RS256 or may 512 version. Weak Secret: This vulnerability is specific to the HS256 algorithm.So if you see RS being used in alg claim you can skip this</span></span>
+        </p>
+        <p>test. HS256 is a symmetric key algorithm.Meaning the same key is used to both encrypt and decrypt.We call it secret. So while using this algorithm we should keep in mind that the secret need be long and strong enough.Else it can be either guessed or brute-forced.</span></span>
+        </p>
+        <p>Consider this token. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.dQknU80__AHPVDmZPFavWdML1XKrwPLeOXnCmoVY3AY The secret of the above token can be easily brute-forced with the jwt_tool</span></span>
+        </p>
+        <p>or even with hashcat. Mitigation: Always use long and strong secrets with HS256. Key Confusion Attack: This attack happens in case of RS256 algorithm. When the underlying library do not mandate the expected alg type while verifying the signature of the</span></span>
+        </p>
+        <p>token this kind of vulnerability may arise.The library , upon not specifying an expected alg type fall backs to default alg type Let’s say the application has issued a token with “alg”:”RS256". RS256 used private key to sign the token and the public key</span></span>
+        </p>
+        <p>to verify the token.So to successfully tamper the token the attacker needs to have the private key that is used to sign the token. Now let’s say the default alg type is HS256.Now if the developer do not specify an alg type explicitly the application will</span></span>
+        </p>
+        <p>use HS256 to verify the token. Considering HS256 uses the same key to sign and verify if the attacker is able to sign his malicious token with the public key , then the application will simply allow the access to the attacker. If the above is confusing</span></span>
+        </p>
+        <p>take look at the below pictures. Library that enforces to specify alg while verifying Libraries that do not enforce the alg type while verifying DEMO: Will Publish Soon Mitigation: Always explicitly set the alg type while verifying the token. Critical</span></span>
+        </p>
+        <p>vulnerabilities in JSON Web Token libraries TL;DR: If you are using node-jsonwebtoken, pyjwt, namshi/jose, php-jwt or jsjwt with asymmetric keys (RS256, RS384… auth0.com https://www.sourceclear.com/vulnerability-database/security/key-confusion-attacks/python/sid-4916</span></span>
+        </p>
+        <p>https://seclists.org/oss-sec/2021/q3/92 Exploiting KID Header: If we see the picture that bit above in the article the KID header is a key identifier.It helps to identify the right key/secret when we have a bunch of them.Its specially used with JWKS(will</span></span>
+        </p>
+        <p>discuss what is jwks and how to hack them). The below vulnerabilities are possible depending on the way its programmed to be used. SQL Injection Directory Traversal Command Execution If the KID header is used to fetch a key from the database then there</span></span>
+        </p>
+        <p>is chance of sql injection. If the sql queries are not handled properly. DEMO: Vulnerable Code: Mitigation: Sanitise the user input and use prepared statements and parameter bindings. Similarly if the key is stored in a file system we can either achieve</span></span>
+        </p>
+        <p>Directory Traversal or command execution. If the os level commands such as cat is used and the input from the header is not being sanitised then this can lead to RCE. DEMO: Vulnerable Code: Mitigation: Sanitise the user input and use code level libraries</span></span>
+        </p>
+        <p>to read the file contents. In other case if the input is not being passed to something like cat but even if the libraries are used to read the file content if the user input is not sanitised this can lead to directory traversal and hence we bypass the</span></span>
+        </p>
+        <p>AuthoriZation DEMO: Vulnerable Code: Mitigation: Sanitise the user input for directory traversal. The best way to deal with this is to keep the keys inside a vault and in the filesystem or in db. Exploiting JKU Header: The jku header is used to fetch</span></span>
+        </p>
+        <p>a jwks file and this file is used to select the correct public key or we can say the correct key identifier and its values that can be usd to build back the public key and verify the token. But what is jwks. The full form is obviously Json Web Keys 😅</span></span>
+        </p>
+        <p>but what this actually is a json file that contains a number for keys or some key value pairs using which we can build the key. Here is how a JWKS file looks like. As you can see we can use the n and e to build a rsa public key. If you are not familiar</span></span>
+        </p>
+        <p>with RSA public key and private key check out this article. https://sectigostore.com/blog/public-key-vs-private-key-how-do-they-work/ The main reason here for the issue is the application have to decode the token and use it in order to fetch the jwks</span></span>
+        </p>
+        <p>so that it can build the public key and verify the token. So if the application simply trusts the jku with out any validation then this can be abused. We can simply host our own JWKS file and point he jku to our server. Steps to exploit Create your public</span></span>
+        </p>
+        <p>and private key pair. openssl genrsa -out private.pem 2048 openssl rsa -in private.pem -outform PEM -pubout -out public.pem 2.Create your JWK You can either use python or this online tool JWK Creator Edit description russelldavies.github.io Make sure</span></span>
+        </p>
+        <p>you make your own jwk identical to the jwk used by the target application.Specially the KID part. 3.host he JWK 4.Change the payload part and sign it with your private key You can use the jwt.io or python as usual to sign the token. Note: if the above</span></span>
+        </p>
+        <p>technique doesn’t work try putting the jwk that you created inside an array shown below. { “keys”:[Content_OF_JWK] } DEMO: Vulnerable Code: Mitigation: Use a whilteList to check if the jku received from the token is in the allowed list or not.DONOT USE</span></span>
+        </p>
+        <p>STARTSWITH, INDEXOF OR ENDSWITH FUNCTION WHILE COMPARING WITH THE WHITE LIST.MATCH THE FULL JKU WITH THE ENTITY OF THE ALLOWED LIST. We will see later how even using the allowed list may be vulnerable and bypassed. Exploiting X5C Header: x5c header contains</span></span>
+        </p>
+        <p>the x509certificate/x509certificate chain that can be used to verify the token. Ideally the public key of the certificate is first gets extracted and then used to verify the token. This is how an x5c header looks like.But it can also have those — -BEGIN</span></span>
+        </p>
+        <p>CERTIFICATE — — and end certificate strings. Now if the application simply trusts the x5c that is there in the token without any validation then this can be abused. We can put our own certificate and modify the body as required and we can bypass the Authorization.</span></span>
+        </p>
+        <p>Steps To Exploit: Create x509 certificate and extract the public and private key out of them openssl req -x509 -nodes -days -newkey rsa:2048 -keyout attacker.key -out attacker.crt openssl x509 -pubkey -noout -in attacker.crt &gt; publicKey.pem 2.Tamper the</span></span>
+        </p>
+        <p>token and put your x509 certificate in place of x5c claim. 3.Modify the token and sign it with the private key. You can either use python3 or jwt.io for this. DEMO: Vulnerable Code: Mitigation: We should not validate the jwt like this in the first place.But</span></span>
+        </p>
+        <p>still if we want to then we should use x5u instead of x5c header.x5u is similar to jku .The only difference is the jku holds a JWK and an x5u holds a x5c link. Exploiting x5u Header: This header works exactly same as the jku.But its used to fetch a x5c</span></span>
+        </p>
+        <p>certificate from a web server that wil be used to create a pubic key out of them and verify the token. This is how a token with x5u looks like. The issue here is same as JKU. If the application simply trusts the x5u without any validation we can abuse</span></span>
+        </p>
+        <p>this. Steps to Exploit: Create a certificate and public, private rsa key pair openssl req -x509 -nodes -days -newkey rsa:2048 -keyout attacker.key -out attacker.crt openssl x509 -pubkey -noout -in attacker.crt &gt; publicKey.pem 2.Host the certificate 3.Tamper</span></span>
+        </p>
+        <p>the token and sign it with the private key You can either use the python3 or jwt.io to do this. DEMO: Vulnerable Code: Mitigation: Maintain a whitelist and perform a full match with the elements of the list and the url from token.DO NOT USE STARTSWITH,</span></span>
+        </p>
+        <p>INDEXOF OR ENDSWITH FUNCTION WHILE COMPARING WITH THE WHITE LIST.MATCH THE FULL JKU WITH THE ENTITY OF THE ALLOWED LIST. SOME OTHER IMP BUGS TO CHECK: Token having no expiration date. If a jwt token do not have any expiration claim set , tis can be vulnerable</span></span>
+        </p>
+        <p>to replay attack.Meaning if the token got captured once(MITM,Info Disclosure) then it can be used repeatedly. Consider the below code. This code uses HS256 alg and have quite a good secret.How ever this code will produce the token which will not have</span></span>
+        </p>
+        <p>any expiration date.To fix this we can use exp claim. As you can see in the above code the exp claim is set.Now this token wont work once the expiration is over. Obviously we need to check this thing while verifying. 2.Cross Service Relay Attack: Consider</span></span>
+        </p>
+        <p>a scenario where there are 3 components. Token Service, appliance Management and Life Cycle Management. It might happen that the LCM and applmgmt uses token service to issue and verify the jwt token. Now let’s say the LCM has a user called Robin and the</span></span>
+        </p>
+        <p>applmgmt allows user registration. If the Token service do not put due diligence and the necessary claim wile creating and verifying token it might happen that the attacker can create a user having same username as Robin in the applmgmt — → which will</span></span>
+        </p>
+        <p>give him a jwt token — — -&gt;and that jwt token when sent to LCM — →LCM will send this to the token service to verify and as the token service is misconfigured it may simply ended up giving access to Robin’s account to the attacker. This attack is called</span></span>
+        </p>
+        <p>cross service relay attack. Thanks For reading, Happy Hacking You can connect with me at linkedin:https://www.linkedin.com/in/swagatkumar/</span></span>
+        </p>
+    
+        <div>
+            <p></p>
+        </div>
+        <br>
+        <br>
+        <p><b>Thats it For this Blog.</b></p>
+        <p><b>Thanks For Reading.</b></p>
+        <p><b>Happy Hacking.</b></p>
+        <p><b>You can connect with me at:</b></p>
+        <p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+        <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+    
+    </body>
+</html>

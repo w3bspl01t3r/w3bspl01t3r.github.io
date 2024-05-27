@@ -745,8 +745,8 @@ public class testObject implements javax.naming.spi.ObjectFactory
         But what about JDK 14 to 19 , why tomcat gadget will not work there?
     </p>
     <p> To answer the above question lets take a close into the gadget</p>
-    <p>The gagdet uses the javax.el.ELProcessor.eval() to execute a expression language written on the payload variable.</p>
-    <p>This expression language uses ScripEngine which is not available after JDK 14 (nashorm script engine is absent).</p>
+    <p>The gagdet uses the javax.el.ELProcessor.eval() to execute an expression language written on the payload variable.</p>
+    <p>This expression language uses ScriptEngine which is not available after JDK 14 (nashorm script engine is absent).</p>
     <p>And hence the expression language never succeeds to give us a shell</p>
     <p>Chaning the expression language on the payload variable to below will give you code execution.</p>
     <p>
