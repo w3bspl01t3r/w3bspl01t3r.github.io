@@ -3,7 +3,7 @@ layout: default
 ---
 <html>
 <body>
-<h1>CommonsCollection1</h1>
+
 <p>So Before we start Learning CommonsCollection1 there are certain Concepts we should Learn.<br><br>
     The trnasformer.<br><br><br>
     In  layman language these are functions which takes an input transfomrs it and produces an output.<br><br><br>
@@ -30,7 +30,7 @@ Few are:
 So we have instntiated the ConstantTransformer with the String "Helloworld".
 So even if we pass 123 to the transform method the value it will return is still gogin to be "HelloWorld"
 <p>
-    <img src="CONSTANTTRANSFROMERINITWORKING">
+    <img src="images/ConstantTransformerInit.PNG">
 </p>
 
 <h3>InvokerTransFormer</h3>
@@ -57,7 +57,7 @@ So even if we pass 123 to the transform method the value it will return is still
     </code>
 <p>So the Output of the code will be "YES"</p>
 <p>
-    <img src="INVOKERINITOUTPUT">
+    <img src="images/InvokerTransformer_init.PNG">
 </p>
 
 <p>So inshort invokerTransformer is used to invoker certain Method.</p>
@@ -66,11 +66,33 @@ So even if we pass 123 to the transform method the value it will return is still
 <p>This transformer as the name suggest chains multiple transformer.<br>
     Meaning it takes the output of the first Transformer and passes it as the argument of the 2nd TransFormer.</p>
     <p>So it takes an Input as array of TransFormers</p>
-    <code>ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });</code>
+    <code>import java.util.ArrayList;
+        import java.util.HashMap;
+        import java.util.List;
+        import java.util.Map;
+        import java.util.HashMap;
+        
+        import org.apache.commons.collections.Transformer;
+        
+        import org.apache.commons.collections.functors.*;
+        
+        public class testing {
+        
+        
+            public static void main(String args[]){
+        
+            Person pt=new Person();
+          
+            ConstantTransformer tr=new ConstantTransformer(Person.class);
+            InvokerTransformer newInstanceTransformer = new InvokerTransformer("newInstance",new Class[0],new Object[0]);
+            InvokerTransformer tr3=new InvokerTransformer("nice",new Class[]{String.class},new  String[]{"hi"});
+            ChainedTransformer ctr=new ChainedTransformer(new Transformer[]{tr,newInstanceTransformer,tr3});
+            System.out.println(ctr.transform("RANDOM"));
+            }}</code>
     <p>Where constant and instantiate are the name if the Transformers</p>
-    <p>The transfomr() of ChainedTransformer will take the argument required by the first Transformer of the TransFormer of the TransFormer array in our cas it will be ConstantTransformer </p>
+    <p>The transfomr() of ChainedTransformer will take the argument required by the first Transformer of the TransFormer of the TransFormer array in our case it will be ConstantTransformer </p>
     <p>
-        <img src="CHAINEDINITOUTPUT">
+        <img src="images/Chained_Transformer_Value.PNG">
     </p>
     
     <p>So lets get into Payload</p>
@@ -143,14 +165,9 @@ So the above code takes the MethodName , Class array of paramTypes and Object[] 
 
 <p>So can we Invoke Runtime.getRuntime().exec() ?</p>
 <p>Answer is Yes, but its not Straight Forward.</p>
-<p>But lets Try to do that and see what happens</p>
-<p>Checkout the Below Image</p>
-<img src="Invoking RUntime.getRuntime().exec() Via InvokerTransformer Only">
-<p>As you can see from the output we got the Error that</p>
-<FILL IT WITH THE ERROR AND CONTINUE THIS>
 
-<p>So the reason we are having this Trouble is in Runtime.class the getRuntime() is defined as a static Method.</p>
-<p>When we are calling Static Method we canot call it from an object of the class but we have to call it on class meaning className.MethodName(). So in out case we can only do it via Runtiem.getRuntime()</p>
+<p>So t in Runtime.class the getRuntime() is defined as a static Method.</p>
+<p>When we are calling Static Method we canot call it from an object of the class but we have to call it on class meaning className.MethodName(). So in our case we can only do it via Runtiem.getRuntime()</p>
 <p>IF we try to create an Object of Runtime() and call the getRuntime() it will thorugh a compile TIme Error</p>
 <p>Try Running the Below Code</p>
 <pre><code>Runtime rt=new Runtime();
