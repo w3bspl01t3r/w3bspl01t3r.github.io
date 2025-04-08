@@ -24,8 +24,121 @@ InstantiateTransformer() constructor takes 2 parameters.
 - Parameter Type(a class array of types)
 - args(The Object type).
 
-<Working OF InstantiateTransFormer with Sample COde></Working>
+<p>
+    When we call the transform() on the instantiateTransformer, the transform() takes one argument.
+    Lets say this is input.<br>
+    Now lets see how the transForm() looks like in InstantiateTransFormer.
+</p>
 
+<p>
+    <pre>
+        <code>
+            @Override
+            public T transform(final Class<? extends T> input) {
+                try {
+                    if (input == null) {
+                        throw new FunctorException(
+                            "InstantiateTransformer: Input object was not an instanceof Class, it was a null object");
+                    }
+                    final Constructor<? extends T> con = input.getConstructor(iParamTypes);
+                    return con.newInstance(iArgs);
+                } catch (final NoSuchMethodException ex) {
+                    throw new FunctorException("InstantiateTransformer: The constructor must exist and be public ");
+                } catch (final InstantiationException ex) {
+                    throw new FunctorException("InstantiateTransformer: InstantiationException", ex);
+                } catch (final IllegalAccessException ex) {
+                    throw new FunctorException("InstantiateTransformer: Constructor must be public", ex);
+                } catch (final InvocationTargetException ex) {
+                    throw new FunctorException("InstantiateTransformer: Constructor threw an exception", ex);
+                }
+            }
+        
+        }
+        </code>
+    </pre>
+</p>
+<p>Which can be simplified as below</p>
+<p>
+    <pre>
+        <code>
+            public T transform(final Class<? extends T> input) {
+                final Constructor<? extends T> con = input.getConstructor(iParamTypes);
+                return con.newInstance(iArgs);
+                }
+        </code>
+    </pre>
+</p>
+<p>So the argument we pass to the transform() is the input, and as you can see the transForm uses Reflections to find all the <b>Public</b> Constructors that takes an Argument<br>
+of iParamTypes i.e the type we pass during the initilisation and then it creates a new object of it using newInstance()</p>
+
+<p>
+    So lets take some example
+</p>
+<p>Lets say we have a class called AnotherClass which looks like below<br>
+<pre>
+    <code>
+import java.lang.reflect.Method;
+public class AnotherClasss{
+    public AnotherClasss(testclass b,String input)
+    {
+
+            b.Hello(input);
+    }
+}
+                
+    </code>
+</pre>
+<br>
+Lets Say there is another class called testclass which looks like below
+<br>
+<pre>
+    <code>
+        public class testclass
+{
+
+public void  Hello(String a)
+{
+    System.out.println(a);
+}
+}
+    </code>
+</pre>
+<br>
+
+Now we want to call the testClass Hello(), but want to use instntiateTransformer.<br>we can do that Through AnotherClass and the code will look like below<br>
+<pre>
+    <code>
+
+import org.apache.commons.collections.functors.*;
+import org.apache.commons.collections.Transformer;
+
+public class instantclass
+{
+    public static void main(String args[])
+    {
+        ConstantTransformer tr=new ConstantTransformer(1);
+        ConstantTransformer tr1=new ConstantTransformer(AnotherClasss.class);
+        InstantiateTransformer tr2=new InstantiateTransformer(new Class[] { testclass.class,String.class},new Object[]{new testclass(),"ITWORKS"});
+        tr2.transform(tr1.transform(tr.transform("test")));
+    }
+}
+    </code>
+</pre></p>
+
+<p>
+    SO how exactly this works.?
+</p>
+<p>
+    As we saw above the transform() takes AnotherClass.class and looks for all the Public Constructors.
+    It Find the AnotherClass(testclass b,String input)
+    And then It initiatlised it.
+
+    Upon initiatlisation as we know the code inside the constrcutors gets executed which indeed calls the b.Hello(input) i.e testClass.Hello("ITWORKS").
+    And Hello(String a) method simply prints the Input and hence we see the output as ITWORKS
+</p>
+<p>
+    <img src="images/cc/cc3itworks.PNG">
+</p>
 <p>Lets Understand the payload now</p>
 <p>
     <pre>
