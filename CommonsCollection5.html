@@ -213,6 +213,19 @@ public static void main(String args[])
 <p>
     <img src="images/cc/cc5CalcPopup.PNG">
 </p>
+
+
+<h4>Summary:</h4>
+<ul>
+  <li>The gadget uses <code>BadAttributeValueExpException</code> as the entry point during deserialization.</li>
+  <li>We set the internal <code>val</code> field to a crafted <code>TiedMapEntry</code> via reflection.</li>
+  <li><code>BadAttributeValueExpException.readObject()</code> invokes <code>val.toString()</code>, triggering <code>TiedMapEntry.toString()</code>.</li>
+  <li><code>TiedMapEntry.toString()</code> calls <code>getValue()</code>, which leads to <code>LazyMap.get()</code>.</li>
+  <li>If the key is missing, <code>LazyMap</code> calls <code>transform()</code> using a user-controlled <code>Transformer</code> chain.</li>
+  <li>This chain executes arbitrary code via <code>Runtime.getRuntime().exec()</code>.</li>
+  <li>Reflection is used to set the <code>val</code> field after object creation to avoid premature execution — this is critical for payload generation.</li>
+</ul>
+
 <p>Thats it for Today.</p>
 <p>Thanks For Reading.</p>
 <p>Happy Hacking.</p>

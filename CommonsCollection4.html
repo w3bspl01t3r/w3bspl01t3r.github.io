@@ -241,6 +241,19 @@ public class cc4 {
 <p>
     This is how the CommonsCollection4 Payload works, staring from the EntryPoint to Code Execution
 </p>
+
+
+<h4>Summary:</h4>
+<ul>
+  <li>The payload uses a combination of <code>ConstantTransformer</code> and <code>InstantiateTransformer</code> chained together.</li>
+  <li><code>ConstantTransformer</code> always returns <code>TrAXFilter.class</code>, regardless of input.</li>
+  <li><code>InstantiateTransformer</code> attempts to create a new instance of <code>TrAXFilter</code> using a <code>TemplatesImpl</code> object we control.</li>
+  <li>A <code>TransformingComparator</code> is created using the above chained transformer, and passed to a <code>PriorityQueue</code>.</li>
+  <li>When the queue is deserialized or sorted, <code>compare()</code> calls <code>transform()</code> on the chained transformers.</li>
+  <li>Even though we added integers (1, 1) to the queue, the values are overwritten by the transformer logic during comparison.</li>
+  <li>This leads to <code>TrAXFilter</code> instantiation → triggering the bytecode in <code>TemplatesImpl</code> → RCE.</li>
+</ul>
+
 <p>Thats it for Today.</p>
 <p>Thanks For Reading.</p>
 <p>Happy Hacking.</p>

@@ -363,6 +363,24 @@ public class TemplatesImplExploit {
     <p>Apart from the above changes everything else remains Same</p>
 </div>
 
+
+<h4>Summary:</h4>
+<ul>
+  <li><code>CommonsCollections3</code> is similar to CC1, but uses <code>InstantiateTransformer</code> instead of <code>InvokerTransformer</code>.</li>
+  <li><code>InstantiateTransformer</code> takes a class and instantiates it using specified constructor arguments.</li>
+  <li>We use <code>TemplatesImpl</code> to embed malicious bytecode, which is executed when <code>newTransformer()</code> is called.</li>
+  <li><code>TrAXFilter.class</code> is chosen because it has a public constructor that takes a <code>Templates</code> object and internally calls <code>newTransformer()</code>.</li>
+  <li>The transformer chain consists of:
+    <ul>
+      <li><code>ConstantTransformer(TrAXFilter.class)</code> - always returns the class</li>
+      <li><code>InstantiateTransformer</code> - uses the class and the malicious <code>TemplatesImpl</code> object to instantiate a new <code>TrAXFilter</code>, triggering the exploit</li>
+    </ul>
+  </li>
+  <li><code>TemplatesImpl</code> is created using JavaAssist to inject a malicious static initializer (e.g., <code>Runtime.getRuntime().exec()</code>).</li>
+  <li>Execution occurs when the transform chain is triggered (e.g., via <code>LazyMap.get()</code> or any gadget that invokes the transformer).</li>
+</ul>
+
+
 <p>Thats it for Today.</p>
 <p>Thanks For Reading.</p>
 <p>Happy Hacking.</p>

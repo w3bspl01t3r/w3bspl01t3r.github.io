@@ -382,6 +382,18 @@ public class cc2 {
 </p>
 <p>This is how the CommonsCollection2 Payload works, staring from the EntryPoint to Code Execution</p>
 
+
+<h4>Summary:</h4>
+<ul>
+  <li><code>CommonsCollections2</code> uses a <code>PriorityQueue</code> and <code>TransformingComparator</code> instead of a chain of transformers or <code>LazyMap</code>.</li>
+  <li>The exploit chain is triggered during deserialization via <code>PriorityQueue.readObject()</code>, which calls <code>heapify()</code>.</li>
+  <li><code>heapify()</code> invokes <code>compare()</code> from the provided <code>Comparator</code>, in this case a <code>TransformingComparator</code>.</li>
+  <li><code>TransformingComparator.compare()</code> internally calls <code>transformer.apply()</code>, which maps to <code>transformer.transform()</code> due to interface inheritance.</li>
+  <li><code>InvokerTransformer</code> is used to invoke <code>newTransformer()</code> on a malicious <code>TemplatesImpl</code> object, which executes the injected bytecode.</li>
+  <li>The queue contents are manipulated using reflection to ensure <code>TemplatesImpl</code> is used during comparison.</li>
+  <li>In a simplified local PoC, the method name can be directly set to <code>newTransformer</code> without needing to override it via reflection.</li>
+</ul>
+
 <p>Thats it for Today.</p>
 <p>Thanks For Reading.</p>
 <p>Happy Hacking.</p>
