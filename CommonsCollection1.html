@@ -303,6 +303,21 @@ public class testing {
 <p>So this is how commons Collection1 Gadget Works</p>
 <p><i>Note: we will read About the LazyMap and the Proxies while we learn on Gadget Builing, For now we will just learn how exactly the paylod works</i></p>
 
+<h4>Summary:</h4>
+<ul>
+  <li><code>CommonsCollections1</code> is the classic transformer-based gadget chain that achieves RCE using <code>InvokerTransformer</code> and <code>ChainedTransformer</code>.</li>
+  <li><code>ConstantTransformer</code> is used to return <code>Runtime.class</code> regardless of input.</li>
+  <li><code>InvokerTransformer</code> then sequentially invokes:
+    <ul>
+      <li><code>getMethod("getRuntime", new Class[0])</code> on <code>Runtime.class</code></li>
+      <li><code>invoke(null, new Object[0])</code> to get a <code>Runtime</code> instance</li>
+      <li><code>exec("calc.exe")</code> on the <code>Runtime</code> instance</li>
+    </ul>
+  </li>
+  <li>These transformers are chained together using <code>ChainedTransformer</code>, forming a pipeline of method calls.</li>
+  <li>To trigger the chain, <code>LazyMap.get()</code> is typically used during deserialization, though this post focuses only on the transformer logic.</li>
+  <li>The payload works by reflecting into Java classes and methods, allowing arbitrary code execution without using external libraries or ysoserial.</li>
+</ul>
 
 <p>Thats it for Today.</p>
 <p>Thanks For Reading.</p>
