@@ -25,8 +25,13 @@ Few are:
     In case of  ConstantTransformer Once it's initialised with something no matter what you send to transform , it always returns the one that it has been initialised with.<br>
     Take below code for an example.
 </p>
-<p><code>ConstantTransformer transformer = new ConstantTransformer("HelloWorld");
-    System.out.println(transformer.transform(123)); //Outouts HelloWorld and the return type Java.lang.String</code></p>
+<p>
+    <pre>
+    <code>
+    ConstantTransformer transformer = new ConstantTransformer("HelloWorld");
+    System.out.println(transformer.transform(123)); //Outouts HelloWorld and the return type Java.lang.String
+</code>
+    </pre></p>
 So we have instntiated the ConstantTransformer with the String "Helloworld".
 So even if we pass 123 to the transform method the value it will return is still gogin to be "HelloWorld"
 <p>
@@ -41,20 +46,32 @@ So even if we pass 123 to the transform method the value it will return is still
     <li>The Value you want to the pass to those method</li>
 </ul> 
 <p> Take below code for an example.</p>
-<code>Person pt=new Person()
-    InvokerTransformer transformer = new InvokerTransformer("nice",new Class[]{String.class},new String[]{"YES"});
-    System.out.println(transformer.transform(pt)) //Outputs Yes</code>
+<p>
+    <pre>
+        <code>
+            Person pt=new Person()
+            InvokerTransformer transformer = new InvokerTransformer("nice",new Class[]{String.class},new String[]{"YES"});
+            System.out.println(transformer.transform(pt)) //Outputs Yes
+        </code>
+    </pre>
+</p>
+
 <p>The above code will find the function on Person Class whose name is nice and it takes one Parameter of string type and the value its going to pass is "YES"<br>
 
     The Person class looks something like below</p>
-    <code>
-        public class Person {
+    <p>
+        <pre>
+            <code>
+            public class Person {
 
             public String nice(String a){
                 return a.toUpperCase();
             }
         }
-    </code>
+            </code>
+        </pre>
+    </p>
+   
 <p>So the Output of the code will be "YES"</p>
 <p>
     <img src="images/cc/InvokerTransformer_init.PNG">
@@ -66,7 +83,10 @@ So even if we pass 123 to the transform method the value it will return is still
 <p>This transformer as the name suggest chains multiple transformer.<br>
     Meaning it takes the output of the first Transformer and passes it as the argument of the 2nd TransFormer.</p>
     <p>So it takes an Input as array of TransFormers</p>
-    <code>import java.util.ArrayList;
+    <p>
+        <pre>
+            <code>
+        import java.util.ArrayList;
         import java.util.HashMap;
         import java.util.List;
         import java.util.Map;
@@ -88,7 +108,11 @@ So even if we pass 123 to the transform method the value it will return is still
             InvokerTransformer tr3=new InvokerTransformer("nice",new Class[]{String.class},new  String[]{"hi"});
             ChainedTransformer ctr=new ChainedTransformer(new Transformer[]{tr,newInstanceTransformer,tr3});
             System.out.println(ctr.transform("RANDOM"));
-            }}</code>
+            }}
+            </code>
+        </pre>
+    </p>
+
     <p>Where constant and instantiate are the name if the Transformers</p>
     <p>The transfomr() of ChainedTransformer will take the argument required by the first Transformer of the TransFormer of the TransFormer array in our case it will be ConstantTransformer </p>
     <p>
@@ -96,6 +120,7 @@ So even if we pass 123 to the transform method the value it will return is still
     </p>
     
     <p>So lets get into Payload</p>
+    
     <pre><code>public class CommonsCollections1PayloadOnly {<br>
         public static void main(String... args) {<br>
             String[] command = {"calc.exe"};<br>
