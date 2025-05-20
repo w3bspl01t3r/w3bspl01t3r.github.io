@@ -195,18 +195,24 @@ public class AnotherClass implements Comparator<String>, Serializable {
     <p>
         So the below code 
         <pre>
-<code>
+        <code>
     Transformer&#60;String, Integer&#62;transformer = new InvokerTransformer<>("length", null, null);
     Integer length = transformer.transform("Hello");  // Calls transform() directly
-</code>
+        </code>
+        </pre>
+        </p>
 
-       <p> can also be written as</p>
-<code>
+       <p> can also be written as
+       <pre>
+        <code>
     Function&#60;String, Integer&#62; func = transformer::transform;  // Adapts `Transformer` to `Function`
     Integer length = func.apply("Hello");  // Calls transform() via apply()
-</code>
+        </code>
 
-</pre>
+       </pre>
+       </p>
+
+
     </p>
     <p>If you check the SuperClass i.e TransFormer.java you will see the below code</p>
     <p>
