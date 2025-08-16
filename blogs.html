@@ -1,35 +1,120 @@
----
-layout: default
----
-<html>
-    <head>
-        <style>
-            .topnav-right {
-  float: right;
-}
-        </style>
-    </head>
-    <body>
-        <div class="topnav-right">
-            <a class="active" href="/">Home</a>
-            <a class="active" href="blogs.html">Blogs</a>
-            <a href="#Contact">contact</a>
-            <a href="/">About</a>
-          </div>
-          <br />
-          <br />
-          <div>
-            <h1>Articles</h1>
-            <ul>
-                <li><a href="ysoserial.html">CommonsCollections gadget chains — not just what works, but why it works.</a></li>
-                <li><a href="JNDIToRCE.html">JNDI Injection To Remote Code Execution.</a></li>
-                <li><a href="BeanValidationToRce.html">Bean Validation To Remote Code Execution</a></li>
-                <li><a href="GPGBypass.html">GPG Bypass: An unique Way to Bypass GPG Verfication To achieve RCE(Conditios applied).</a></li>
-                <li><a href="InsecureDeserialization.html">Java Insecure Deserlization.</a></li>
-                <li><a href="HackingJWT.html">Hacking JWT: Approach and Techniques to break into JWT Authetication.</a></li>
-                <li><a href="JDBCInjection.html">JDBC Injection: Exploiting Dynamic JDBC Configuration to Remote Code Execution.</a></li>
-                
-            </ul>
-          </div>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>All Blogs | zdaylabs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      color: #dcdcdc;
+      line-height: 1.6;
+      padding: 0 2rem;
+      min-height: 100vh;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 0 1rem;
+      border-bottom: 1px solid #333;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #ccc;
+      font-size: 0.95rem;
+    }
+    
+    nav a:hover {
+      color: #fef200;
+    }
+    
+    .socials a {
+      margin-left: 1rem;
+      color: #999;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+    
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    
+    .blogs-section {
+      text-align: center;
+    }
+    
+    .blogs-section h2 {
+      color: #fff;
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .blog-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .blog-list li {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      border-left: 4px solid #36d1dc;
+      transition: all 0.3s ease;
+    }
+    
+    .blog-list li:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(5px);
+    }
+    
+    
+    .blog-list a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      display: block;
+    }
+    
+    .blog-list a:hover {
+      color: #fef200;
+    }
+  </style>
+</head>
+<body>
+  <div id="navigation-placeholder"></div>
+  <script src="navigation.js"></script>
+
+  <main>
+    <section class="blogs-section">
+      <h2>All Blog Posts</h2>
+      <ul class="blog-list">
+        <li><a href="BeanValidationToRce.html">Bean Validation To Remote Code Execution</a></li>
+        <li><a href="ysoserial.html">CommonsCollections gadget chains — not just what works, but why it works</a></li>
+        <li><a href="GPGBypass.html">GPG Bypass: Unique Way to Bypass GPG Verification To achieve RCE</a></li>
+        <li><a href="HackingJWT.html">Hacking JWT: Approach and Techniques to break into JWT Authentication</a></li>
+        <li><a href="InsecureDeserialization.html">Java Insecure Deserialization</a></li>
+        <li><a href="JDBCInjection.html">JDBC Injection: Exploiting Dynamic JDBC Configuration to Remote Code Execution</a></li>
+        <li><a href="JNDIToRCE.html">JNDI Injection To Remote Code Execution</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
 </html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact | ZDaylabs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      color: #dcdcdc;
+      line-height: 1.6;
+      padding: 0 2rem;
+      min-height: 100vh;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 0 1rem;
+      border-bottom: 1px solid #333;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #ccc;
+      font-size: 0.95rem;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    nav a:hover {
+      color: #fef200;
+    }
+    
+    .socials a {
+      margin-left: 1rem;
+      color: #999;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+    
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 2rem;
+    }
+    
+    .contact-section {
+      background: rgba(54, 209, 220, 0.1);
+      border: 2px solid #36d1dc;
+      border-radius: 8px;
+      padding: 3rem 2rem;
+      margin: 2rem 0;
+    }
+    
+    .contact-section h2 {
+      color: #36d1dc;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .contact-section p {
+      color: #bbb;
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .contact-btn {
+      background: #36d1dc;
+      color: #1a1f2e;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .contact-btn:hover {
+      background: #fef200;
+      transform: translateY(-2px);
+    }
+    
+    .highlight {
+      color: #fef200;
+      font-weight: 600;
+    }
+    
+    /* Popup styles */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+    }
+    
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #2d3748;
+      border: 2px solid #36d1dc;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      max-width: 400px;
+      width: 90%;
+    }
+    
+    .popup h3 {
+      color: #36d1dc;
+      margin-bottom: 1rem;
+    }
+    
+    .popup p {
+      color: #dcdcdc;
+      margin-bottom: 1.5rem;
+    }
+    
+    .email-link {
+      color: #fef200;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 1.1rem;
+    }
+    
+    .close-btn {
+      background: #36d1dc;
+      color: #1a1f2e;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    
+    .close-btn:hover {
+      background: #fef200;
+    }
+  </style>
+</head>
+<body>
+  <div id="navigation-placeholder"></div>
+  <script src="navigation.js"></script>
+
+  <main>
+    <h1>Contact Us</h1>
+    
+    <div class="contact-section">
+      <h2>📧 Get In Touch</h2>
+      <p>Have questions about our research? Want to collaborate? Need to report a security vulnerability?</p>
+      <p>We'd love to hear from you!</p>
+      <button class="contact-btn" onclick="showContactPopup()">Show Contact Information</button>
+    </div>
+    
+    <div style="margin-top: 3rem;">
+      <p>We typically respond to inquiries within <span class="highlight">24-48 hours</span>.</p>
+    </div>
+  </main>
+
+  <!-- Popup -->
+  <div class="popup-overlay" id="popupOverlay" onclick="hideContactPopup()">
+    <div class="popup" onclick="event.stopPropagation()">
+      <h3>Contact Information</h3>
+      <p>You can contact us at:</p>
+      <a href="mailto:research@zdaylabs.com" class="email-link">research@zdaylabs.com</a>
+      <br><br>
+      <button class="close-btn" onclick="hideContactPopup()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function showContactPopup() {
+      document.getElementById('popupOverlay').style.display = 'block';
+    }
+    
+    function hideContactPopup() {
+      document.getElementById('popupOverlay').style.display = 'none';
+    }
+    
+    // Close popup with Escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        hideContactPopup();
+      }
+    });
+  </script>
+</body>
+</html>

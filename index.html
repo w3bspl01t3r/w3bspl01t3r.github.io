@@ -1,33 +1,99 @@
----
-layout: default
----
-<html>
-    <head>
-        <style>
-            .topnav-right {
-  float: right;
-}
-        </style>
-    </head>
-    <body>
-        <div class="topnav-right">
-            <a class="active" href="/">Home</a>
-            <a class="active" href="blogs.html">Blogs</a>
-            <a href="#Contact">contact</a>
-            <a href="/">About</a>
-          </div>
-          <br />
-          <br />
-          <div>
-            <h2>About Me:</h2>
-            <i>Hey there!
-            <p>Welcome to my blog post.</p>
-            <p>Here I write about the security issues related to java applications, starting from enterprise level application to libraries.</p>
-            <p>I also spend time doing 1 Day analysis or you can say patch analysis or Patch diffing for different web apps and libraries specific to Java, but sometimes non java apps as well</p>
-            <p>I work as full time security engineer and spend my time learning new tricks and attack techniques</p>
-            <p>Feel free to reachout for any feed backs on the blogs</p>
-</i>
-            <h3>Cheers!!</h3>
-          </div>
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Labs | Modern Security Blog</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div id="navigation-placeholder"></div>
+  <script src="navigation.js"></script>
+
+  <main>
+    <section class="intro">
+      <h1>About <span class="highlight">ZDaylabs</span></h1>
+      <p><span class="highlight">ZDaylabs</span> is the epicentre of offensive security expertise – where research, innovation, and real attacker insight power our security research and development.</p>
+      <p>This blog offers a glimpse into the original research and security insights that drive our continuous learning and exploration.</p>
+    </section>
+
+    <section class="content">
+      <div class="posts">
+        <h2>BLOG POSTS</h2>
+        <div id="blog-posts-container">
+          <!-- Blog posts will be dynamically loaded here -->
+        </div>
+        <div class="show-more">
+          <a href="w3bspl01t3r.github.io-main/blogs.html" style="color: #36d1dc; text-decoration: none; font-weight: 600;">Show More →</a>
+        </div>
+      </div>
+      <div class="research">
+        <h2>RESEARCH</h2>
+        <div id="research-container">
+          <!-- Research entries will be dynamically loaded here -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Blog posts data from w3bspl01t3r directory
+    const blogPosts = [
+      { title: "Bean Validation To RCE", file: "BeanValidationToRce.html", description: "Exploting  Bean Validation vulnerabilities to Remote Code Execution" },
+      { title: "YSoserial Deep Dive", file: "ysoserial.html", description: "CommonsCollections gadget chains — not just what works, but why it works " },
+      { title: "GPG Bypass", file: "GPGBypass.html", description: "Unique Way to Bypass GPG Verification To achieve RCE(Conditios applied)" }
+    ];
+
+    const allBlogPosts = [
+      { title: "Bean Validation To RCE", file: "BeanValidationToRce.html", description: "Exploting  Bean Validation vulnerabilities to Remote Code Execution" },
+      { title: "YSoserial Deep Dive", file: "ysoserial.html", description: "CommonsCollections gadget chains — not just what works, but why it works " },
+      { title: "GPG Bypass", file: "GPGBypass.html", description: "Unique Way to Bypass GPG Verification To achieve RCE(Conditios applied)" },
+      { title: "Hacking JWT", file: "HackingJWT.html", description: "JWT vulnerabilities and exploitation techniques" },
+      { title: "Insecure Deserialization", file: "InsecureDeserialization.html", description: "Understanding what why and how Java Deserialization works" },
+      { title: "JDBC Injection", file: "JDBCInjection.html", description: "JDBC Injection To Remote Code Injection" },
+      { title: "JNDI To RCE", file: "JNDIToRCE.html", description: "Exploting JNDI Injection To Remote Code Execution." }
+    ];
+
+    const researchPosts = [
+      { title: "Authentication Bypass In TrackPlus allegra", file: "#", description: "Discovered authentication bypass vulnerability in TrackPlus allegra system" }
+    ];
+
+    // Function to populate blog posts
+    function populateBlogPosts() {
+      const container = document.getElementById('blog-posts-container');
+      
+      blogPosts.forEach(post => {
+        const article = document.createElement('article');
+        article.innerHTML = `
+          <h3><a href="w3bspl01t3r.github.io-main/${post.file}" style="color: #fff; text-decoration: none;">${post.title}</a></h3>
+          <p>${post.description}</p>
+          <span class="date">SECURITY RESEARCH — TECHNICAL DEEP DIVE</span>
+        `;
+        container.appendChild(article);
+      });
+    }
+
+    // Function to populate research posts
+    function populateResearchPosts() {
+      const container = document.getElementById('research-container');
+      
+      researchPosts.forEach(post => {
+        const article = document.createElement('article');
+        article.innerHTML = `
+          <h3><a href="${post.file}" style="color: #fff; text-decoration: none;">${post.title}</a></h3>
+          <p>${post.description}</p>
+          <span class="date">VULNERABILITY RESEARCH — CVE DISCOVERY</span>
+        `;
+        container.appendChild(article);
+      });
+    }
+
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      populateBlogPosts();
+      populateResearchPosts();
+    });
+  </script>
+</body>
 </html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disclosure Policy | ZDaylabs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      color: #dcdcdc;
+      line-height: 1.6;
+      padding: 0 2rem;
+      min-height: 100vh;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 0 1rem;
+      border-bottom: 1px solid #333;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #ccc;
+      font-size: 0.95rem;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    nav a:hover {
+      color: #fef200;
+    }
+    
+    .socials a {
+      margin-left: 1rem;
+      color: #999;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+    
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    
+    h2 {
+      color: #fef200;
+      font-size: 1.8rem;
+      margin: 2rem 0 1rem;
+      border-bottom: 2px solid #333;
+      padding-bottom: 0.5rem;
+    }
+    
+    h3 {
+      color: #36d1dc;
+      font-size: 1.4rem;
+      margin: 1.5rem 0 0.8rem;
+    }
+    
+    p {
+      margin-bottom: 1.2rem;
+      color: #ddd;
+    }
+    
+    ul {
+      color: #ddd;
+      margin-left: 1.5rem;
+    }
+    
+    li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .highlight {
+      color: #fef200;
+      font-weight: 600;
+    }
+    
+    .emphasis {
+      color: #36d1dc;
+      font-weight: 500;
+    }
+    
+    .warning {
+      background: rgba(254, 242, 0, 0.1);
+      border-left: 4px solid #fef200;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      border-radius: 4px;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 2rem 0;
+      border-top: 1px solid #333;
+      margin-top: 3rem;
+      color: #999;
+    }
+    
+    .contact-info {
+      background: rgba(54, 209, 220, 0.1);
+      border-left: 4px solid #36d1dc;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="navigation-placeholder"></div>
+  <script src="navigation.js"></script>
+
+  <main>
+    <h1>Vulnerability Disclosure Policy</h1>
+    
+    <p>At <span class="highlight">ZDaylabs</span>, we are committed to responsible vulnerability disclosure. This policy outlines our approach to reporting security vulnerabilities to software vendors and our disclosure timeline.</p>
+
+    <h2>Our Commitment</h2>
+    <p>We believe in coordinated disclosure that balances the need for transparency with responsible security practices. Our goal is to help improve the security of software systems while giving vendors adequate time to address vulnerabilities.</p>
+
+    <h2>Disclosure Timeline</h2>
+    <h3>90-Day Standard Window</h3>
+    <p>We operate under a <span class="emphasis">90-day disclosure window</span> from the date of initial vendor notification. This timeline allows vendors sufficient time to:</p>
+    <ul>
+      <li>Acknowledge and verify the vulnerability</li>
+      <li>Develop and test appropriate fixes</li>
+      <li>Coordinate release schedules</li>
+      <li>Prepare security advisories</li>
+    </ul>
+
+    <div class="warning">
+      <h3>Reserved Rights</h3>
+      <p><strong>Important:</strong> While we typically adhere to the 90-day window, <span class="highlight">ZDaylabs reserves the right to disclose vulnerabilities before the 90-day period</span> under the following circumstances:</p>
+      <ul>
+        <li>Active exploitation of the vulnerability is detected in the wild</li>
+        <li>The vulnerability poses an immediate and severe threat to users</li>
+        <li>Vendor becomes unresponsive or refuses to acknowledge the issue</li>
+        <li>Vendor requests unreasonable delays without justification</li>
+        <li>Public disclosure would serve the greater security interest</li>
+      </ul>
+    </div>
+
+    <h2>Disclosure Process</h2>
+    <h3>Initial Contact</h3>
+    <p>We will make reasonable efforts to contact vendors through official security channels, including:</p>
+    <ul>
+      <li>Dedicated security email addresses</li>
+      <li>Bug bounty platforms</li>
+      <li>Security contact forms</li>
+      <li>Direct communication with security teams</li>
+    </ul>
+
+    <h3>Information Provided</h3>
+    <p>Our initial disclosure will include:</p>
+    <ul>
+      <li>Detailed vulnerability description</li>
+      <li>Proof-of-concept (when appropriate)</li>
+      <li>Impact assessment</li>
+      <li>Suggested remediation steps</li>
+      <li>Our intended disclosure timeline</li>
+    </ul>
+
+    <h3>Coordination</h3>
+    <p>We are committed to working collaboratively with vendors throughout the disclosure process. This includes:</p>
+    <ul>
+      <li>Regular status updates</li>
+      <li>Clarification of technical details when needed</li>
+      <li>Reasonable timeline adjustments for complex fixes</li>
+      <li>Coordination on public disclosure timing</li>
+    </ul>
+
+    <h2>Public Disclosure</h2>
+    <p>After the disclosure window expires or early disclosure conditions are met, we will publish:</p>
+    <ul>
+      <li>Technical analysis of the vulnerability</li>
+      <li>Proof-of-concept code (when appropriate)</li>
+      <li>Timeline of vendor communication</li>
+      <li>Remediation guidance for users</li>
+    </ul>
+
+    <h2>Scope</h2>
+    <p>This policy applies to Security vulnerabilities discovered during our research, which includes:</p>
+    <ul>
+      <li>Third-party software and systems</li>
+      <li>Web applications, mobile apps, and infrastructure</li>
+      <li>Open source and commercial software</li>
+    </ul>
+
+    <div class="contact-info">
+      <h3>Contact Information</h3>
+      <p>For questions about this policy or to report security issues to us, please contact:</p>
+      <p><strong>Email:</strong> research@ZDaylabs.com</p>
+      <p><strong>PGP Key:</strong> Available upon request</p>
+    </div>
+
+    <h2>Policy Updates</h2>
+    <p>This policy may be updated periodically to reflect changes in our disclosure practices or industry standards. The latest version will always be available on this page.</p>
+
+    <p><em>Last updated: January 2025</em></p>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 ZDaylabs. All rights reserved.</p>
+  </footer>
+</body>
+</html>
