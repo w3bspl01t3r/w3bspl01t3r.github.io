@@ -50,45 +50,52 @@
     }
     
     main {
-      max-width: 900px;
+      max-width: 800px;
       margin: 2rem auto;
       padding: 0 1rem;
+    }
+    
+    
+    .research-section {
       text-align: center;
     }
-    
-    h1 {
-      font-size: 2.5rem;
+
+    .research-section h2 {
       color: #fff;
+      font-size: 2rem;
       margin-bottom: 2rem;
     }
-    
-    .coming-soon {
-      background: rgba(54, 209, 220, 0.1);
-      border: 2px solid #36d1dc;
-      border-radius: 8px;
-      padding: 3rem 2rem;
-      margin: 2rem 0;
+
+    .research-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
     }
-    
-    .coming-soon h2 {
-      color: #36d1dc;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    
-    .coming-soon p {
-      color: #bbb;
-      font-size: 1.1rem;
+
+    .research-list li {
       margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      border-left: 4px solid #36d1dc;
+      transition: all 0.3s ease;
     }
-    
-    .highlight {
+
+    .research-list li:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(5px);
+    }
+
+    .research-list a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      display: block;
+    }
+
+    .research-list a:hover {
       color: #fef200;
-      font-weight: 600;
-    }
-    
-    .accent {
-      color: #36d1dc;
     }
   </style>
 </head>
@@ -97,25 +104,12 @@
   <script src="navigation.js"></script>
 
   <main>
-    <h1>Research</h1>
-    
-    <div class="coming-soon">
-      <h2>🔬 Research in Progress</h2>
-      <p>Our research team is currently working on cutting-edge security research and vulnerability analysis.</p>
-      <p><span class="highlight">Blog in writing...</span></p>
-      <p class="accent">Stay tuned for detailed technical research papers, proof-of-concepts, and security insights.</p>
-    </div>
-    
-    <div style="margin-top: 3rem;">
-      <p>Check back soon for:</p>
-      <ul style="text-align: left; max-width: 600px; margin: 0 auto; color: #bbb;">
-        <li>Advanced exploitation techniques</li>
-        <li>Zero-day research findings</li>
-        <li>Security tool development</li>
-        <li>Vulnerability analysis reports</li>
-        <li>Custom payload development</li>
+    <section class="research-section">
+      <h2>Research Papers & CVE Discoveries</h2>
+      <ul class="research-list">
+        <li><a href="CVE-2025-6216.html">CVE-2025-6216: Authentication Bypass In TrackPlus Allegra</a></li>
       </ul>
-    </div>
+    </section>
   </main>
 </body>
 </html>

@@ -24,7 +24,7 @@
           <!-- Blog posts will be dynamically loaded here -->
         </div>
         <div class="show-more">
-          <a href="w3bspl01t3r.github.io-main/blogs.html" style="color: #36d1dc; text-decoration: none; font-weight: 600;">Show More →</a>
+          <a href="blogs.html" style="color: #36d1dc; text-decoration: none; font-weight: 600;">Show More →</a>
         </div>
       </div>
       <div class="research">
@@ -65,7 +65,7 @@
       blogPosts.forEach(post => {
         const article = document.createElement('article');
         article.innerHTML = `
-          <h3><a href="w3bspl01t3r.github.io-main/${post.file}" style="color: #fff; text-decoration: none;">${post.title}</a></h3>
+          <h3><a href="${post.file}" style="color: #fff; text-decoration: none;">${post.title}</a></h3>
           <p>${post.description}</p>
           <span class="date">SECURITY RESEARCH — TECHNICAL DEEP DIVE</span>
         `;
