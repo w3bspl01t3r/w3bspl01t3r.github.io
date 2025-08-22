@@ -76,18 +76,30 @@
       margin-bottom: 1rem;
     }
     
+    /* Unified code block styling */
     pre {
-      background-color: #1e2329;
+      background-color: #1e1f22;
+      color: #bcbec4;
       border: 1px solid #333;
-      border-radius: 4px;
+      border-radius: 6px;
       padding: 1rem;
       overflow-x: auto;
       margin: 1rem 0;
+      font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+      font-size: 0.95rem;
     }
     
     code {
-      color: #36d1dc;
-      font-family: 'Courier New', monospace;
+      color: #bcbec4;
+      font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+      font-size: 0.95rem;
+    }
+    
+    pre code {
+      color: inherit;
+      background: transparent;
+      font-family: inherit;
+      font-size: inherit;
     }
     
     a {

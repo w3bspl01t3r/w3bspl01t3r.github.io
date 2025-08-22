@@ -177,7 +177,7 @@ These are called Validators and depending on the application requirement we can 
 What ever the String passed to the data variable is gets added to the message .
 The message is then sent to buildConstraintViolationWithTemplate() which raises an error and displays the message to the user and discards the request.
 Now we can send a Java expression in the data input and can get a code execution From this function.</p>
-<p><code>${&#39;&#39;.getClass().forName(&#39;java.lang.ProcessBuilder&#39;).getDeclaredConstructors()[0].newInstance([&#39;touch&#39;,&#39;/tmp/gg&#39;]).start()}</code></p>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">${<span style="color: #6aab73;">''</span>.<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">forName</span>(<span style="color: #6aab73;">'java.lang.ProcessBuilder'</span>).<span style="color: #56a8f5;">getDeclaredConstructors</span>()[<span style="color: #b3ae60;">0</span>].<span style="color: #56a8f5;">newInstance</span>([<span style="color: #6aab73;">'touch'</span>,<span style="color: #6aab73;">'/tmp/gg'</span>]).<span style="color: #56a8f5;">start</span>()}</pre></div>
 <p>Note: You may have to change the payload based on the application you are trying to exploit.</p>
 <h2 id="root-cause-analysis">Root Cause Analysis:</h2>
 <p>One key element to exploit this issue is that there needs to be hibernate Dependency present on the Class path.
@@ -192,8 +192,8 @@ This can happen in 2 ways </p>
 <h3 id="using-parameters">Using Parameters:</h3>
 <p>Value must be between {min} and {max}</p>
 <h3 id="using-expression">Using Expression:</h3>
-<p><code>Must be greater than ${inclusive == true ? &#39;or equal to &#39; : &#39;&#39;}{value}</code></p>
-<p>So any data which has only {} , is going to be interpolated using Parameters and data which has <code>${}</code> is going to be interpolated using expressions.</p>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">Must be greater than ${inclusive == <span style="color: #cf8e6d;">true</span> ? <span style="color: #6aab73;">'or equal to '</span> : <span style="color: #6aab73;">''</span>}{value}</pre></div>
+<p>So any data which has only {} , is going to be interpolated using Parameters and data which has <code>${}</code> is going to be interpolated using expressions.</p>
 <p><img src="images/BeanValidation/pic 6.png"></p>
 <p>As you can see on the above code the InterpolationTerm class which has a parameterised Constructor ,checks if the data sent is an ELExpression or not, and the way it checks is simply by checking if the data starts with $</p>
 <p><img src="images/BeanValidation/pic 7.png"></p>

