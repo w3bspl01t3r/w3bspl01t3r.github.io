@@ -135,26 +135,32 @@
   <script src="navigation.js"></script>
   <main>
     <h1>CommonsCollection1</h1>
-    <p>So Before we start Learning CommonsCollection1 there are certain Concepts we should Learn.<br><br>
-        The trnasformer.<br><br><br>
-        In  layman language these are functions which takes an input transfomrs it and produces an output.<br><br><br>
-    Few are:
+    <p>
+      Before we start learning <strong>CommonsCollections1</strong>, there are a few concepts we should understand first.<br><br>
+      The <strong>Transformer</strong>.<br><br>
+      In simple terms, a transformer is a function that takes an input, transforms it, and produces an output.<br><br>
+      Some common ones are:
     </p>
-
+    
     <ol>
-        <li>InvokerTransFormer</li>
-        <li>ConstantTransformer</li>
-        <li>ChainedTransFormer</li>
+      <li>InvokerTransformer</li>
+      <li>ConstantTransformer</li>
+      <li>ChainedTransformer</li>
     </ol>
-    <p>We will dicuss how the CommonsCollection1 payload works and we will pop a calculator withour own code file without using the ysoerial.</p>
-    <p>We will discuss how exactly the serilized data gets created in ysorial in another post.</p>
-
-    <P>SO lets start with ConstantTransformer</P>
+    
+    <p>
+      We will discuss how the CommonsCollections1 payload works, and we'll pop a calculator using our own code file — without relying on <code>ysoserial</code>.<br>
+      A deeper look into how serialized data gets created in <code>ysoserial</code> will be covered in another post.
+    </p>
+    
+    <p>So, let's start with <strong>ConstantTransformer</strong>.</p>
+    
     <h3>ConstantTransformer</h3>
     <p>
-        In case of  ConstantTransformer Once it's initialised with something no matter what you send to transform , it always returns the one that it has been initialised with.<br>
-        Take below code for an example.
+      In the case of <strong>ConstantTransformer</strong>, once it's initialized with a value, no matter what input you send to its <code>transform</code> method, it will always return the value it was initialized with.<br>
+      Take the following code as an example:
     </p>
+    
     <p>
 <p>
     <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Person</span> pt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Person</span>();
@@ -162,9 +168,13 @@
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(transformer.<span style="color: #56a8f5;">transform</span>(pt)); <span style="color: #808080;">//Outputs Yes</span></pre></div>
 </p>
 
-<p>The above code will find the function on Person Class whose name is nice and it takes one Parameter of string type and the value its going to pass is "YES"<br>
+<p>
+  The above code will look for the function in the <strong>Person</strong> class whose name is <code>nice</code>, 
+  which takes a single parameter of type <code>String</code>.  
+  The value it will pass to this method is <code>"YES"</code>.<br><br>
+  The <strong>Person</strong> class looks something like this:
+</p>
 
-    The Person class looks something like below</p>
     <p>
         <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public class</span> Person {
 
@@ -179,12 +189,20 @@
     <img src="images/cc/InvokerTransformer_init.PNG">
 </p>
 
-<p>So inshort invokerTransformer is used to invoker certain Method.</p>
-<p>It uses Java's Reflection to Invoker Those methods</p>
-<h3>ChainedTransFormer</h3>
-<p>This transformer as the name suggest chains multiple transformer.<br>
-    Meaning it takes the output of the first Transformer and passes it as the argument of the 2nd TransFormer.</p>
-    <p>So it takes an Input as array of TransFormers</p>
+<p>
+  In short, the <strong>InvokerTransformer</strong> is used to invoke a specific method.<br>
+  It relies on Java's Reflection API to call those methods.
+</p>
+
+<h3>ChainedTransformer</h3>
+<p>
+  As the name suggests, the <strong>ChainedTransformer</strong> combines multiple transformers.<br>
+  It takes the output of the first transformer and passes it as the input to the second transformer, and so on.
+</p>
+<p>
+  In other words, it accepts an array of transformers and executes them in sequence.
+</p>
+
     <p>
         <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
@@ -238,8 +256,14 @@
         </pre>
     </p>
   </div>
-    <p>Where constant and instantiate are the name if the Transformers</p>
-    <p>The transfomr() of ChainedTransformer will take the argument required by the first Transformer of the TransFormer of the TransFormer array in our case it will be ConstantTransformer </p>
+  <p>
+    Here, <strong>constant</strong> and <strong>instantiate</strong> are the names of the transformers.
+  </p>
+  <p>
+    The <code>transform()</code> method of <strong>ChainedTransformer</strong> will take the argument required by the first transformer in the transformer array.  
+    In our case, that first transformer is the <strong>ConstantTransformer</strong>.
+  </p>
+  
     <p>
         <img src="images/cc/Chained_Transformer_Value.PNG">
     </p>
@@ -271,33 +295,59 @@
     }
 }</pre></div>
 
-<p>The ideal goal is to execute Runtime.getRuntime().exec(Command)</p>
-<p>At [1] we are instntiating the ConstantTransformer with Runtime.class</p>
-<p>So no matter what we pass to it's transform() it will rerutn the Runtime.class</p>
-<p>At [2] we are invoking the getMethod() via invokerTransformer and passing 2 more things</p>
-<ul><li>A class array of String.class and Class[].class</li>
-<li>An Object Array of "getRuntime" and and blnk object element</li></ul>
-<p>At [3] we are invking the "invoke" method and again passing couple of args</p>
-<p>Finally at [4] we are invoking the exec() and passing our Command</p>
-
-<p>Now lets Try to understand the above with couple of Questions</p>
-
+<p>
+  The goal is to execute <code>Runtime.getRuntime().exec(command)</code>.
+</p>
 
 <p>
-    Before that lets just simplyfy the above code
+  At <strong>[1]</strong>, we initialize a <strong>ConstantTransformer</strong> with <code>Runtime.class</code>.  
+  This means no matter what we pass to its <code>transform()</code> method, it will always return <code>Runtime.class</code>.
 </p>
+
+<p>
+  At <strong>[2]</strong>, we use an <strong>InvokerTransformer</strong> to call <code>getMethod()</code>, passing two things:
+</p>
+<ul>
+  <li>
+    A <em>Class[]</em> describing parameter types: <code>{ String.class, Class[].class }</code>
+  </li>
+  <li>
+    An <em>Object[]</em> with the actual arguments: <code>{ "getRuntime", new Object[0] }</code>
+  </li>
+</ul>
+
+<p>
+  At <strong>[3]</strong>, we invoke the <code>invoke()</code> method (again via <strong>InvokerTransformer</strong>) with the appropriate arguments to obtain the <code>getRuntime</code> method handle and then call it to get a <code>Runtime</code> instance.
+</p>
+
+<p>
+  Finally, at <strong>[4]</strong>, we invoke <code>exec()</code> on the obtained <code>Runtime</code> instance, passing our command.
+</p>
+
+<p>
+  Now, let's reason about the above with a couple of questions.
+</p>
+
+<p>
+  Before that, let's simplify the code for clarity.
+</p>
+
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">ConstantTransformer</span> tr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>);
 <span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]});
 <span style="color: #cf8e6d;">InvokerTransformer</span> tr3 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #b3ae60;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]});
 <span style="color: #cf8e6d;">InvokerTransformer</span> tr4 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"exec"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{<span style="color: #6aab73;">"calc.exe"</span>});
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>).<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getName</span>());
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(tr4.<span style="color: #56a8f5;">transform</span>(tr3.<span style="color: #56a8f5;">transform</span>(transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>))));</pre></div>
-<p>If you last line we are taking the out of the first Transfromer and passing it as an input for the next transFormer.<br>
-    This is exactly what chainedTransfromer will do.</p>
+<p>
+  In the last line, we take the output of the first transformer and pass it as the input to the next transformer.<br>
+  This is exactly what the <strong>ChainedTransformer</strong> does.
+</p>
 
+<p><strong>Why do we need these?</strong></p>
+<p>
+  To understand why these transformers are needed and the exact sequence they must follow, let's dive into the transformer code and see how it works.
+</p>
 
-<p>Why do we need these?</p>
-<p>TO understand the need of all these transformer and the exact sequence , let deep dive in to the TransFormer's code and understand how it works.</p>
 <div>
     <h3>InvokerTransFormer</h3>
     <img src="images/cc/InvokerTransFormer_class.PNG">
@@ -307,32 +357,68 @@
     <span style="color: #cf8e6d;">this</span>.iParamTypes = paramTypes;
     <span style="color: #cf8e6d;">this</span>.iArgs = args;
 }</pre></div>
-So the above code takes the MethodName , Class array of paramTypes and Object[] of args.
-<p>When we call the TransForm Method defined at line 119 It uses Reflection to Invoke The Method Provided By Us.(If this looks foregin to you, i would recommed to Go thorugh Reflection Trainning and then Comback)</p>
-<p>This Means Using InvokerTransFormer We can Invoke Any method Present in the Class Path</p>
+<p>
+  The above code takes the <strong>method name</strong>, a <strong>Class[]</strong> of parameter types, and an <strong>Object[]</strong> of arguments.<br>
+  When we call the <code>transform()</code> method (defined at line 119), it uses Java Reflection to invoke the method we provided.  
+  (If this looks unfamiliar, I recommend going through Reflection training first and then coming back.)
+</p>
 
-<p>So can we Invoke Runtime.getRuntime().exec() ?</p>
-<p>Answer is Yes, but its not Straight Forward.</p>
+<p>
+  This means that with <strong>InvokerTransformer</strong>, we can invoke <em>any</em> method available in the classpath.
+</p>
 
-<p>So t in Runtime.class the getRuntime() is defined as a static Method.</p>
-<p>When we are calling Static Method we canot call it from an object of the class but we have to call it on class meaning className.MethodName(). So in our case we can only do it via Runtiem.getRuntime()</p>
-<p>IF we try to create an Object of Runtime() and call the getRuntime() it will thorugh a compile TIme Error</p>
-<p>Try Running the Below Code</p>
+<p>
+  So, can we invoke <code>Runtime.getRuntime().exec()</code>?  
+  The answer is <strong>yes</strong>, but it's not straightforward.
+</p>
+
+<p>
+  In <code>Runtime.class</code>, the <code>getRuntime()</code> method is defined as <strong>static</strong>.<br>
+  When calling a static method, you cannot call it from an object of the class; instead, you must call it directly on the class itself, i.e., <code>ClassName.MethodName()</code>.  
+  In our case, that means <code>Runtime.getRuntime()</code>.
+</p>
+
+<p>
+  If we try to create a new <code>Runtime()</code> object and then call <code>getRuntime()</code>, it will throw a <strong>compile-time error</strong>.
+</p>
+
+<p>
+  Try running the code below:
+</p>
+
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Runtime</span> rt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Runtime</span>();
 rt.<span style="color: #56a8f5;">getRuntime</span>().<span style="color: #56a8f5;">exec</span>(<span style="color: #6aab73;">"calc.exe"</span>);</pre></div>
 
-Excellent,
-So we know why we neeed InvokerTransFormer, but what about ConstantTransFormer?
-<p>TO solve the Problem we faced Above we need ConstantTransFormer.</p>
-<P>Remeber the Property of Constant TransFormer?</P>
-<p>Once its instantiated it can not be Changed without the use of Reflection Explicilty.</p>
-<p>So that is why we use ConstantTransFormer and passing Runtime.class in there.</p>
+<p>
+  Excellent — we know why we need <strong>InvokerTransformer</strong>. But what about <strong>ConstantTransformer</strong>?
+</p>
 
-<P>But why are we looking for getMethod inside Runtime.class(So the output of the COnstantTransFormer will be input for the InvokerTransFormer, so the class searching is going to happen in the return value of ConstantTransFormer's tansform())?<br>
-And why we even need the "invoke"?</P>
-<p>Thats a good catch.</p>
-<p>Runtime.class doesn't even have the getMethod()</p>
-<p>Lets Check what does the ConstantTransFormer's transform() returns </p>
+<p>
+  To solve the problem we faced above, we use <strong>ConstantTransformer</strong>.
+</p>
+
+<p>
+  Remember its property: once it's instantiated with a value, its <code>transform()</code> method always returns that same value (unless you deliberately change it via reflection).
+</p>
+
+<p>
+  That's why we pass <code>Runtime.class</code> into <strong>ConstantTransformer</strong>.
+</p>
+
+<p><em>But why are we looking for <code>getMethod()</code> “inside” <code>Runtime.class</code>, and why do we even need <code>invoke()</code>?</em></p>
+
+<p>
+  Good catch. <code>getMethod()</code> is actually declared on <code>java.lang.Class</code>, not on <code>Runtime</code> itself. Since <strong>ConstantTransformer</strong> returns <code>Runtime.class</code> (which is a <code>Class&lt;?&gt;</code> object), the next <strong>InvokerTransformer</strong> calls <code>Class#getMethod("getRuntime")</code> on that <code>Class</code> object to obtain a <code>java.lang.reflect.Method</code> handle.
+</p>
+
+<p>
+  We then need <code>invoke()</code> to actually execute that method. Because <code>getRuntime()</code> is <strong>static</strong>, we pass <code>null</code> as the target instance and an empty argument array: <code>method.invoke(null, new Object[0])</code>. This returns a <code>Runtime</code> instance, on which the final step calls <code>exec(command)</code>.
+</p>
+
+<p>
+  Let's check what <strong>ConstantTransformer</strong>'s <code>transform()</code> returns next.
+</p>
+
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.List;
@@ -353,19 +439,52 @@ And why we even need the "invoke"?</P>
     }
 }</pre></div>
 <img src="images/cc/ReturnValueOfConstantTransformer.PNG">
-<p>As you can see the retunr Value is not java.lang.Runtime but its java.lang.Class</p>
-<p>Reason is when ever we pass a class to ConstantTransFormer it retunrs the Class.class (This Class Exist on JDK)</p>
-<P>Now this class Doesn't have a function called getRuntime() and neither we can call it, however this calss have a function called getMethod() that uses the releection to find a method</P>
-<p>And the Input to this function is of type String and varargs of class and hence we have passed String.class and blank Class[] and the values we want is getRuntime()</p>
-<p>This method will then use the reflection to find the getRuntime on Runtime.class</p>
+<p>
+  As you can see, the return value is not <code>java.lang.Runtime</code> but <code>java.lang.Class</code>.
+</p>
 
-<p>Cool , so now its clear why we need these 2 things but what about the invoke?</p>
-<p>We need invoke Method cause inorder for us to call the getRuntime() on runtime.class we have call it via what called "calling on the class" due to getRuntime() being static</p>
-<p>So when we call the invoke method an instance of Runtime.class gets returned so that we can call the exec() on it</p>
+<p>
+  That's because when we pass <code>Runtime.class</code> to <strong>ConstantTransformer</strong>, its <code>transform()</code> simply returns that same object — a <em>Class</em> object representing <code>java.lang.Runtime</code>.
+</p>
 
-<p>But the class.class doesn't have the Invoke() defined.</p>
-<p>That is correct, the InvokerTransformer's transform() method return java.lang.reflect.Method and the invoke() is defined on there </p>
-<p>So once we call the invoke Method we get the Runtime.getRuntime()@</p>
+<p>
+  Now, this <em>Class</em> object doesn't have a <code>getRuntime()</code> method (that's a method on <code>Runtime</code> itself).  
+  However, <code>java.lang.Class</code> <em>does</em> have <code>getMethod()</code>, which we can use via reflection to look up methods by name.
+</p>
+
+<p>
+  The signature is <code>Class#getMethod(String name, Class&lt;?&gt;... parameterTypes)</code>.  
+  Since <code>Runtime.getRuntime()</code> has <strong>no parameters</strong>, we call:
+  <br>
+  <code>clazz.getMethod("getRuntime", new Class[0])</code>
+</p>
+
+<p>
+  This returns a <code>java.lang.reflect.Method</code> representing <code>Runtime.getRuntime</code>.
+</p>
+
+<p>
+  <strong>Why do we need <code>invoke()</code>?</strong><br>
+  Because <code>getRuntime()</code> is <strong>static</strong>, it must be called “on the class,” not on an instance.  
+  With reflection, that means:
+  <br>
+  <code>method.invoke(null, new Object[0])</code>
+</p>
+
+<p>
+  Calling <code>invoke</code> like this returns the singleton <code>Runtime</code> instance.  
+  Once we have that instance, we can call <code>exec(command)</code> on it.
+</p>
+
+<p>
+  Note that <code>Class</code> itself doesn't define <code>invoke()</code> — <code>invoke()</code> is defined on <code>java.lang.reflect.Method</code>.  
+  The <strong>InvokerTransformer</strong> step returns that <code>Method</code>, and that's what we call <code>invoke()</code> on.
+</p>
+
+<p>
+  After <code>invoke()</code> completes, we effectively have the result of <code>Runtime.getRuntime()</code>, and can proceed to <code>exec(...)</code>.
+</p>
+
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.List;
@@ -390,9 +509,19 @@ And why we even need the "invoke"?</P>
 }</pre></div>
 <img src="images/cc/reachedToRuntime.PNG">
 
-<p>So now we have the java.lang.Runtime and we can now call the exec() on it and that what we are doing at the end</p>
-<p>And as always we passing the new Class[]{String.class} and new String[]{"calc.exe"} as this is what exec function needs interms of invokerTransformer</p>
-<p>So now if we execute the below code we will have our calculator poped up.</p>
+<p>
+  Now that we have a <code>java.lang.Runtime</code> instance, we can call <code>exec()</code> on it — which is exactly what we do at the end.
+</p>
+
+<p>
+  As before, we pass the correct parameter types and arguments expected by <code>exec(String)</code>:  
+  <code>new Class[] { String.class }</code> and <code>new Object[] { "calc.exe" }</code> (when using <strong>InvokerTransformer</strong>).
+</p>
+
+<p>
+  Running the code below will launch the calculator.
+</p>
+
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.List;
@@ -421,8 +550,17 @@ And why we even need the "invoke"?</P>
     <img src="images/cc/calculatorpopedUp.PNG">
 </p>
 </div>
-<p>So this is how commons Collection1 Gadget Works</p>
-<p><i>Note: we will read About the LazyMap and the Proxies while we learn on Gadget Builing, For now we will just learn how exactly the paylod works</i></p>
+<p>
+  So, this is how the <strong>CommonsCollections1</strong> gadget works.
+</p>
+
+<p>
+  <i>
+    Note: We will cover <code>LazyMap</code> and proxies later when we dive into gadget building.  
+    For now, the focus is on understanding how the payload itself works.
+  </i>
+</p>
+
 
 <h4>Summary:</h4>
 <ul>

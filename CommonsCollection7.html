@@ -150,17 +150,19 @@
 <h1>CommonsCollection7</h1>
 
 <p>
-    On this blog post we will learn about CommonsCollecton7 payload.
-    <br>
-    Now Before Jumping into the commonsCollection7 payload , lets understand a little bit of HashTable
+  In this blog post, we will explore the CommonsCollections7 payload.
+  <br>
+  Before diving into the CommonsCollections7 payload, let's take a moment to understand HashTables.
 </p>
 
-<P>
-   <p>
-    A <code>Hashtable</code> in Java is a data structure used to store key-value pairs. It allows fast access and retrieval using the <code>get()</code> and <code>put()</code> methods, making it one of the foundational classes in Java's Collections Framework.
+<p>
+  A <code>Hashtable</code> in Java is a data structure used to store key-value pairs. 
+  It allows fast access and retrieval using the <code>get()</code> and <code>put()</code> methods, 
+  making it one of the foundational classes in Java's Collections Framework.
 </p>
 
-<p>Let’s start with a basic example:</p>
+
+<p>Let's start with a basic example:</p>
 
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Hashtable</span>&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">String</span>&gt; ht = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>&lt;&gt;();
 
@@ -171,8 +173,10 @@ ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"autho
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(ht.<span style="color: #56a8f5;">get</span>(<span style="color: #6aab73;">"author"</span>));    <span style="color: #808080;">// Output: James Gosling</span></pre></div>
 
 <p>
-    Behind the scenes, when you insert a key like <code>"language"</code>, Java internally computes the hash using the key’s <code>hashCode()</code> method. 
-    This method returns an integer that serves as a fingerprint of the object and is used to determine where in memory (i.e., in the internal array) the value should be placed.
+  Behind the scenes, when you insert a key such as <code>"language"</code>, 
+  Java internally computes a hash using the key's <code>hashCode()</code> method. 
+  This method returns an integer that acts as a fingerprint of the object and 
+  determines where in memory (specifically, in the internal array) the value should be stored.
 </p>
 
 <p>
@@ -186,8 +190,10 @@ ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"autho
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(key2.<span style="color: #56a8f5;">hashCode</span>());  <span style="color: #808080;">// 2112 (collision!)</span></pre></div>
 
 <p>
-    Here, both keys produce the same hash code (<code>2112</code>) despite being different strings — this is a <strong>hash collision</strong>, and we'll talk about how it's handled shortly.
+  Here, both keys produce the same hash code (<code>2112</code>) despite being different strings — 
+  this is known as a <strong>hash collision</strong>, and we'll discuss how it is handled shortly.
 </p>
+
 
 <hr>
 
@@ -231,8 +237,10 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(ht.<span style="color: #56a8f5;">get</span>(key2)); <span style="color: #808080;">// Output: second</span></pre></div>
 
 <p>
-    When retrieving, the Hashtable checks each entry at that index using <code>equals()</code> to identify the correct key:
+  When retrieving a value, the <code>Hashtable</code> checks each entry at that index 
+  using the <code>equals()</code> method to identify the correct key:
 </p>
+
 
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">for</span> (; entry != <span style="color: #cf8e6d;">null</span>; entry = entry.next) {
     <span style="color: #cf8e6d;">if</span> ((entry.hash == hash) &amp;&amp; entry.key.<span style="color: #56a8f5;">equals</span>(key)) {
@@ -241,15 +249,15 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
 }</pre></div>
 
 <p>
-    So even if multiple keys hash to the same bucket, Java can still retrieve the right value as long as <code>equals()</code> distinguishes them.
+  So, even if multiple keys hash to the same bucket, Java can still retrieve the correct value as long as <code>equals()</code> distinguishes them.
 </p>
 
 <p>
-    This collision resolution mechanism becomes especially critical in deserialization attacks where crafted objects override <code>equals()</code> and <code>hashCode()</code> to trigger specific behavior — like transformer chains in CommonsCollections gadgets.
+  This collision-resolution mechanism becomes especially critical in deserialization attacks, where crafted objects override <code>equals()</code> and <code>hashCode()</code> to trigger specific behavior — for example, transformer chains in CommonsCollections gadgets.
 </p>
 
-</P>
-<h4> With the above knowledge about the hashtable lets jump into the CC7 payload.</h4>   
+<h4>With the above knowledge about the Hashtable, let's jump into the CC7 payload.</h4>
+
 
     <p>
         Below is how the payload looks like
@@ -298,14 +306,17 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
 }</pre></div>
     </p>
     <p>
-        So the payload uses the TransFormerChain and LaZyMap along with hashTable.
-    </p>
-    <p>
-        <i>We have discussed about the LazyMap in CC5. Please give it a read if you are unaware of its uses in deserisliation.</i>
-    </p>
-    <p>
-        Lets rewrite the payload to reproduce rce locally.
-    </p>
+      So, the payload uses a <code>TransformerChain</code> and <code>LazyMap</code> together with a <code>Hashtable</code>.
+  </p>
+  
+  <p>
+      <i>We discussed <code>LazyMap</code> in CC5 — please read that section if you're unfamiliar with its role in deserialization.</i>
+  </p>
+  
+  <p>
+      Let's rewrite the payload to reproduce RCE locally.
+  </p>
+  
     <div>
 
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
@@ -377,16 +388,22 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
     <span style="color: #56a8f5;">addEntry</span>(hash, key, value, index);
     <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">null</span>;
 }</pre></div>
-            <br>
-            If you check the above code , the code first takes the entry get's a hashCode of it and in the for loop it checks for the collision.<br>
-            if the for loop exeutes to be true then the if condition os checked.<br>
-            How ever duding the first entry the condition on the for loop fails , so it never calls the entry.key.equals().<br>
+<p>
+  If you check the code above, it first takes the entry, gets its <code>hashCode()</code>, and then checks for collisions inside the <code>for</code> loop.<br>
+  If the <code>for</code> loop evaluates to true, the <code>if</code> condition is checked.<br>
+  However, during the first entry the condition in the <code>for</code> loop fails, so it never calls <code>entry.key.equals()</code>.<br>
+</p>
 
-            On the 2nd put however with entries like yy and zZ, the hashCode of these 2 are exactly the same i.e 3812.<br>
-            So the if condition is called and since both the hashes are same the entry.key.equals() will be called.<br>
+<p>
+  On the second <code>put</code>, with entries like <code>yy</code> and <code>zZ</code>, the hash codes of these two are exactly the same (i.e., <code>3812</code>).<br>
+  So the <code>if</code> condition is triggered and, since both hashes match, <code>entry.key.equals()</code> will be called.<br>
+</p>
 
-            Now the entries we have in the hashtable as LaZyMap entries.<br>
-            However the LaZyMap does not have any equals function but extends AbstractMapDecorator which has the equals functions.<br><br>
+<p>
+  Now the entries we have in the Hashtable are <code>LazyMap</code> entries.<br>
+  The <code>LazyMap</code> itself does not declare an <code>equals()</code> method, but it extends <code>AbstractMapDecorator</code>, which provides the <code>equals()</code> implementation.
+</p>
+
             <img src="images/cc/abstractmapdecorator_equals.PNG"><br>
         </p>
         <p> Now this equals() at AbstractMapDecorator calls map.equals() , map being an abstract class the AbstractMap.equals() gets called</p>
@@ -425,15 +442,20 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
     <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">true</span>;
 }</pre></div>
         </P>
-        <p>On the above what we need to pay attention is to the else block where  we are calling m.get(key)<br>IF you pay close attention,
-        the input here is of ObjectType, and we have sent a LaZyMap here, and the m value is set to the Object 0, so when we call m.get(), LazyMap.get() gets called.</p>
         <p>
-            Now the LazYMap.get() check if the key exist.
-            If the key doesn't exist it calls the transformerChain that we initialised during the decorate().
-        </p>
-        <p>
-            And hence we are able to execute the transFormerChain that leads to code execution
-        </p>
+          In the snippet above, pay attention to the <code>else</code> block where we call <code>m.get(key)</code>. 
+          If you look closely, the input type here is <code>Object</code>, and we have passed a <code>LazyMap</code>. 
+          The local variable <code>m</code> is set to that object, so when we call <code>m.get()</code>, <code>LazyMap.get()</code> is invoked.
+      </p>
+      
+      <p>
+          <code>LazyMap.get()</code> checks whether the key exists. If the key does not exist, it calls the <code>TransformerChain</code> that was initialized during <code>decorate()</code>.
+      </p>
+      
+      <p>
+          That's how we end up executing the <code>TransformerChain</code>, which ultimately leads to code execution.
+      </p>
+      
     </div>
 
 

@@ -193,7 +193,7 @@ java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8
                         java.lang.reflect.<span style="color: #cf8e6d;">Method</span>.<span style="color: #56a8f5;">invoke</span>()
                             java.lang.<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #56a8f5;">exec</span>()</pre></div>
 </p>
-<p>If you pay close attention, we already know how the 2nd half works, basically we set a hasmap and a transformerchain in lazyMap and when the get() doesn't find the key we get RCE</p>
+<p>If you pay close attention, we already know how the 2nd half works, basically we set a hashmap and a transformerchain in lazyMap and when the get() doesn't find the key we get RCE</p>
 <p>So let focus our attention on the first part i.e the entry part.</p>
 
 <p>
@@ -211,14 +211,21 @@ java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8
 <p>
     <img src="images/cc/tidemapgetvaluecalls.PNG">
 </p>
-<p>Now this HashCode() method can be getting called in lot of places, but from out past research we know that it definitiely gets called in HashMap.hash(), which is again getting called in put().</p>
-<p>So if we can reach HashMap.put() from ObjectInputStream.readObject() we can reach till the LazyMap.get() which will execute our code.</p>
-<P>The ysoserial payload says that we can reach till the hashmap.put() using HashSet class, which is true but its little bit complex, you can't just set the key value of the Hashmap and let it go on as the required functionsDoesn
-    exist, and that is why even in the ysoserial payload they are getting map field and table field from the innerImplementation.
-</P>
+<p>
+  The <code>hashCode()</code> method can be invoked in many places, but from our past research we know that it definitely gets called in <code>HashMap.hash()</code>, which is again invoked inside <code>put()</code>.
+</p>
 
 <p>
-    But if you pay close attention you can see that the HashMap.readObject() there is a function called <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">putVal(hash(key), key, value, false, false);</span>.
+  So, if we can reach <code>HashMap.put()</code> from <code>ObjectInputStream.readObject()</code>, we can eventually reach <code>LazyMap.get()</code>, which will execute our code.
+</p>
+
+<p>
+  The ysoserial payload shows that we can reach <code>HashMap.put()</code> using the <code>HashSet</code> class. This is true, but the process is a bit more complex. You cannot simply set the key-value pair in the <code>HashMap</code> and expect it to work, because the required functions do not exist. That is why, even in the ysoserial payload, the code accesses the <code>map</code> field and the <code>table</code> field from the internal implementation.
+</p>
+
+
+<p>
+    But if you pay close attention , you can see that the HashMap.readObject() there is a function called <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">putVal(hash(key), key, value, false, false);</span>.
     <img src="images/cc/hashmapreadobjectcall.PNG"><br><br>
     The <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">hash(key)</span> calls <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">key.hashCode()</span>.
     <br>
@@ -226,7 +233,7 @@ java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8
     <img src="images/cc/has_on_hashmap.PNG">
     <br>
     <br>
-    So if set the Key of the hashMap as TideMapEntry then the hashMap readObject can reach till TideMapEntry.hashCode() skipping the hashset part.
+    So if we set the Key of the hashMap as TideMapEntry then the hashMap readObject can reach till TideMapEntry.hashCode() skipping the hashset part.
 </p>
 
 <p>

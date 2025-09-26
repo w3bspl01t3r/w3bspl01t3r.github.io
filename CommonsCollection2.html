@@ -166,7 +166,11 @@
 <p>
     On the above code You wil see the numbers getting printed one by One.
 </p>
-<p>Similarly in the priorityQueue Apart blank construcutors there are constructor that takes comparator and compares the numbers that are in the queue</p>
+<p>
+  Similarly, in <code>PriorityQueue</code>, apart from the default (blank) constructor,  
+  there is also a constructor that accepts a <code>Comparator</code> to define how the numbers in the queue are compared.
+</p>
+
 <p>
   <div style="background-color: #1e1f22; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
@@ -202,12 +206,17 @@
     
 </p>
 <p>So the priorituQueue will execute the Compare Method Writeen on the AnotherClass.java file and will obtain the ouput</p>
-<p>So basically the Constructor takes a comparator , executes the compare function present on it and then obtains the Output.</p>
+<p>
+  Basically, the constructor takes a <code>Comparator</code>, calls its <code>compare()</code> function,  
+  and then uses the result of that function to determine the ordering of elements in the queue.
+</p>
+
 
 <p>
-    Now lets understand little bit more of the priorityQueue on Desr context<br>
-    As we know from Vanila Java Desr method the data received By the readObject method gets executed , and lets say the data we sent is of a class which has a readObject then even if there is a class cast execption the readObject code will still get executed.<br>
-    Examining the PriorityQueue, it has a readObject block that looks like Below.
+    Now lets understand little bit more of the priorityQueue on deserialization context<br>
+    As we know from vanila java deserialization method,  the data received by the readObject() method gets executed , and lets say the data we sent , is of a class which has a readObject implmented . <br>
+    Then even if there is a classCastExecption the readObject code will still get executed.<br>
+    Examining the PriorityQueue we can see it has a readObject block that looks like Below.
 </p>
 <p>
   <div style="background-color: #1e1f22; color: #bcbec4;">
@@ -239,8 +248,8 @@
     
 </p>
 <p>
-    The heapify() check if the comparator is null and if its not null it calls the siftDownUsingComparator().<br>
-    This function uses the Comparator we provided it during the initilisation and calls the Compare() method.<br>
+    The <code>heapify()</code> checks if the comparator is null and if it is not null it calls the <code>siftDownUsingComparator()</code>.<br>
+    This function uses the Comparator we provided  during the initilisation and calls the <code>compare()</code> method.<br>
     So the code Written on the Compare Method Will get Executed.
 </p>
 
@@ -315,7 +324,7 @@
     </p>
     <p>And then it assigns it to this.transformer</p>
     <p>So indeed it takes the TransFromer Provided by us and calls the TransForm() Method</p>
-    <p>But wait a sec, it calls the apply(), however there is not apply() in invokerTransformer, so there has to be some kind of code for the translation or apply() to transform</p>
+    <p>But wait a sec, it calls the apply(), however there is no apply() in invokerTransformer, so there has to be some kind of code for the translation or apply() to transform</p>
     <p>Check the code where the this.transForm is defined</p>
     <p>
       <div style="background-color: #1e1f22; color: #bcbec4;">
@@ -379,28 +388,54 @@
         </div>
         
     </p>
-    <p>This is how the apply function gets converted to transform()</p>
-<p>So in the entire Payload we are using the templateImpl and using InvokerTransFormer to call "toString" on it for the code Execute</p>
-<p>But wait in TemplatesImpl class there is no "toString" method , so how are we achieveing code Execution with it.</p>
-<p>In ysoserial payload , in the later line the "toString" method is getting replaced with "newTransformer"</p>
-<p>
-    <pre>
-        Reflections.setFieldValue(transformer, "iMethodName", "newTransformer");
-    </pre>
-</p>
-<p>And then again using Reflection we are chaingin the content of the queue to the templatesImpl code</p>
-<p>
-    So basically we are using TemplatesIMpl to load our bytecode, to call the newTransformer() on TemplatesImpl we use InvokerTransFormer and to reach till the invokerTransformer we are using<br>
-    TransFormingComparator which again we reach via PriorityQueue's Constructor , and this whole thing will be allowed due to the ReadObject() present in the priorityQueue which will<br>
-    Call the hepify() which will call the ShiftdownusingCompartor() and thus call the compareMethod .
-</p>
-<p>
-    Quick Question
-</p>
-<p>Since we use Reflection and change the "toString" to newTransformer() can we use the newTransformer() directly in our local poc code to execute code.</p>
-<p>Answer is Yes,</p>
-<p>But the code wiil be slightly different.</p>
-<p>The last 4 lines of the code will look somethingLike below.</p>
+    <p>
+      This is how the <code>apply()</code> function eventually maps to <code>transform()</code>.
+    </p>
+    
+    <p>
+      In the full payload, we use <code>TemplatesImpl</code> and an <strong>InvokerTransformer</strong> to call <code>toString()</code> on it in order to trigger code execution.
+    </p>
+    
+    <p>
+      But wait — the <code>TemplatesImpl</code> class doesn’t even define a <code>toString()</code> method.  
+      So how are we actually achieving code execution with it?
+    </p>
+    
+    <p>
+      In the <code>ysoserial</code> payload, at a later stage, the <code>toString</code> method name is replaced with <code>newTransformer</code>:
+    </p>
+    
+    <p>
+      <pre>
+    Reflections.setFieldValue(transformer, "iMethodName", "newTransformer");
+      </pre>
+    </p>
+    
+    <p>
+      Then, using reflection, the contents of the queue are replaced with the <code>TemplatesImpl</code> object.
+    </p>
+    
+    <p>
+      In short:
+      <ul>
+        <li><code>TemplatesImpl</code> is used to load our malicious bytecode.</li>
+        <li>To call <code>newTransformer()</code> on <code>TemplatesImpl</code>, we use <strong>InvokerTransformer</strong>.</li>
+        <li>To reach the <strong>InvokerTransformer</strong>, we use <strong>TransformingComparator</strong>.</li>
+        <li>We reach <code>TransformingComparator</code> through the <code>PriorityQueue</code> constructor.</li>
+        <li>This whole chain executes because <code>PriorityQueue</code>'s <code>readObject()</code> triggers <code>heapify()</code>, which calls <code>shiftDownUsingComparator()</code>, which in turn calls <code>compare()</code>.</li>
+      </ul>
+    </p>
+    
+    <p><strong>Quick Question:</strong></p>
+    <p>
+      Since we're using reflection to replace <code>toString</code> with <code>newTransformer()</code>, can we just call <code>newTransformer()</code> directly in a local PoC?
+    </p>
+    
+    <p>
+      The answer is <strong>yes</strong> — but the code will be slightly different.  
+      The last four lines of the PoC will look something like this:
+    </p>
+    
 <p>
   <div style="background-color: #1e1f22; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">

@@ -135,86 +135,117 @@
   <script src="navigation.js"></script>
 
   <main>
-<h1>GPG Bypass</h1>
-<p>Will talk about a technique of GPG Bypass ,I discovered during one of the pentest i was doing and how i was able to use it to bypass the Filter to Gain Code Execution.</p>
+    <h1>GPG Bypass</h1>
 
-<p><h1><b>What Is GPG:</b></h1></p>
-<p>GPG which is the abbreviation for GNU privacy guard , a replacement for Symantec's PGP Cryptography is Software/binary that supports encrypting files both in symmetric and asymmetric way.</p>
-<p><h2><b>How GPG Works:</b></h2></p>
-<p>So basically it works on public key encryption</p>
-<p>You can generate your GPG keys using the gpg binary and use those keys to encrypt a file ,share the public key to make sure the others can verify the file and use the private key to decrypt it.</p>
-<p><h2><b>Example:</b></h2></p>
-<p><img src="images/gpgbypass/image1.webp"></p>
-<p>As you can see we generated the GPG keys and then use it the encrypt and decrypt files as we mentioned above.</p>
-<p><h2><b>How the decryption Goes on:</b></h2></p>
-<p>So once you receive a encrypted file , you can use the GPG binary to decrypt it like below.</p>
-<p><img src="images/gpgbypass/image2.webp"></p>
-<p><img src="images/gpgbypass/image3.webp"></p>
-<p><i><b>The question is how the gpg is being used as a filter ?</b></i></p>
-<p>
-    Well think of a software upgrade feature.</p>
-<p>If you take some example , let's say the OpManager of Zoho Corp,</p>
-<p>
-    if you see how the upgrade happens ,</p>
-<p><ul><li>Download the upgrade pack</li><li>SSH into the box</li><li>Use the OpManager's upgrade shell script by passing the Upgrade File location</li>
-    <li>But some Applications allows such upgrades from the web it self.</p></li></ul></p>
+    <p>
+        I'll describe a GPG bypass technique I discovered during a penetration test and show how I used it to bypass a filter and gain code execution.
+    </p>
     
+    <h2>What is GPG?</h2>
+    <p>
+        GPG (GNU Privacy Guard) is a replacement for PGP. It's a software binary that supports encrypting files using both symmetric and asymmetric cryptography.
+    </p>
     
+    <h2>How GPG works</h2>
+    <p>
+        GPG uses public-key encryption. You generate GPG keys with the <code>gpg</code> binary and use those keys to encrypt files. You share the public key so others can verify the file and keep the private key to decrypt it.
+    </p>
     
-<p>The application asks you for a upgrade bundle file , and then uses that file to either download the necessary files from the Application's upgrade server and then overwrite the files,</p>
-<p>
-    or the bundle may it self contain the files it want to overwrite, and it uses them directly</p>
-<p>
-    Such upgrade functionality can be exploited to Arbitrary file write(AFW) if proper measures are not taken.</p>
-<p>To defend against this kind of attack , the application generally accepts an encrypted bundle file whose keys to decrypt either lies on the underlying file system or it might download as per the need and this file is generally differs from one instance of the app to other.
-</p>
-<p><h2><b>Check out the below code,
-</b></h2></p>
-<p><img src="images/gpgbypass/image4.webp"></p>
-<p>
-    If you see the code above, the file uses the gpg binary to verify and decrypt the file,</p>
-<p>You may think, well there are no — decrypt flag mentioned ,so how is it even decrypting.</p>
-<p>Thats a good catch but not enough,</p>
-<p>When you pass a encrypted file to gpg , even if you do not mention the</p>
-<p><h2><b>
--- decrypt</b></h2></p>
-<p>flag , the gpg is going to figure it by it's own and going to involve the keys for decryption and since you will not have the relevant keys , the process will fail.
-</p>
-<p>But take a look on what happens when you use the above command on a terminal</p>
-<p><img src="images/gpgbypass/image5.webp"></p>
-<p>
-    The first line of output says</p>
-<p>No Command Supplied, Trying to Guess what you mean...</p>
-<p>Which means if you can fool the GPG to think that this is not an encrypted file but a normal gpg file then the gpg is going to simply recover the actual file which will then be used later in the upgrade process.
-</p>
-<p><h2><b>
-    -- store flag</b></h2></p>
-<p>So while Iwas reading through the man page for gpg i came across the — store flag which creates a valid gpg file but doesn't involve any kind of keys,
-</p>
-<p>So if i infect the actual bundle file and then pass it , the filter is going to be passed, and thus my files is going to be overwritten in the file system.
-</p>
-
-<p>So let's spawn a new VM instance encrypt a file there and try to decrypt on this vm.</p>
-<p><img src="images/gpgbypass/image6.webp"></p>
-<p><img src="images/gpgbypass/image7.webp"></p>
-<p>As you can see above , the file didn't got verified as the keys were different,</p>
-<p>Now lets apply the trick.</p>
-<p><img src="images/gpgbypass/image8.webp"></p>
-<p><img src="images/gpgbypass/image9.webp"></p>
-<p>As you can see the file got verified and the actual text file got retrieved and saved in the file specified by us.</p>
-<p><img src="images/gpgbypass/image10.gif"></p>
-<p>Using this now i can craft a bundle file that will give me a Arbitrary file Write and thus can lead to RCE.(There are many ways to achieve RCE from the Arbitrary file write, can be by overwriting cronjobs, Application files, dropping shells in webroot or may be you can find some shell scripts or python scripts which gets triggered by some api and you can use it to achieve rce that way).
-</p>
-<p><i><b>Note: The features are not just restricted to Software upgrade , it can be backup restore and others as well, and if you are not able to get AFW, then may be you can try ti get a File Disclosure using symlink attack.</b></i></p>
-</p>
-
-<p>Thats it for Today.</p>
-<p>Thanks For Reading.</p>
-<p>Happy Hacking.</p>
-<p>You can connect with me at:</p>
-<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
-<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
-
+    <h2>Example</h2>
+    <p><img src="images/gpgbypass/image1.webp" alt="GPG key generation example"></p>
+    <p>
+        As you can see, we generated GPG keys and used them to encrypt and decrypt files as described above.
+    </p>
+    
+    <h2>How the decryption works</h2>
+    <p>
+        Once you receive an encrypted file, you can use the <code>gpg</code> binary to decrypt it like this:
+    </p>
+    <p><img src="images/gpgbypass/image2.webp" alt="GPG decrypt example"></p>
+    <p><img src="images/gpgbypass/image3.webp" alt="GPG decrypt output"></p>
+    
+    <p><em><strong>The question is: how is GPG being used as a filter?</strong></em></p>
+    <p>
+        Think of a software upgrade feature. For example, an application like OpManager (Zoho) may support upgrades that come as a bundle file.
+    </p>
+    <ul>
+        <li>Download the upgrade pack</li>
+        <li>SSH into the box</li>
+        <li>Run the OpManager upgrade script and pass the upgrade file location</li>
+        <li>Some applications even allow uploads of the upgrade bundle via the web UI</li>
+    </ul>
+    
+    <p>
+        The application asks for an upgrade bundle and either downloads necessary files from an upgrade server and overwrites files, or the bundle itself contains the files to overwrite.
+    </p>
+    <p>
+        Such upgrade functionality can be exploited for Arbitrary File Write (AFW) if proper checks are not in place.
+    </p>
+    
+    <p>
+        To defend against this, applications often accept an encrypted bundle. The keys to decrypt that bundle are either present on the filesystem or downloaded on demand, and are usually instance-specific.
+    </p>
+    
+    <h2>Check out the code below</h2>
+    <p><img src="images/gpgbypass/image4.webp" alt="Code snippet using gpg binary"></p>
+    <p>
+        If you inspect the code above, it uses the <code>gpg</code> binary to verify and decrypt the file.
+    </p>
+    <p>
+        You might notice there is no <code>--decrypt</code> flag specified — so how does it decrypt?
+    </p>
+    <p>
+        Good catch, but not enough. When you pass an encrypted file to <code>gpg</code>, even if you don't supply <code>--decrypt</code>, GPG will try to guess the intended operation. Since you typically won't have the required keys on that system, the decryption normally fails.
+    </p>
+    
+    <p>
+        Look at what happens when you run the command on a terminal:
+    </p>
+    <p><img src="images/gpgbypass/image5.webp" alt="GPG terminal output"></p>
+    <p>
+        The first line says: <em>No command supplied, trying to guess what you mean...</em>
+    </p>
+    <p>
+        That means if you can fool GPG into thinking the file is not an encrypted message but a normal GPG-storable file, GPG will “recover” the embedded data and output the original file — which the upgrade process will then use.
+    </p>
+    
+    <h2>The <code>--store</code> flag</h2>
+    <p>
+        While reading the <code>gpg</code> man page I found the <code>--store</code> flag, which creates a valid GPG file but does not involve any keys.
+    </p>
+    <p>
+        If I craft the bundle to include a stored (not-encrypted) GPG object and pass it to the application, the filter gets satisfied and the bundle is accepted — allowing my files to overwrite files on the filesystem.
+    </p>
+    
+    <p>
+        To demonstrate, I spawned a VM, created an encrypted file there, and tried to decrypt it on the target VM.
+    </p>
+    <p><img src="images/gpgbypass/image6.webp" alt="VM encrypt on source"></p>
+    <p><img src="images/gpgbypass/image7.webp" alt="Decryption attempt with mismatched keys"></p>
+    <p>
+        As you can see, the file failed verification because the keys were different.
+    </p>
+    
+    <p>Now let's apply the trick:</p>
+    <p><img src="images/gpgbypass/image8.webp" alt="Applying --store trick"></p>
+    <p><img src="images/gpgbypass/image9.webp" alt="Stored file accepted"></p>
+    <p>
+        The file is verified and the underlying text file is recovered and saved to the location we specified.
+    </p>
+    <p><img src="images/gpgbypass/image10.gif" alt="Proof of concept GIF"></p>
+    
+    <p>
+        Using this technique, I can craft a bundle that results in Arbitrary File Write and therefore lead to RCE. There are many ways to achieve RCE from AFW: overwrite cron jobs, replace application binaries, drop web shells in the webroot, or overwrite scripts that are later executed by APIs or scheduled tasks.
+    </p>
+    
+    <p><em><strong>Note:</strong> This technique is not limited to software upgrades — it can apply to backup restores and other flows. If AFW is not achievable, consider trying for file disclosure via symlink attacks.</em></p>
+    
+    <p>That's it for today. Thanks for reading — happy hacking.</p>
+    
+    <p>Connect with me:</p>
+    <p><a href="https://www.linkedin.com/in/swagatkumar/">LinkedIn</a></p>
+    <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+    
   </main>
 </body>
 </html>

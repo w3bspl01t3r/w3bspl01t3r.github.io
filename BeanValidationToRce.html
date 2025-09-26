@@ -154,18 +154,18 @@
 
   <main>
     <h1 id="bean-validation-to-remote-code-execution">Bean Validation To Remote Code Execution</h1>
-<p>In this blog post we will talk about a Java Specific bug that are often overlooked during pentest , which can give us a code execution if certain Conditions are met.</p>
+<p>In this blog post we will talk about a Java Specific bug that are often overlooked during pentest, which can give us a code execution if certain Conditions are met.</p>
 <h2 id="what-is-bean-and-what-is-validators-on-spring">What is Bean and what is Validators On Spring:</h2>
-<p>The Bean in java simply refers to the POJO classes or we can say ,
-the classes which have member variable declared , which have getters and setter methods.
+<p>The Bean in java simply refers to the POJO classes or we can say,
+the classes which have member variable declared, which have getters and setter methods.
 Now when ever we fire any api that api needs to have certain body, and in spring we can set it by passing the Body type as class name.</p>
 
    <p><img src="images/BeanValidation/Pic1.png"> </p>
- <p> Now each time we fire the request we often see that , the application validates the data before processing the request, and this is done by @Valid attribute .</p>
+ <p> Now each time we fire the request we often see that, the application validates the data before processing the request, and this is done by @Valid attribute.</p>
 
   <p><img src="images/BeanValidation/pic2.png"> </p>
 
-<p>As you can see above that we do not want specific variable not to be null or we want specific variable to be between certain numbers, and for these have added annotation such as @NotNull @Min and @Max .
+<p>As you can see above that we do not want specific variable not to be null or we want specific variable to be between certain numbers, and for these have added annotation such as @NotNull @Min and @Max.
 These are called Validators and depending on the application requirement we can also introduce our custom validators.</p>  
 
  <p><img src="images/BeanValidation/pic 3.png"> </p>
@@ -174,28 +174,28 @@ These are called Validators and depending on the application requirement we can 
   Now each request we fire to the /validate endpoint when the data is anything other than the string &quot;Correct Data&quot; its going throw an Error stating that &quot;Wrong data sent&quot;.</p>
 <h2 id="converting-to-code-execution">Converting To Code Execution:</h2>
 <p>If you pay attention to the above code you can see that the Message that gets displayed is partially Controlled by the attacker.
-What ever the String passed to the data variable is gets added to the message .
+What ever the String passed to the data variable is gets added to the message.
 The message is then sent to buildConstraintViolationWithTemplate() which raises an error and displays the message to the user and discards the request.
 Now we can send a Java expression in the data input and can get a code execution From this function.</p>
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">${<span style="color: #6aab73;">''</span>.<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">forName</span>(<span style="color: #6aab73;">'java.lang.ProcessBuilder'</span>).<span style="color: #56a8f5;">getDeclaredConstructors</span>()[<span style="color: #b3ae60;">0</span>].<span style="color: #56a8f5;">newInstance</span>([<span style="color: #6aab73;">'touch'</span>,<span style="color: #6aab73;">'/tmp/gg'</span>]).<span style="color: #56a8f5;">start</span>()}</pre></div>
 <p>Note: You may have to change the payload based on the application you are trying to exploit.</p>
 <h2 id="root-cause-analysis">Root Cause Analysis:</h2>
 <p>One key element to exploit this issue is that there needs to be hibernate Dependency present on the Class path.
-If you are using maven and spring , check out the pom.xml file to see if you have hibernate-validator version ≤ 6.1.7.Final</p>
+If you are using maven and spring, check out the pom.xml file to see if you have hibernate-validator version ≤ 6.1.7.Final</p>
 <p>Now the question is why this dependency is required.
 To understand it in more details we used breakpoint and debugged the complete code flow from BuildConstraintViolationWithTemplate() to the actual sink fucntion which evaluates the Expression which is ELTermResolver.interpolate().
 But before diving into the root cause lets understand few concepts.</p>
 <h2 id="interpolation">Interpolation:</h2>
 <h3 id="message-interpolation">Message Interpolation:</h3>
 <p>A message interpolator is responsible for transforming the so called message descriptor specified via the message attribute of the constraint into a fully expanded, human-readable error message.
-This can happen in 2 ways </p>
+This can happen in 2 ways</p>
 <h3 id="using-parameters">Using Parameters:</h3>
 <p>Value must be between {min} and {max}</p>
 <h3 id="using-expression">Using Expression:</h3>
 <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">Must be greater than ${inclusive == <span style="color: #cf8e6d;">true</span> ? <span style="color: #6aab73;">'or equal to '</span> : <span style="color: #6aab73;">''</span>}{value}</pre></div>
 <p>So any data which has only {} , is going to be interpolated using Parameters and data which has <code>${}</code> is going to be interpolated using expressions.</p>
 <p><img src="images/BeanValidation/pic 6.png"></p>
-<p>As you can see on the above code the InterpolationTerm class which has a parameterised Constructor ,checks if the data sent is an ELExpression or not, and the way it checks is simply by checking if the data starts with $</p>
+<p>As you can see on the above code the InterpolationTerm class which has a parameterised Constructor,checks if the data sent is an ELExpression or not, and the way it checks is simply by checking if the data starts with $</p>
 <p><img src="images/BeanValidation/pic 7.png"></p>
 <p>and if the the data starts with $ then the interpolation resolvers is going to be ELTermResolver class.
 Checking the ELTermResolver class we see the method interpolate being implemented, which looks like below.</p>
@@ -208,7 +208,7 @@ The full call stack looks like below.</p>
 <p>Use parameterised message templates instead of String concatenation. When doing so, always use Expression variables which will allow you to pass objects directly to the EL context preventing an attacker from being able to arbitrary modify the message template</p>
 <p><img src="images/BeanValidation/pic 10.png"></p>
     <h2 id="case-studies">Case Studies:</h2>
-<p>DropWizard Remote Code Execution Analysis(CVE-2020–5245 and CVE-2020–11002)</p>
+<p>DropWizard Remote Code Execution Analysis(CVE-2020-5245 and CVE-2020-11002)</p>
 
 
 <p>CVE-2020-5245</p>

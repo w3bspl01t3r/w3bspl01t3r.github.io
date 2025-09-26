@@ -151,14 +151,19 @@
 
 
 <p>
-    THe CommonsCollection5 payload is more or less similar to the CommonsCollection1 payload.<br>
-    Just like we used a chain of transformers there we will be Using the same Chain of TransFormers here.<br>
-
-    However the Etnry point is different here.<br>
-    Here we will be using  a class called BadAttributeValueExpException class to reach our Goal<br>
-    <br>
-    So lets jump in and see how the payload looks like
+  The <strong>CommonsCollections5</strong> payload is largely similar to the <strong>CommonsCollections1</strong> payload.<br>
+  We use the same chain of transformers here as well.
 </p>
+
+<p>
+  However, the entry point is different.<br>
+  In this payload we use a class called <code>BadAttributeValueExpException</code> to reach our goal.
+</p>
+
+<p>
+  Let’s jump in and see how the payload looks.
+</p>
+
 
 <p>
   <div style="background-color: #1e1f22; color: #bcbec4;">
@@ -205,13 +210,14 @@
 
 
 <p>
-    As we previously know about the ClassCastException and readObject, the same thing happens here as well.
-    <br><br>
-    Lets Check the source of BadAttributeValueExpException
+  As we already saw with <code>ClassCastException</code> and <code>readObject()</code>, a similar flow happens here.<br><br>
+  Let’s check the source of <code>BadAttributeValueExpException</code>.
 </p>
+
 <p>
-    The BadAttributeValueExpException has the following code block on its class
+  The <code>BadAttributeValueExpException</code> class contains the following code block:
 </p>
+
 <p>
   <div style="background-color: #1e1f22; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
@@ -240,19 +246,43 @@
     </div>
     
 </p>
-<p>A custom ReadObject implementation.</p>
-<p>Which means even if there will be a class cast exception, the code present on the readObject will still be executed.</p>
 <p>
-    Looking into the code, the point of interest is the valObj.toString()
+  A custom <code>readObject()</code> implementation.
 </p>
-<p>IF you pay close attention this valObj is getting set from the gf.get("val") </p>
-<p>This particular class also have val variable which gets set via the constrcutors, that in our payload we are sending as null.</p>
 
-<p>SO if we can controll this variable we can make the decission , which toString() to get executed.</p>
-<p>In our payload we are setting the val field to the entry via Refelction and the entry is basically a TiedMapEntry Object. </p>
-<p>We will not discuss how exactly the TiedMapEntry works, but what happens this class imnplements the map interface and have a fucntion called toString()</p>
-<p>So if we pass the entry(Object of TiedMapEntry) to the BadAttributeValueExpException() then then the toString() of TiedMapEntry can be called<br><br>
-Diving deep into the toString() we see that the function calls getValue() which indeed calls map.get() </p>
+<p>
+  This means that even if a <code>ClassCastException</code> occurs, the code inside <code>readObject()</code> will still execute.
+</p>
+
+<p>
+  Looking at the code, the point of interest is the call to <code>valObj.toString()</code>.
+</p>
+
+<p>
+  If you look closely, <code>valObj</code> is set from <code>gf.get("val")</code>.
+</p>
+
+<p>
+  This class also has a <code>val</code> field that is set via its constructors, which in our payload we initially pass as <code>null</code>.
+</p>
+
+<p>
+  So, if we can control this field, we can decide which <code>toString()</code> gets executed.
+</p>
+
+<p>
+  In our payload, we set the <code>val</code> field (via reflection) to an <em>entry</em>, which is a <strong>TiedMapEntry</strong> object.
+</p>
+
+<p>
+  We won’t dive into the full details of <code>TiedMapEntry</code> here, but in short: it implements <code>Map.Entry</code> and defines its own <code>toString()</code>.
+</p>
+
+<p>
+  Therefore, if we pass that <em>entry</em> (a <code>TiedMapEntry</code> instance) into <code>BadAttributeValueExpException</code>, the <code>toString()</code> of <code>TiedMapEntry</code> will be invoked.<br><br>
+  Looking deeper into that <code>toString()</code>, it calls <code>getValue()</code>, which in turn calls <code>map.get(...)</code>.
+</p>
+
 <p>
     <img src="images/cc/TiedMaptoString.PNG">
     <br>
@@ -260,11 +290,22 @@ Diving deep into the toString() we see that the function calls getValue() which 
     <img src="images/cc/getValueTiedMapEntry.PNG">
 </p>
 
-<p>Going back to the payload the Map we  are using is the LaZyMap</p>
-<p>And the way we are using LazyMap is by using the decorate function which takes a HashMap and Transformer</p>
 <p>
-    Lets Review the LaZyMap.get()
+  Returning to the payload, the <code>Map</code> we use is <strong>LazyMap</strong>.
 </p>
+
+<p>
+  We use <code>LazyMap</code> via its <code>decorate()</code> method, which takes a backing <code>HashMap</code> and a <strong>Transformer</strong>.
+</p>
+
+<p>
+  Let’s review <code>LazyMap#get()</code>:
+</p>
+<ul>
+  <li>If the key is present, it returns the existing value.</li>
+  <li>If the key is <em>not</em> present, it applies the provided <strong>Transformer</strong> to the key to compute a value, stores that value into the backing map, and returns it.</li>
+</ul>
+
 <p>
   <div style="background-color: #1e1f22; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
@@ -282,20 +323,23 @@ Diving deep into the toString() we see that the function calls getValue() which 
     
 </p>
 <p>
-    So when the TiedMapEntry calls the map.get() the above get gets called.<br><br>
-    On the above function , if the key is absent then the transformer.transform gets called where the transfromer is been taken from user and gets intitlised into the LaZyMap<br>
-    factory variable via constructors.
+  So, when <code>TiedMapEntry</code> calls <code>map.get()</code>, the <code>LazyMap#get()</code> implementation is triggered.<br><br>
+  In that method, if the requested key is absent, then <code>transformer.transform()</code> is invoked.  
+  The transformer here is user-supplied and gets initialized into the <code>LazyMap</code>’s <code>factory</code> variable via its constructor.
 </p>
+
 <p>
     <img src="images/cc/LazyMapCodeAnalysis.PNG">
 </p>
 
 <p>
-    THe TransFormer.transform executes the code , which we have discussed in the previous on how.
+  The <code>Transformer.transform()</code> call is what actually executes our code — as we discussed earlier.
 </p>
+
 <p>
-    So taking all the above, the payload uses the BadAttributeValueExpException() to reach till the transformer like below.
-    <br>
+  Putting it all together: the payload leverages <code>BadAttributeValueExpException</code> to reach the transformer, like this:
+</p>
+
     <div style="background-color: #1e1f22; color: #bcbec4;">
       <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
       <span style="color: #cf8e6d;">ObjectInputStream.readObject()</span>
@@ -318,17 +362,25 @@ Diving deep into the toString() we see that the function calls getValue() which 
       
 </p>
 <p>
-    Below is the slight modification of the above code where we have used java8u202 to execute the payload in locainstnace and instead of using refelction to set the val<br>
-    Variable we are directly passing the val varibale to the BadAttributeValueExpException() construtor.
+  Below is a slight modification of the previous code, where we tested the payload on <strong>Java 8u202</strong> in a local instance.  
+  Instead of using reflection to set the <code>val</code> variable, we directly passed it to the <code>BadAttributeValueExpException()</code> constructor.
 </p>
+
 <p>
-    The reason we can not use the same for gadget chain construction is: <br><br>
-    if we pass entry directly to BadAttributeValueExpException  then the constuctor there will call the toString() immediately resulting in immeidate code execution and we will not be able craft a serilised payload.<br><br>
-
-This is the reasson why reflection is used to set this variable in the later Stage.<br><br>
-
-This is also a reason why on most of the ysoserial payloads we are using reflection to make the changes in the later satage so that we can craft the serilised payload and doesn't execute code immediately in our local instance.
+  However, we cannot use the same approach for gadget chain construction because: <br><br>
+  If we pass the entry directly to <code>BadAttributeValueExpException</code>, its constructor will immediately call <code>toString()</code>, leading to <strong>instant code execution</strong>.  
+  This prevents us from crafting a serialized payload.
 </p>
+
+<p>
+  That is why reflection is used to set the <code>val</code> variable at a later stage.  
+  This delay ensures we can build the serialized payload without triggering execution prematurely.
+</p>
+
+<p>
+  This also explains why, in most <code>ysoserial</code> payloads, reflection is used to adjust fields in later stages — allowing payload construction without immediate code execution in the local instance.
+</p>
+
 <p>
 <div style="background-color: #1e1f22; color: #bcbec4;">
 <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
