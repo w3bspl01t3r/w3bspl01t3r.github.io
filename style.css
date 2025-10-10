@@ -63,24 +63,6 @@ body {
     gap: 3rem;
   }
   
-  .posts {
-    flex: 2;
-  }
-  
-  .posts h2 {
-    font-weight: bold;
-    border-bottom: 1px solid #333;
-    padding-bottom: 0.5rem;
-  }
-  
-  .posts article h3 {
-    color: #fff;
-    margin: 1rem 0 0.5rem;
-  }
-  
-  .posts article p {
-    color: #bbb;
-  }
   
   .date {
     font-size: 0.8rem;

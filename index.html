@@ -3,8 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Labs | Modern Security Blog</title>
+  <title>ZDayLabs</title>
   <link rel="stylesheet" href="style.css"/>
+  <style>
+    .section-wrapper {
+      display: flex;
+      justify-content: space-between;
+      gap: 40px; /* Adjust spacing as needed */
+      flex-wrap: wrap;
+    }
+    
+    .section-wrapper .research {
+      flex: 1;
+      min-width: 300px; /* Ensures responsiveness */
+    }
+  </style>
 </head>
 <body>
   <div id="navigation-placeholder"></div>
@@ -13,13 +26,13 @@
   <main>
     <section class="intro">
       <h1>About <span class="highlight">ZDaylabs</span></h1>
-      <p><span class="highlight">ZDaylabs</span> is the epicentre of offensive security expertise – where research, innovation, and real attacker insight power our security research and development.</p>
+      <p><span class="highlight">ZDaylabs</span> , We exploit, analyze, and document.</p>
       <p>This blog offers a glimpse into the original research and security insights that drive our continuous learning and exploration.</p>
     </section>
 
-    <section class="content">
-      <div class="posts">
-        <h2>BLOG POSTS</h2>
+    <section class="content section-wrapper">
+      <div class="blogs">
+        <h2><a href="blogs.html" style="cursor: pointer; text-decoration: none; color: inherit; display: inline-block;">BLOG POSTS</a></h2>
         <div id="blog-posts-container">
           <!-- Blog posts will be dynamically loaded here -->
         </div>
@@ -27,13 +40,18 @@
           <a href="blogs.html" style="color: #36d1dc; text-decoration: none; font-weight: 600;">Show More →</a>
         </div>
       </div>
-      <div class="research">
-        <h2>RESEARCH</h2>
+    
+      <div style="text-align: right;" class="research">
+        <h2> <a href="research.html" style="cursor: pointer; text-decoration: none; color: inherit; display: inline-block;">RESEARCH</a></h2>
         <div id="research-container">
           <!-- Research entries will be dynamically loaded here -->
         </div>
+        <div class="show-more">
+          <a href="research.html" style="color: #36d1dc; text-decoration: none; font-weight: 600;">Show More →</a>
+        </div>
       </div>
     </section>
+    
   </main>
 
   <script>
@@ -55,7 +73,10 @@
     ];
 
     const researchPosts = [
-      { title: "Authentication Bypass In TrackPlus allegra", file: "CVE-2025-6216.html", description: "Discovered authentication bypass vulnerability in TrackPlus allegra system" }
+      { title: "Remote Code Execution in JasperReports", file: "CVE-2025-10492.html", description: "Discovered remote code execution vulnerability in JasperReports Library" },
+      { title: "Authentication Bypass In TrackPlus allegra", file: "CVE-2025-6216.html", description: "Discovered authentication bypass vulnerability in TrackPlus allegra system" },
+      { title: "Remote Code Execution In TrackPlus allegra", file: "CVE-2025-xxxx.html", description: "Discovered Remote Code Execution in TrackPlus allegra system" }
+      
     ];
 
     // Function to populate blog posts
