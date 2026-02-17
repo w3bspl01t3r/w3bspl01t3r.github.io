@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CommonsCollection2 | zdaylabs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      color: #dcdcdc;
+      line-height: 1.6;
+      padding: 0 2rem;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 0 1rem;
+      border-bottom: 1px solid #333;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #ccc;
+      font-size: 0.95rem;
+    }
+
+    nav a:hover {
+      color: #fef200;
+    }
+
+    .socials a {
+      margin-left: 1rem;
+      color: #999;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      color: #fef200;
+      font-size: 1.8rem;
+      margin: 2rem 0 1rem;
+      border-bottom: 2px solid #333;
+      padding-bottom: 0.5rem;
+    }
+
+    h3 {
+      color: #fef200;
+      font-size: 1.4rem;
+      margin: 1.5rem 0 0.8rem;
+    }
+
+    h4 {
+      color: #fef200;
+    }
+
+    .highlight {
+      color: #fef200;
+      font-weight: 600;
+    }
+
+    .accent {
+      color: #36d1dc;
+    }
+
+    p {
+      color: #bbb;
+      margin-bottom: 1rem;
+    }
+
+    pre {
+      background-color: #1e2329;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    code {
+      color: #36d1dc;
+      font-family: 'Courier New', monospace;
+    }
+
+    a {
+      color: #36d1dc;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #fef200;
+    }
+
+    ul, ol {
+      color: #bbb;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+
+    .note {
+      background: rgba(254, 242, 0, 0.08);
+      border: 1px solid rgba(254, 242, 0, 0.25);
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1.25rem 0;
+      color: #ddd;
+    }
+
+    .warn {
+      background: rgba(255, 99, 71, 0.08);
+      border: 1px solid rgba(255, 99, 71, 0.25);
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1.25rem 0;
+      color: #ddd;
+    }
+  </style>
+</head>
+<body>
+  <div id="navigation-placeholder"></div>
+  <script src="navigation.js"></script>
+
+  <main>
+    <h1>CommonsBeanUtils1</h1>
+
+    <p>
+      If you’re reading this for the first time, I’d recommend going through the
+      <span class="highlight">CommonsCollections</span> blogs first and then coming back here.
+      This series is built on top of the CommonsCollections series.
+    </p>
+
+    <p>
+      In this blog post we’ll discuss the <span class="highlight">CommonsBeanUtils1</span> gadget:
+      <span class="accent">how it works</span>, <span class="accent">why the dependencies matter</span>,
+      and we’ll wrap up with a <span class="accent">safe</span> “local lab” discussion (non-operational)
+      to show the control flow end-to-end.
+    </p>
+
+    <div class="warn">
+      <strong>Safety note:</strong> This post intentionally avoids publishing weaponizable exploit code
+      (for example, deserialization payloads that execute OS commands). The goal here is to explain
+      the mechanics and the defensive implications.
+    </div>
+
+    <h2>Quick refresher: CommonsCollections2 control flow</h2>
+
+    <p>
+      For refresher, CommonsCollections2 is commonly described with a control-flow chain like:
+    </p>
+
+    <pre><code>PriorityQueue.readObject()
+  → PriorityQueue.heapify()
+    → PriorityQueue.siftDown(...)
+      → Comparator.compare(...)
+        → (Comparator-specific logic)
+          → TemplatesImpl.newTransformer()
+            → loads attacker-controlled bytecode (if present)</code></pre>
+
+    <p>
+      The key learning: <span class="highlight">PriorityQueue deserialization</span> re-orders elements
+      during <code>readObject()</code>, and if a non-null comparator exists, it will be invoked while
+      heapifying.
+    </p>
+
+    <h2>CommonsBeanUtils1: what changes at a high level?</h2>
+
+    <p>
+      CommonsBeanUtils1 is conceptually very similar to CC2 in that it leverages:
+      <span class="highlight">PriorityQueue</span> + a <span class="highlight">Comparator</span>,
+      and reaches a sensitive method on a JDK/Xalan class (often described as <code>TemplatesImpl</code>).
+    </p>
+
+    <p>
+      The main change is: instead of a comparator that transforms objects via an
+      “invoker-style” transformer, this gadget uses <span class="highlight">BeanComparator</span>.
+    </p>
+
+    <pre><code>PriorityQueue.readObject()
+  → PriorityQueue.heapify()
+    → PriorityQueue.siftDown(...)
+      → BeanComparator.compare(...)
+        → property resolution via PropertyUtils.getProperty(...)
+          → getter resolution via JavaBeans Introspector
+            → (sensitive method reachable in vulnerable configurations)</code></pre>
+
+    <div class="note">
+      <strong>Note:</strong> If you’re unsure why passing a comparator matters, revisit the CC2 post:
+      the moment <code>PriorityQueue</code> heapifies during deserialization, it will call
+      <code>compare()</code> on the comparator.
+    </div>
+
+    <h2>Deep dive: BeanComparator.compare()</h2>
+
+    <p>
+      When we initialize a BeanComparator like:
+    </p>
+
+    <pre><code>BeanComparator bc = new BeanComparator("outputProperties");</code></pre>
+
+    <p>
+      It sets two important fields:
+    </p>
+
+    <ul>
+      <li><code>property</code> gets set (e.g., <code>"outputProperties"</code>).</li>
+      <li>
+        <code>comparator</code> is set to a default comparable comparator if not supplied.
+        (This is where transitive dependencies can come into play.)
+      </li>
+    </ul>
+
+    <p>
+      Inside <code>compare(o1, o2)</code>, when <code>property</code> is non-null, it resolves:
+    </p>
+
+    <pre><code>value1 = PropertyUtils.getProperty(o1, property);
+value2 = PropertyUtils.getProperty(o2, property);
+return internalCompare(value1, value2);</code></pre>
+
+    <p>
+      The critical part is <code>PropertyUtils.getProperty</code>. Because you control:
+    </p>
+    <ul>
+      <li><code>o1</code>/<code>o2</code> (objects placed into the queue), and</li>
+      <li><code>property</code> (the string passed to the comparator),</li>
+    </ul>
+    <p>
+      you influence which getter method is discovered and invoked through the JavaBeans
+      introspection process (property descriptors, read methods, etc.).
+    </p>
+
+    <h3>How property resolution works (conceptually)</h3>
+
+    <p>
+      For simple properties (not nested like <code>a.b.c</code>), the resolution typically:
+    </p>
+
+    <ol>
+      <li>Creates/uses introspection data for the target class.</li>
+      <li>Finds a matching property descriptor for the supplied property name.</li>
+      <li>Extracts a read method (getter) from the descriptor.</li>
+      <li>Invokes the read method reflectively.</li>
+    </ol>
+
+    <p>
+      That’s why a property name like <code>outputProperties</code> maps to a getter like
+      <code>getOutputProperties()</code> when present and compatible with JavaBeans rules.
+    </p>
+
+    <h2>“Quick Question” section (safe answer)</h2>
+
+    <p><strong>Q:</strong> “Where do we send <code>getOutputProperties()</code> to invokeMethod?”</p>
+    <p>
+      In JavaBeans-style introspection, you usually don’t pass the method directly. You fetch a
+      <span class="highlight">PropertyDescriptor</span>, then call something like
+      <code>getReadMethod()</code> on it to obtain the getter method, and only then invoke it.
+      So the “method reference” is derived from metadata, not hard-coded.
+    </p>
+
+    <h2>Dependencies: why three jars show up in many writeups</h2>
+
+    <h3>1) commons-logging</h3>
+    <p>
+      Commons Logging is often a compile/runtime dependency of BeanUtils.
+      In many environments, BeanUtils may throw errors if it cannot find commons-logging on the
+      classpath, even if logging isn’t directly involved in the gadget chain.
+    </p>
+
+    <h3>2) commons-collections</h3>
+    <p>
+      Some BeanComparator constructors or defaults can reference comparator utilities that live in
+      Commons Collections. In some cases, this dependency is <em>incidental</em> to the chain and can be
+      replaced by supplying your own comparator (as long as it’s compatible and serializable where needed).
+    </p>
+
+    <h3>3) commons-beanutils</h3>
+    <p>
+      This is the core library providing BeanComparator/PropertyUtils property resolution logic.
+    </p>
+
+    <div class="note">
+      <strong>Defensive takeaway:</strong> A “not used directly” dependency can still matter because
+      it changes what classes are available at runtime and what defaults get selected. Always model the
+      full classpath when assessing deserialization risk.
+    </div>
+
+    <h2>Defensive checklist: how to reduce risk</h2>
+
+    <ul>
+      <li><strong>Disable Java native deserialization</strong> for untrusted data wherever possible.</li>
+      <li>
+        Use an <strong>allowlist-based ObjectInputFilter</strong> (JEP 290) to restrict classes during
+        deserialization.
+      </li>
+      <li>
+        <strong>Remove unused libraries</strong> (BeanUtils / Collections / Xalan) from server classpaths
+        when not required.
+      </li>
+      <li>
+        <strong>Patch/upgrade</strong> libraries and runtimes, and track known gadget-bearing versions.
+      </li>
+      <li>
+        Add detections: look for suspicious deserialization entry points and unexpected
+        <code>PriorityQueue</code>/<code>Comparator</code> usage patterns.
+      </li>
+    </ul>
+
+    <h4>Summary</h4>
+    <ul>
+      <li><code>CommonsBeanUtils1</code> follows the same deserialization “entry point” pattern as CC2: <code>PriorityQueue.readObject()</code> triggers heap operations.</li>
+      <li>The comparator’s <code>compare()</code> is invoked during heapify/sift-down, making comparators powerful gadget primitives.</li>
+      <li><code>BeanComparator</code> resolves a property name into a getter call via JavaBeans introspection (<code>PropertyDescriptor</code> → <code>getReadMethod()</code> → reflective invoke).</li>
+      <li>Some dependencies appear due to transitive/default behaviors (logging / default comparators), even if not central to the vulnerable control flow.</li>
+      <li>Best defense is to avoid deserializing untrusted data and enforce strict class filtering (JEP 290).</li>
+    </ul>
+
+    <p>Thats it for Today.</p>
+    <p>Thanks For Reading.</p>
+    <p>Happy Hacking (responsibly).</p>
+    <p>You can connect with me at:</p>
+    <p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+    <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+
+  </main>
+</body>
+</html>

