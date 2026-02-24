@@ -10,7 +10,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      background-color: #1a1a2e;
       color: #dcdcdc;
       line-height: 1.6;
       padding: 0 2rem;
@@ -167,7 +167,7 @@
   </p>
   
 <p>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">@Override</span>
     <span style="color: #cf8e6d;">public</span> T <span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">Class</span> input) {
@@ -194,7 +194,7 @@
 </p>
 <p>Which can be simplified as below</p>
 <p>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">public</span> T <span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">Class</span> input) {
         <span style="color: #cf8e6d;">final</span> Constructor con = input.<span style="color: #56a8f5;">getConstructor</span>(iParamTypes);
@@ -212,7 +212,7 @@
 </p>
 
 <p>Lets say we have a class called AnotherClass which looks like below<br/>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">import</span> java.lang.reflect.Method;
     <span style="color: #cf8e6d;">public class</span> AnotherClasss {
@@ -226,7 +226,7 @@
 <br/>
 Lets Say there is another class called testclass which looks like below
 <br/>
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
   <span style="color: #cf8e6d;">public class</span> testclass {
   
@@ -244,7 +244,7 @@ Lets Say there is another class called testclass which looks like below
   We can achieve this through <code>AnotherClass</code>, and the code will look like the following:<br/>
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
   <span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.*;
   <span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
@@ -285,7 +285,7 @@ Lets Say there is another class called testclass which looks like below
     Now, let's move on to understanding the payload.
   </p>
   
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">public Object</span> <span style="color: #56a8f5;">getObject</span>(<span style="color: #cf8e6d;">final String</span> command) <span style="color: #cf8e6d;">throws Exception</span> {
         Object templatesImpl = Gadgets.<span style="color: #56a8f5;">createTemplatesImpl</span>(command);
@@ -328,7 +328,7 @@ Lets Say there is another class called testclass which looks like below
   </div>
   
   <div>
-    <div style="background-color: #1e1f22; color: #bcbec4;">
+    <div style="background-color: #0d1117; color: #bcbec4;">
       <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
   <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
   <span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;
@@ -490,7 +490,7 @@ Lets Say there is another class called testclass which looks like below
     If you examine how <code>InstantiateTransformer.transform()</code> works, you’ll find the following code:
   </p>
   
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
                         <span style="color: #cf8e6d;">public</span> T <span style="color: #56a8f5;">transform</span>(<span style="color: #cf8e6d;">final Class</span> input) {
                                    <span style="color: #cf8e6d;">final Constructor</span> con = input.<span style="color: #56a8f5;">getConstructor</span>(iParamTypes);

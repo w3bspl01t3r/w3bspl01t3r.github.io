@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      background-color: #1a1a2e;
       color: #dcdcdc;
       line-height: 1.6;
       padding: 0 2rem;
@@ -92,7 +92,7 @@
     }
     
     pre {
-      background-color: #1e2329;
+      background-color: #0d1117;
       border: 1px solid #333;
       border-radius: 4px;
       padding: 1rem;
@@ -162,7 +162,7 @@
 <p>With that said, here's what the payload looks like:</p>
 
 <p>
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Object</span> templates = <span style="color: #cf8e6d;">Gadgets</span>.<span style="color: #56a8f5;">createTemplatesImpl</span>(command); <span style="color: #808080;">//1</span>
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Object</span> templates = <span style="color: #cf8e6d;">Gadgets</span>.<span style="color: #56a8f5;">createTemplatesImpl</span>(command); <span style="color: #808080;">//1</span>
 
 <span style="color: #cf8e6d;">ConstantTransformer</span> constant = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>); <span style="color: #808080;">//2</span>
 
@@ -239,7 +239,7 @@ args[<span style="color: #b3ae60;">0</span>] = templates;
 <br>
 So the whole above code can look like below
 </p>
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">
   <span style="color: #cf8e6d;">Object</span> templates = <span style="color: #cf8e6d;">Gadgets</span>.<span style="color: #56a8f5;">createTemplatesImpl</span>(command);
   <span style="color: #cf8e6d;">ConstantTransformer</span> constant = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">TrAXFilter</span>.<span style="color: #cf8e6d;">class</span>);
@@ -266,7 +266,7 @@ Here the obj1 and obj2 are the values we pass via queue.add()
 <br>
 Now in the transformer.apply() , here the transformer is ChainedTransFormer, and if you see the chainedTrasformer's transform Code
     </p>
-    <div style="background-color: #1e1f22; color: #bcbec4;">
+    <div style="background-color: #0d1117; color: #bcbec4;">
       <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
       <span style="color: #cf8e6d;">@Override</span>
       <span style="color: #cf8e6d;">public</span> T <span style="color: #56a8f5;">transform</span>(T object) {
@@ -291,7 +291,7 @@ Now in the transformer.apply() , here the transformer is ChainedTransFormer, and
 
 </code></pre>
 </p>
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
   object = iTransformer.<span style="color: #56a8f5;">apply</span>(object);
   </pre>
@@ -306,7 +306,7 @@ Now in the transformer.apply() , here the transformer is ChainedTransFormer, and
 </p>
 
 
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
   <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
   <span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;

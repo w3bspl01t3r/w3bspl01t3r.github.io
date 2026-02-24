@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      background-color: #1a1a2e;
       color: #dcdcdc;
       line-height: 1.6;
       padding: 0 2rem;
@@ -92,7 +92,7 @@
     }
     
     pre {
-      background-color: #1e2329;
+      background-color: #0d1117;
       border: 1px solid #333;
       border-radius: 4px;
       padding: 1rem;
@@ -142,7 +142,7 @@
 
 <p>So lets First Dive in and understand what is PriorityQueue and how does it works.</p>
 <p>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">import</span> java.util.PriorityQueue;
     
@@ -172,7 +172,7 @@
 </p>
 
 <p>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     AnotherClass ob = <span style="color: #cf8e6d;">new</span> AnotherClass();
     PriorityQueue&lt;<span style="color: #cf8e6d;">String</span>&gt; pq = <span style="color: #cf8e6d;">new</span> PriorityQueue&lt;<span style="color: #cf8e6d;">String</span>&gt;(2, ob);
@@ -186,7 +186,7 @@
     The Another class looks like below
 </p>
 <p>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">import</span> java.io.IOException;
     <span style="color: #cf8e6d;">import</span> java.io.Serializable;
@@ -219,7 +219,7 @@
     Examining the PriorityQueue we can see it has a readObject block that looks like Below.
 </p>
 <p>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">private void</span> <span style="color: #56a8f5;">readObject</span>(java.io.ObjectInputStream s)
         <span style="color: #cf8e6d;">throws</span> java.io.IOException, ClassNotFoundException {
@@ -255,7 +255,7 @@
 
 <p>Now Lets Jump into the Payload</p>
 <p>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">public Queue</span>&lt;<span style="color: #cf8e6d;">Object</span>&gt; <span style="color: #56a8f5;">getObject</span>(<span style="color: #cf8e6d;">final String</span> command) <span style="color: #cf8e6d;">throws Exception</span> {
         <span style="color: #cf8e6d;">final Object</span> templates = Gadgets.<span style="color: #56a8f5;">createTemplatesImpl</span>(command);
@@ -287,7 +287,7 @@
 <p>We are using TransFormingComparator .So the Compare() on TransFormingComparator will get Executed.<p>
     <p>Lets Take a look into how the Compare() Looks like in the TransFormingCompartor.</p>
     <p>
-      <div style="background-color: #1e1f22; color: #bcbec4;">
+      <div style="background-color: #0d1117; color: #bcbec4;">
         <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
         <span style="color: #cf8e6d;">public int</span> <span style="color: #56a8f5;">compare</span>(<span style="color: #cf8e6d;">final</span> I obj1, <span style="color: #cf8e6d;">final</span> I obj2) {
             <span style="color: #cf8e6d;">final</span> O value1 = transformer.<span style="color: #56a8f5;">apply</span>(obj1);
@@ -300,7 +300,7 @@
     </p>
     <p>It calls the Transformer.apply(), This transformer is the same TransFormer That we have passed</p>
     <p>
-      <div style="background-color: #1e1f22; color: #bcbec4;">
+      <div style="background-color: #0d1117; color: #bcbec4;">
         <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
         <span style="color: #cf8e6d;">public</span> TransformingComparator(<span style="color: #cf8e6d;">final</span> Transformer&lt;? <span style="color: #cf8e6d;">super</span> I, ? <span style="color: #cf8e6d;">extends</span> O&gt; transformer) {
             <span style="color: #cf8e6d;">this</span>(transformer, ComparatorUtils.NATURAL_COMPARATOR);
@@ -327,7 +327,7 @@
     <p>But wait a sec, it calls the apply(), however there is no apply() in invokerTransformer, so there has to be some kind of code for the translation or apply() to transform</p>
     <p>Check the code where the this.transForm is defined</p>
     <p>
-      <div style="background-color: #1e1f22; color: #bcbec4;">
+      <div style="background-color: #0d1117; color: #bcbec4;">
         <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
         <span style="color: #cf8e6d;">private final</span> Transformer&lt;? <span style="color: #cf8e6d;">super</span> I, ? <span style="color: #cf8e6d;">extends</span> O&gt; transformer;
         </pre>
@@ -337,7 +337,7 @@
     <p>One thing to keep in mind is some modern Java frameworks (like Streams and Lambdas) allow functional interfaces (like Transformer) to be treated like Function<I, O>.</p>
     <p>
         So the below code 
-        <div style="background-color: #1e1f22; color: #bcbec4;">
+        <div style="background-color: #0d1117; color: #bcbec4;">
           <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
           Transformer&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">Integer</span>&gt; transformer = <span style="color: #cf8e6d;">new</span> InvokerTransformer&lt;&gt;(<span style="color: #6aab73;">"length"</span>, <span style="color: #cf8e6d;">null</span>, <span style="color: #cf8e6d;">null</span>);
           <span style="color: #cf8e6d;">Integer</span> length = transformer.<span style="color: #56a8f5;">transform</span>(<span style="color: #6aab73;">"Hello"</span>);  <span style="color: #6aab73;">// Calls transform() directly</span>
@@ -347,7 +347,7 @@
         </p>
 
        <p> can also be written as
-        <div style="background-color: #1e1f22; color: #bcbec4;">
+        <div style="background-color: #0d1117; color: #bcbec4;">
           <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
           Function&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">Integer</span>&gt; func = transformer::<span style="color: #56a8f5;">transform</span>;  <span style="color: #6aab73;">// Adapts `Transformer` to `Function`</span>
           <span style="color: #cf8e6d;">Integer</span> length = func.<span style="color: #56a8f5;">apply</span>(<span style="color: #6aab73;">"Hello"</span>);  <span style="color: #6aab73;">// Calls transform() via apply()</span>
@@ -360,7 +360,7 @@
     </p>
     <p>If you check the SuperClass i.e TransFormer.java you will see the below code</p>
     <p>
-      <div style="background-color: #1e1f22; color: #bcbec4;">
+      <div style="background-color: #0d1117; color: #bcbec4;">
         <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
         <span style="color: #cf8e6d;">public interface</span> Transformer&lt;T, R&gt; <span style="color: #cf8e6d;">extends</span> Function&lt;T, R&gt; {
         
@@ -437,7 +437,7 @@
     </p>
     
 <p>
-  <div style="background-color: #1e1f22; color: #bcbec4;">
+  <div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     InvokerTransformer transformer = <span style="color: #cf8e6d;">new</span> InvokerTransformer(<span style="color: #6aab73;">"newTransformer"</span>, <span style="color: #cf8e6d;">new Class</span>[<span style="color: #b3ae60;">0</span>], <span style="color: #cf8e6d;">new Object</span>[<span style="color: #b3ae60;">0</span>]);
     PriorityQueue&lt;TemplatesImpl&gt; priorityQueue = <span style="color: #cf8e6d;">new</span> PriorityQueue&lt;TemplatesImpl&gt;(<span style="color: #b3ae60;">2</span>, <span style="color: #cf8e6d;">new</span> TransformingComparator(transformer));
@@ -451,7 +451,7 @@
     The Entire Code along with CreatesImpl for CommonsCollection2 will look like below with the Above Modification.
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
   <span style="color: #cf8e6d;">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
   <span style="color: #cf8e6d;">import</span> java.lang.reflect.Field;

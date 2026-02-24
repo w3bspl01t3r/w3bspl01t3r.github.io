@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      background-color: #1a1a2e;
       color: #dcdcdc;
       line-height: 1.6;
       padding: 0 2rem;
@@ -92,7 +92,7 @@
     }
     
     pre {
-      background-color: #1e2329;
+      background-color: #0d1117;
       border: 1px solid #333;
       border-radius: 4px;
       padding: 1rem;
@@ -164,7 +164,7 @@
     Below is how the gadget Chain looks like for commonsCollection6.
 </p>
 <p>
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">java.io.<span style="color: #cf8e6d;">ObjectInputStream</span>.<span style="color: #56a8f5;">readObject</span>()
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">java.io.<span style="color: #cf8e6d;">ObjectInputStream</span>.<span style="color: #56a8f5;">readObject</span>()
 java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8f5;">readObject</span>()
     java.util.<span style="color: #cf8e6d;">HashMap</span>.<span style="color: #56a8f5;">put</span>()
     java.util.<span style="color: #cf8e6d;">HashMap</span>.<span style="color: #56a8f5;">hash</span>()
@@ -179,7 +179,7 @@ java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8
 <p>
     let's divide the chain in 2 parts.<br><br>
     1st half<br>
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">java.io.<span style="color: #cf8e6d;">ObjectInputStream</span>.<span style="color: #56a8f5;">readObject</span>()
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">java.io.<span style="color: #cf8e6d;">ObjectInputStream</span>.<span style="color: #56a8f5;">readObject</span>()
 java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8f5;">readObject</span>()
     java.util.<span style="color: #cf8e6d;">HashMap</span>.<span style="color: #56a8f5;">put</span>()
     java.util.<span style="color: #cf8e6d;">HashMap</span>.<span style="color: #56a8f5;">hash</span>()
@@ -187,7 +187,7 @@ java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8
         org.apache.commons.collections.keyvalue.<span style="color: #cf8e6d;">TiedMapEntry</span>.<span style="color: #56a8f5;">getValue</span>()</pre></div>
     <br>
     2nd half <br>
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">                        org.apache.commons.collections.map.<span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">get</span>()
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">                        org.apache.commons.collections.map.<span style="color: #cf8e6d;">LazyMap</span>.<span style="color: #56a8f5;">get</span>()
                         org.apache.commons.collections.functors.<span style="color: #cf8e6d;">ChainedTransformer</span>.<span style="color: #56a8f5;">transform</span>()
                         org.apache.commons.collections.functors.<span style="color: #cf8e6d;">InvokerTransformer</span>.<span style="color: #56a8f5;">transform</span>()
                         java.lang.reflect.<span style="color: #cf8e6d;">Method</span>.<span style="color: #56a8f5;">invoke</span>()
@@ -225,9 +225,9 @@ java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8
 
 
 <p>
-    But if you pay close attention , you can see that the HashMap.readObject() there is a function called <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">putVal(hash(key), key, value, false, false);</span>.
+    But if you pay close attention , you can see that the HashMap.readObject() there is a function called <span style="background-color: #0d1117; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">putVal(hash(key), key, value, false, false);</span>.
     <img src="images/cc/hashmapreadobjectcall.PNG"><br><br>
-    The <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">hash(key)</span> calls <span style="background-color: #1e1f22; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">key.hashCode()</span>.
+    The <span style="background-color: #0d1117; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">hash(key)</span> calls <span style="background-color: #0d1117; color: #bcbec4; font-family: 'JetBrains Mono',monospace; font-size: 9.8pt; padding: 2px 4px;">key.hashCode()</span>.
     <br>
     <br>
     <img src="images/cc/has_on_hashmap.PNG">
@@ -240,7 +240,7 @@ java.util.<span style="color: #cf8e6d;">HashSet</span>.<span style="color: #56a8
     SO below is how the modified code looks like for CommonsCollection6 Gadget Chain.
 </p>
 <p>
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> org.apache.commons.collections.Transformer;
 <span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.ChainedTransformer;
 <span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.ConstantTransformer;
 <span style="color: #cf8e6d;">import</span> org.apache.commons.collections.functors.InvokerTransformer;
@@ -286,7 +286,7 @@ import java.util.HashMap;
     If you don't want the calc.exe to pop duing the first time you have to use the reflections.
 </p>
 <p>
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.io.FileInputStream;
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.io.FileInputStream;
 <span style="color: #cf8e6d;">import</span> java.io.ObjectInputStream;
 
 <span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">class</span> <span style="color: #56a8f5;">checkclass</span> {

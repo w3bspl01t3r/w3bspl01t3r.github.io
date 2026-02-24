@@ -11,19 +11,19 @@
             --bg-code: #0d1117;
             --text-primary: #e6e6e6;
             --text-secondary: #b0b0b0;
-            --accent: #e94560;
+            --accent: #fef200;
             --accent-secondary: #0f3460;
             --link-color: #58a6ff;
-            --code-keyword: #ff7b72;
-            --code-string: #a5d6ff;
-            --code-comment: #8b949e;
-            --code-type: #79c0ff;
-            --code-method: #d2a8ff;
-            --code-number: #79c0ff;
-            --code-annotation: #ffa657;
-            --code-plain: #c9d1d9;
+            --code-keyword: #cf8e6d;
+            --code-string: #6aab73;
+            --code-comment: #808080;
+            --code-type: #cf8e6d;
+            --code-method: #56a8f5;
+            --code-number: #b3ae60;
+            --code-annotation: #bbb529;
+            --code-plain: #bcbec4;
             --border-color: #30363d;
-            --highlight-bg: rgba(233, 69, 96, 0.1);
+            --highlight-bg: rgba(254, 242, 0, 0.1);
         }
 
         * {
@@ -39,12 +39,45 @@
             font-size: 16px;
             line-height: 1.7;
             min-height: 100vh;
+            padding: 0 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 0 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        nav a {
+            margin: 0 1rem;
+            text-decoration: none;
+            color: #ccc;
+            font-size: 0.95rem;
+        }
+
+        nav a:hover {
+            color: #fef200;
+        }
+
+        .socials a {
+            margin-left: 1rem;
+            color: #999;
+            font-size: 1.2rem;
+            text-decoration: none;
         }
 
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 24px 80px;
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
 
         h1 {
@@ -99,7 +132,7 @@
 
         code {
             background-color: var(--bg-code);
-            color: var(--code-annotation);
+            color: #36d1dc;
             padding: 2px 6px;
             border-radius: 4px;
             font-family: 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
@@ -228,6 +261,9 @@
     </style>
 </head>
 <body>
+  <div id="navigation-placeholder"></div>
+  <script src="navigation.js"></script>
+
     <div class="container">
 
         <h1>Groovy1</h1>
@@ -940,8 +976,19 @@
         <p>Similarly, we can target different functions to exploit different vulnerabilities.</p>
 
         <p>This is how the entire Gadget Chain works.</p>
+<div> <section>
+<p><b>Hope you liked it. </b></p>
+        <p>Thats it for Today.</p>
+<p>Thanks For Reading.</p>
+<p>Happy Hacking.</p>
+<p>You can connect with me at:</p>
+<p><a href="https://www.linkedin.com/in/swagatkumar/">Linkedin</a></p>
+<p><a href="https://x.com/webspl01t3r">Twitter</a></p>
+</section>       </div>
 
-        <p><b>Hope you liked it. Happy Hacking!</b></p>
+
+</body>
+</html>
 
     </div>
 </body>

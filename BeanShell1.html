@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      background-color: #1a1a2e;
       color: #dcdcdc;
       line-height: 1.6;
       padding: 0 2rem;
@@ -92,7 +92,7 @@
     }
     
     pre {
-      background-color: #1e2329;
+      background-color: #0d1117;
       border: 1px solid #333;
       border-radius: 4px;
       padding: 1rem;
@@ -140,7 +140,7 @@
 
 <p>This chain is somewhat similar to the CommonsCollection2 chain.</p>
 <p>As we know, in the CommonsCollection2 chain we use PriorityQueue and Transforming Comparator to reach Runtime.getRuntime().exec().</p>
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt; margin: 0;">
 <code>PriorityQueue.<span style="color: #56a8f5;">readObject</span>()
    PriorityQueue.<span style="color: #56a8f5;">heapify</span>()
@@ -158,7 +158,7 @@
 <p>Now let's jump into this gadget.</p>
 
 
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
 <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.Proxy;
@@ -238,7 +238,7 @@
 <p>So for example,</p>
 <p>If you want to call the display method in the below class</p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
 <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
   <span style="color: #cf8e6d;">public class</span> <span style="color: #56a8f5;">Sample</span> <span style="color: #cf8e6d;">implements</span> Displayable {
 
@@ -256,7 +256,7 @@
 <p>and there exists another interface called Displayable</p>
 
 
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
     <span style="color: #cf8e6d;">public interface</span> <span style="color: #56a8f5;">Displayable</span> {
     <span style="color: #cf8e6d;">void</span> <span style="color: #56a8f5;">display</span>();
@@ -267,7 +267,7 @@
 <p>However, in order to do so, there has to be another class that would implement an InvocationHandler and a method called invoke(), and that invoke() should contain the logic to call this display method.</p>
 <p>So let's say there is a class called AnotherClass which looks like below</p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.Method;
 
@@ -295,7 +295,7 @@
 <p>Now we can call this using the below code</p>
 
 
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.Proxy;
@@ -360,7 +360,7 @@
   <p>1. Namespace</p><p>2. An interpreter</p><p>The interpreter has an eval() which will simply register our AST expression, and once we use that XThis constructor, the interpreter and the namespace get set.</p>
   <p>Let's see a small example:</p>
   
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
     <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
 <span style="color: #cf8e6d;">import</span> bsh.Interpreter;
 
@@ -394,7 +394,7 @@
 
 <p>And this is where the compare function flows and since we have declared our function, when compare() is called, our compare gets called and we achieve code execution.</p>
 <p>So the below code can be used to get a Base64 string of the gadget chain.</p>
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.Proxy;
@@ -467,7 +467,7 @@
 
 
 <h2>Extra Miles:</h2><p>So as we discussed, we are not bound to use the PriorityQueue.</p><p>So let's use the HashMap.</p>
-<div style="background-color: #1e1f22; color: #bcbec4;">
+<div style="background-color: #0d1117; color: #bcbec4;">
   <pre style="font-family: 'JetBrains Mono', monospace; font-size: 9.8pt;">
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.InvocationHandler;
 <span style="color: #cf8e6d;">import</span> java.lang.reflect.Proxy;

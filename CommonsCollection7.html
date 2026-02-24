@@ -8,7 +8,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1e3a5f 100%);
+      background-color: #1a1a2e;
       color: #dcdcdc;
       line-height: 1.6;
       padding: 0 2rem;
@@ -92,7 +92,7 @@
     }
     
     pre {
-      background-color: #1e2329;
+      background-color: #0d1117;
       border: 1px solid #333;
       border-radius: 4px;
       padding: 1rem;
@@ -164,7 +164,7 @@
 
 <p>Let's start with a basic example:</p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Hashtable</span>&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">String</span>&gt; ht = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>&lt;&gt;();
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Hashtable</span>&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">String</span>&gt; ht = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>&lt;&gt;();
 
 ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"language"</span>, <span style="color: #6aab73;">"Java"</span>);
 ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"author"</span>, <span style="color: #6aab73;">"James Gosling"</span>);
@@ -183,7 +183,7 @@ ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"autho
     For example:
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">String</span> key1 = <span style="color: #6aab73;">"Aa"</span>;
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">String</span> key1 = <span style="color: #6aab73;">"Aa"</span>;
 <span style="color: #cf8e6d;">String</span> key2 = <span style="color: #6aab73;">"BB"</span>;
 
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(key1.<span style="color: #56a8f5;">hashCode</span>());  <span style="color: #808080;">// 2112</span>
@@ -204,7 +204,7 @@ ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"autho
     It does this using the following line of code:
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">int</span> index = (hash &amp; <span style="color: #b3ae60;">0x7FFFFFFF</span>) % table.length;</pre></div>
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">int</span> index = (hash &amp; <span style="color: #b3ae60;">0x7FFFFFFF</span>) % table.length;</pre></div>
 
 <ul>
     <li><code>hash &amp; 0x7FFFFFFF</code>: This bitmask ensures the hash code is positive (since <code>hashCode()</code> can return negative values).</li>
@@ -215,7 +215,7 @@ ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"autho
     So if your hashtable has 16 slots, and <code>hashCode()</code> returns 2112, then:
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">index = (<span style="color: #b3ae60;">2112</span> &amp; <span style="color: #b3ae60;">0x7FFFFFFF</span>) % <span style="color: #b3ae60;">16</span> = <span style="color: #b3ae60;">0</span></pre></div>
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;">index = (<span style="color: #b3ae60;">2112</span> &amp; <span style="color: #b3ae60;">0x7FFFFFFF</span>) % <span style="color: #b3ae60;">16</span> = <span style="color: #b3ae60;">0</span></pre></div>
 
 <hr>
 
@@ -225,7 +225,7 @@ ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"autho
     That's where hash collisions come in. Java handles them using a technique called <strong>chaining</strong>: it stores multiple entries at the same index as a linked list.
 </p>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Hashtable</span>&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">String</span>&gt; ht = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>&lt;&gt;();
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">Hashtable</span>&lt;<span style="color: #cf8e6d;">String</span>, <span style="color: #cf8e6d;">String</span>&gt; ht = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">Hashtable</span>&lt;&gt;();
 
 <span style="color: #cf8e6d;">String</span> key1 = <span style="color: #6aab73;">"Aa"</span>;  <span style="color: #808080;">// hashCode = 2112</span>
 <span style="color: #cf8e6d;">String</span> key2 = <span style="color: #6aab73;">"BB"</span>;  <span style="color: #808080;">// hashCode = 2112 (collision)</span>
@@ -242,7 +242,7 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
 </p>
 
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">for</span> (; entry != <span style="color: #cf8e6d;">null</span>; entry = entry.next) {
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">for</span> (; entry != <span style="color: #cf8e6d;">null</span>; entry = entry.next) {
     <span style="color: #cf8e6d;">if</span> ((entry.hash == hash) &amp;&amp; entry.key.<span style="color: #56a8f5;">equals</span>(key)) {
         <span style="color: #cf8e6d;">return</span> entry.value;
     }
@@ -262,7 +262,7 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
     <p>
         Below is how the payload looks like
         
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">Hashtable</span> <span style="color: #56a8f5;">getObject</span>(<span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">String</span> command) <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">Exception</span> {
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">Hashtable</span> <span style="color: #56a8f5;">getObject</span>(<span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">String</span> command) <span style="color: #cf8e6d;">throws</span> <span style="color: #cf8e6d;">Exception</span> {
 
     <span style="color: #808080;">// Reusing transformer chain and LazyMap gadgets from previous payloads</span>
     <span style="color: #cf8e6d;">final</span> <span style="color: #cf8e6d;">String</span>[] execArgs = <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">String</span>[]{command};
@@ -319,7 +319,7 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
   
     <div>
 
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">import</span> java.util.ArrayList;
 <span style="color: #cf8e6d;">import</span> java.util.HashMap;
 <span style="color: #cf8e6d;">import</span> java.util.Hashtable;
 <span style="color: #cf8e6d;">import</span> java.util.List;
@@ -365,7 +365,7 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
         <p>
             Now lets understand the above code and flow.<br>
             When we call the put() on hash table the below code gets executed.<br>
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">synchronized</span> <span style="color: #cf8e6d;">V</span> <span style="color: #56a8f5;">put</span>(<span style="color: #cf8e6d;">K</span> key, <span style="color: #cf8e6d;">V</span> value) {
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">synchronized</span> <span style="color: #cf8e6d;">V</span> <span style="color: #56a8f5;">put</span>(<span style="color: #cf8e6d;">K</span> key, <span style="color: #cf8e6d;">V</span> value) {
     <span style="color: #808080;">// Make sure the value is not null</span>
     <span style="color: #cf8e6d;">if</span> (value == <span style="color: #cf8e6d;">null</span>) {
         <span style="color: #cf8e6d;">throw</span> <span style="color: #cf8e6d;">new</span> <span style="color: #cf8e6d;">NullPointerException</span>();
@@ -409,7 +409,7 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
         <p> Now this equals() at AbstractMapDecorator calls map.equals() , map being an abstract class the AbstractMap.equals() gets called</p>
         <P>
             Below is how the equals() at AbstractMap looks Like
-<div style="background-color: #1e1f22; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">boolean</span> <span style="color: #56a8f5;">equals</span>(<span style="color: #cf8e6d;">Object</span> o) {
+<div style="background-color: #0d1117; color: #bcbec4;"><pre style="font-family: 'JetBrains Mono',monospace; font-size: 9.8pt;"><span style="color: #cf8e6d;">public</span> <span style="color: #cf8e6d;">boolean</span> <span style="color: #56a8f5;">equals</span>(<span style="color: #cf8e6d;">Object</span> o) {
     <span style="color: #cf8e6d;">if</span> (o == <span style="color: #cf8e6d;">this</span>)
         <span style="color: #cf8e6d;">return</span> <span style="color: #cf8e6d;">true</span>;
 
