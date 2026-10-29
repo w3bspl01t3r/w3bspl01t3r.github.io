@@ -128,10 +128,11 @@
     }
   };
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const isResearchArticle = researchPages.has(currentPage);
   const isTechnicalArticle = technicalPages.has(currentPage);
 
   let placeholder = document.getElementById("navigation-placeholder");
-  if (!placeholder && isTechnicalArticle) {
+  if (!placeholder && (isResearchArticle || isTechnicalArticle)) {
     placeholder = document.createElement("div");
     placeholder.id = "navigation-placeholder";
     const firstContent = document.body.firstElementChild;
@@ -325,6 +326,86 @@
     }
   }
 
+  function modernizeRestoredResearchArticle() {
+    if (!isResearchArticle) {
+      return;
+    }
+
+    document.documentElement.classList.add("restored-research-document");
+    document.body.classList.add("restored-research-page");
+
+    if (!document.querySelector(".skip-link")) {
+      const skipLink = document.createElement("a");
+      skipLink.className = "skip-link";
+      skipLink.href = "#main-content";
+      skipLink.textContent = "Skip to content";
+      document.body.insertBefore(skipLink, placeholder);
+    }
+
+    const main = document.querySelector("main");
+    if (!main || main.dataset.modernized === "true") {
+      return;
+    }
+
+    const heading = main.querySelector("h1");
+    if (!heading) {
+      return;
+    }
+
+    const remainingContent = Array.from(main.childNodes).filter(function (node) {
+      return node !== heading;
+    });
+
+    main.dataset.modernized = "true";
+    main.id = "main-content";
+    main.className = "research-article technical-article restored-research-article";
+
+    const backLink = document.createElement("a");
+    backLink.className = "article-back";
+    backLink.href = "/research.html";
+    backLink.textContent = "<- All research";
+
+    const articleHeader = document.createElement("header");
+    articleHeader.className = "article-header";
+
+    const eyebrow = document.createElement("p");
+    eyebrow.className = "eyebrow";
+    eyebrow.textContent = "Vulnerability research";
+    articleHeader.append(eyebrow, heading);
+
+    const articleBody = document.createElement("div");
+    articleBody.className = "article-body";
+    let section = document.createElement("section");
+    section.className = "article-section technical-content restored-research-content";
+
+    remainingContent.forEach(function (node) {
+      if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "H2" && hasMeaningfulContent(section)) {
+        articleBody.appendChild(section);
+        section = document.createElement("section");
+        section.className = "article-section technical-content restored-research-content";
+      }
+      section.appendChild(node);
+    });
+    if (hasMeaningfulContent(section)) {
+      articleBody.appendChild(section);
+    }
+
+    main.replaceChildren(backLink, articleHeader, articleBody);
+
+    Array.from(document.body.children).forEach(function (element) {
+      if (element.tagName === "FOOTER" && !element.classList.contains("site-footer")) {
+        element.remove();
+      }
+    });
+
+    if (!document.querySelector(".site-footer")) {
+      const footer = document.createElement("footer");
+      footer.className = "site-footer";
+      footer.innerHTML = '<div class="site-container footer-bottom"><span>© 2026 ZDayLabs</span><span><a href="/research.html">Research</a> · <a href="/contact.html">Contact</a></span></div>';
+      document.body.appendChild(footer);
+    }
+  }
+
   function initializeMenu() {
     const toggle = document.querySelector(".nav-toggle");
     const navigation = document.getElementById("site-navigation");
@@ -384,8 +465,12 @@
     });
 
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", modernizeTechnicalArticle);
+    document.addEventListener("DOMContentLoaded", function () {
+      modernizeTechnicalArticle();
+      modernizeRestoredResearchArticle();
+    });
   } else {
     modernizeTechnicalArticle();
+    modernizeRestoredResearchArticle();
   }
 })();

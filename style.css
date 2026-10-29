@@ -1365,7 +1365,8 @@ main {
   font-style: italic;
 }
 
-body.technical-article-page {
+body.technical-article-page,
+body.restored-research-page {
   margin: 0 !important;
   min-width: 320px;
   padding: 0 !important;
@@ -1379,11 +1380,13 @@ body.technical-article-page {
   line-height: 1.65;
 }
 
-html.technical-article-document {
+html.technical-article-document,
+html.restored-research-document {
   overflow-x: clip;
 }
 
-.technical-article-page > header:not(.site-header) {
+.technical-article-page > header:not(.site-header),
+.restored-research-page > header:not(.site-header) {
   display: none !important;
 }
 
@@ -1554,6 +1557,30 @@ html.technical-article-document {
 .technical-article .technical-content > div[style*="background"] {
   max-width: 100%;
   background: transparent !important;
+}
+
+.restored-research-article .cve-info {
+  padding: 1.25rem !important;
+  border: 1px solid var(--line-strong) !important;
+  color: var(--muted);
+  background: var(--surface-soft) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: none !important;
+}
+
+.restored-research-article .cve-info h3 {
+  margin: 0 0 1rem !important;
+  color: var(--lime-soft) !important;
+}
+
+.restored-research-article .cve-info p {
+  margin: 0.45rem 0 !important;
+}
+
+.restored-research-article .severity {
+  font-family: var(--font-mono);
+  font-size: 0.72rem !important;
+  letter-spacing: 0.06em;
 }
 
 .policy-shell,

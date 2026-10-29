@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Dependency-free checks for the static ZDayLabs site."""
 
+import hashlib
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -24,6 +25,14 @@ RESEARCH_PAGES = {
     "CVE-2025-60786.html",
     "CVE-2025-6216.html",
     "CVE-2025-xxxx.html",
+}
+RESEARCH_CONTENT_HASHES = {
+    "CVE-2025-10492.html": "fbeb0213757345d5fe6cda6732fc791ced78f5d1d95659438c36a4e0b212aa0d",
+    "CVE-2025-11466.html": "f9f3701ee85816bc472af6f337a10368dc736fc5bd1201d2cda0dda34af52709",
+    "CVE-2025-60785.html": "76900e9788bb25494f2e9820f4431377281333f158d7bd72e1ad8d78add4fde2",
+    "CVE-2025-60786.html": "475aac06585d6ecf6ee3374a200f4096135800769268208e76c44644265e38dd",
+    "CVE-2025-6216.html": "69ff25004703d6092886655364ad0cf02c457d2bce046e5ecb69dbbed287df86",
+    "CVE-2025-xxxx.html": "ee62c5328c18a33e8f332f2fcb711ea434e261e104a1d1dfc98ac530d4654cf9",
 }
 TECHNICAL_PAGES = {
     "BeanShell1.html",
@@ -107,9 +116,23 @@ def main():
 
         if page.name in RESEARCH_PAGES:
             content = page.read_text(encoding="utf-8")
-            for required in ('class="research-article"', 'class="article-header"', 'href="/research.html"'):
+            for required in (
+                'class="restored-research-page"',
+                'href="/style.css"',
+                'src="/navigation.js"',
+            ):
                 if required not in content:
-                    failures.append(f"{page.name}: missing modern research marker {required}")
+                    failures.append(f"{page.name}: missing restored research shell marker {required}")
+
+            main_start = content.find("<main")
+            main_end = content.find("</main>", main_start)
+            if main_start == -1 or main_end == -1:
+                failures.append(f"{page.name}: missing original research main content")
+            else:
+                main_end += len("</main>")
+                main_hash = hashlib.sha256(content[main_start:main_end].encode()).hexdigest()
+                if main_hash != RESEARCH_CONTENT_HASHES[page.name]:
+                    failures.append(f"{page.name}: original research content was modified")
 
         if page.name in TECHNICAL_PAGES:
             content = page.read_text(encoding="utf-8")
@@ -140,6 +163,8 @@ def main():
 
     for content_file in sorted(ROOT.rglob("*")):
         if content_file.suffix.lower() not in {".html", ".md"} or ".git" in content_file.parts:
+            continue
+        if content_file.parent == ROOT and content_file.name in RESEARCH_PAGES:
             continue
         content = content_file.read_text(encoding="utf-8", errors="replace")
         dash_forms = ("—", "–", "&mdash;", "&ndash;", "&#8212;", "&#8211;", "&#x2014;", "&#x2013;")
