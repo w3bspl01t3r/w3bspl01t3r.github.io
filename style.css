@@ -1365,6 +1365,197 @@ main {
   font-style: italic;
 }
 
+body.technical-article-page {
+  margin: 0 !important;
+  min-width: 320px;
+  padding: 0 !important;
+  overflow-x: clip !important;
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(72, 229, 224, 0.09), transparent 28rem),
+    radial-gradient(circle at 88% 2%, rgba(124, 255, 107, 0.08), transparent 30rem),
+    var(--bg) !important;
+  font-family: var(--font-sans) !important;
+  line-height: 1.65;
+}
+
+html.technical-article-document {
+  overflow-x: clip;
+}
+
+.technical-article-page > header:not(.site-header) {
+  display: none !important;
+}
+
+.technical-article {
+  max-width: none !important;
+  margin-inline: auto !important;
+  padding: 3.5rem 0 7rem !important;
+}
+
+.technical-article .article-header {
+  display: block !important;
+}
+
+.technical-article .article-header h1 {
+  color: var(--text);
+}
+
+.technical-article .technical-content {
+  color: var(--muted);
+}
+
+.technical-article .technical-content > * {
+  max-width: 100%;
+}
+
+.technical-article .technical-content h2,
+.technical-article .technical-content h3,
+.technical-article .technical-content h4 {
+  text-align: left !important;
+}
+
+.technical-article .technical-content h2 {
+  padding: 0 !important;
+  border: 0 !important;
+  color: var(--text) !important;
+}
+
+.technical-article .technical-content h3 {
+  color: var(--lime-soft) !important;
+}
+
+.technical-article .technical-content h4 {
+  color: var(--text) !important;
+}
+
+.technical-article .technical-content p,
+.technical-article .technical-content li {
+  color: var(--muted) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.technical-article .technical-content p:empty {
+  display: none;
+}
+
+.technical-article .technical-content a {
+  color: var(--lime-soft) !important;
+  overflow-wrap: anywhere;
+  text-decoration-color: rgba(181, 255, 169, 0.38);
+  text-underline-offset: 0.18em;
+}
+
+.technical-article .technical-content a:hover {
+  color: var(--lime) !important;
+}
+
+.technical-article .technical-content img {
+  position: static !important;
+  display: block;
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 1.4rem auto !important;
+  border: 1px solid var(--line);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.technical-article .technical-content figure {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 1.8rem 0 !important;
+}
+
+.technical-article .technical-content iframe,
+.technical-article .technical-content video {
+  position: static !important;
+  display: block;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 320px;
+  border: 1px solid var(--line) !important;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.technical-article .technical-content pre,
+.technical-article .technical-content pre[style] {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 1.4rem 0 !important;
+  padding: 1.2rem !important;
+  overflow: auto !important;
+  border: 1px solid var(--line) !important;
+  border-left: 3px solid var(--cyan) !important;
+  color: #c7d8d4 !important;
+  background: #071013 !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: none !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.65;
+  white-space: pre;
+  contain: inline-size;
+}
+
+.technical-article .technical-content code {
+  font-family: var(--font-mono) !important;
+}
+
+.technical-article .technical-content .codeblock,
+.technical-article .technical-content .chain-block {
+  width: 100% !important;
+  min-width: 0;
+  max-width: 100% !important;
+  overflow: auto !important;
+  contain: inline-size;
+}
+
+.technical-article .technical-content :where(code):not(pre code) {
+  padding: 0.12rem 0.32rem;
+  color: var(--lime-soft) !important;
+  background: rgba(124, 255, 107, 0.07);
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.technical-article .technical-content blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.2rem;
+  border-left: 3px solid var(--lime);
+  color: var(--muted);
+  background: var(--surface-soft);
+}
+
+.technical-article .technical-content table {
+  display: block;
+  width: 100% !important;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.technical-article .technical-content th,
+.technical-article .technical-content td {
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  text-align: left;
+}
+
+.technical-article .technical-content > div[style*="background"] {
+  max-width: 100%;
+  background: transparent !important;
+}
+
 .policy-shell,
 .article-shell {
   width: min(calc(100% - 40px), 900px);

@@ -25,6 +25,27 @@ RESEARCH_PAGES = {
     "CVE-2025-6216.html",
     "CVE-2025-xxxx.html",
 }
+TECHNICAL_PAGES = {
+    "BeanShell1.html",
+    "BeanValidationToRce.html",
+    "CommonsBeanUtils1.html",
+    "CommonsCollection1.html",
+    "CommonsCollection2.html",
+    "CommonsCollection3.html",
+    "CommonsCollection4.html",
+    "CommonsCollection5.html",
+    "CommonsCollection6.html",
+    "CommonsCollection7.html",
+    "GPGBypass.html",
+    "Groovy1.html",
+    "HackingJWT.html",
+    "InsecureDeserialization.html",
+    "JDBCInjection.html",
+    "JNDIToRCE.html",
+    "beyondcommoncollections.html",
+    "customgadget.html",
+    "ysoserial.html",
+}
 IGNORED_SCHEMES = {"http", "https", "mailto", "tel", "data"}
 
 
@@ -89,6 +110,16 @@ def main():
             for required in ('class="research-article"', 'class="article-header"', 'href="/research.html"'):
                 if required not in content:
                     failures.append(f"{page.name}: missing modern research marker {required}")
+
+        if page.name in TECHNICAL_PAGES:
+            content = page.read_text(encoding="utf-8")
+            for required in (
+                'class="technical-article-page"',
+                'href="/style.css"',
+                'src="/navigation.js"',
+            ):
+                if required not in content:
+                    failures.append(f"{page.name}: missing modern technical-note marker {required}")
 
     for page_path, parser in parsed_pages.items():
         for reference in parser.references:
