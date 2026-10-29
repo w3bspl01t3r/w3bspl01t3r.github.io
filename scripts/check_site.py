@@ -17,6 +17,14 @@ CORE_PAGES = {
     "policy.html",
     "404.html",
 }
+RESEARCH_PAGES = {
+    "CVE-2025-10492.html",
+    "CVE-2025-11466.html",
+    "CVE-2025-60785.html",
+    "CVE-2025-60786.html",
+    "CVE-2025-6216.html",
+    "CVE-2025-xxxx.html",
+}
 IGNORED_SCHEMES = {"http", "https", "mailto", "tel", "data"}
 
 
@@ -76,6 +84,12 @@ def main():
                 if required not in content:
                     failures.append(f"{page.name}: missing shared shell marker {required}")
 
+        if page.name in RESEARCH_PAGES:
+            content = page.read_text(encoding="utf-8")
+            for required in ('class="research-article"', 'class="article-header"', 'href="/research.html"'):
+                if required not in content:
+                    failures.append(f"{page.name}: missing modern research marker {required}")
+
     for page_path, parser in parsed_pages.items():
         for reference in parser.references:
             target, fragment = resolve_reference(page_path, reference)
@@ -92,6 +106,14 @@ def main():
                     parsed_pages[target] = target_parser
                 if fragment not in target_parser.ids:
                     failures.append(f"{page_path.name}: missing fragment target {reference}")
+
+    for content_file in sorted(ROOT.rglob("*")):
+        if content_file.suffix.lower() not in {".html", ".md"} or ".git" in content_file.parts:
+            continue
+        content = content_file.read_text(encoding="utf-8", errors="replace")
+        dash_forms = ("—", "–", "&mdash;", "&ndash;", "&#8212;", "&#8211;", "&#x2014;", "&#x2013;")
+        if any(dash_form in content for dash_form in dash_forms):
+            failures.append(f"{content_file.relative_to(ROOT)}: contains an em dash or en dash")
 
     if failures:
         print("Static site checks failed:")

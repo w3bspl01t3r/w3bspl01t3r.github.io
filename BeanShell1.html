@@ -331,7 +331,7 @@
 
 <img src="images/Beanshell1/InvokeImpl.png" style="max-width:100%; height:auto; border-radius:4px; margin:1rem 0;">
 
-<p>The above code checks various things — if the method name equals toString(), it does some operation, but we are not interested in this.</p>
+<p>The above code checks various things - if the method name equals toString(), it does some operation, but we are not interested in this.</p>
 <p>At the end it calls InvokeMethod().</p>
 
 <p>This method is present on its super class, that is <a type="inline-richlink" rev="{&quot;isCached&quot;:false}" href="https://This.java">This.java</a></p>
@@ -389,7 +389,7 @@
 <p>This interpreter is the same as Java.</p><p>So in a Java file, just because you define a function doesn't mean it will get executed, but if you call it, it will get executed.</p>
 
 <p>Similarly, on the first eval, the function is getting defined, and on the 2nd eval we are calling it.</p>
-<p>Now if you check our payload, we are doing something similar — at first we are simply defining what the compare function would be, and when the PriorityQueue gets deserialized, shiftdownOperator calls the compare() function.</p>
+<p>Now if you check our payload, we are doing something similar - at first we are simply defining what the compare function would be, and when the PriorityQueue gets deserialized, shiftdownOperator calls the compare() function.</p>
 <p>This will flow to our InvocationHandler which will call the Invoke() &rarr; InvokeImpl() &rarr; InvokeMethod &rarr; InvokeImpl &rarr; methodBody.eval().</p>
 
 <p>And this is where the compare function flows and since we have declared our function, when compare() is called, our compare gets called and we achieve code execution.</p>
@@ -535,7 +535,7 @@ String payload = <span style="color: #6aab73;">"int hashCode() {"</span> +
 <p>And the reason is simple.</p>
 <p>So in a Dynamic Proxy, the interface tells Java what the Proxy is pretending to be.</p>
 <p>So if there are no checks on the class it's pretending to be, then we can set any random interface (it does not need to be serializable).</p>
-<p>In the case of PriorityQueue, the class needs a Comparator — anything else will fail.</p>
+<p>In the case of PriorityQueue, the class needs a Comparator - anything else will fail.</p>
 <p>But in the case of HashMap and hashCode, there are no such checks, and in fact the key itself is of Object type.</p>
 <P>So this is how the BeanShell1 Gadget works and how we can improvise it.</P>
 <p>Hope you like it.</p>

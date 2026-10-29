@@ -26,10 +26,44 @@
 
   function markCurrentPage() {
     const currentPage = window.location.pathname.split("/").pop() || "index.html";
-    const groups = {
-      "policy.html": "contact.html"
-    };
-    const activePage = groups[currentPage] || currentPage;
+    const researchPages = new Set([
+      "CVE-2025-10492.html",
+      "CVE-2025-11466.html",
+      "CVE-2025-60785.html",
+      "CVE-2025-60786.html",
+      "CVE-2025-6216.html",
+      "CVE-2025-xxxx.html"
+    ]);
+    const technicalPages = new Set([
+      "BeanShell1.html",
+      "BeanValidationToRce.html",
+      "CommonsBeanUtils1.html",
+      "CommonsCollection1.html",
+      "CommonsCollection2.html",
+      "CommonsCollection3.html",
+      "CommonsCollection4.html",
+      "CommonsCollection5.html",
+      "CommonsCollection6.html",
+      "CommonsCollection7.html",
+      "GPGBypass.html",
+      "Groovy1.html",
+      "HackingJWT.html",
+      "InsecureDeserialization.html",
+      "JDBCInjection.html",
+      "JNDIToRCE.html",
+      "beyondcommoncollections.html",
+      "customgadget.html",
+      "ysoserial.html"
+    ]);
+
+    let activePage = currentPage;
+    if (researchPages.has(currentPage)) {
+      activePage = "research.html";
+    } else if (technicalPages.has(currentPage)) {
+      activePage = "blogs.html";
+    } else if (currentPage === "policy.html") {
+      activePage = "contact.html";
+    }
 
     document.querySelectorAll("#site-navigation a").forEach(function (link) {
       const linkPage = link.getAttribute("href").split("/").pop();

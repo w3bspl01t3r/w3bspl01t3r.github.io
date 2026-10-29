@@ -190,8 +190,7 @@ ht.<span style="color: #56a8f5;">put</span>(<span style="color: #6aab73;">"autho
 <span style="color: #cf8e6d;">System</span>.out.<span style="color: #56a8f5;">println</span>(key2.<span style="color: #56a8f5;">hashCode</span>());  <span style="color: #808080;">// 2112 (collision!)</span></pre></div>
 
 <p>
-  Here, both keys produce the same hash code (<code>2112</code>) despite being different strings — 
-  this is known as a <strong>hash collision</strong>, and we'll discuss how it is handled shortly.
+  Here, both keys produce the same hash code (<code>2112</code>) despite being different strings -   this is known as a <strong>hash collision</strong>, and we'll discuss how it is handled shortly.
 </p>
 
 
@@ -253,7 +252,7 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
 </p>
 
 <p>
-  This collision-resolution mechanism becomes especially critical in deserialization attacks, where crafted objects override <code>equals()</code> and <code>hashCode()</code> to trigger specific behavior — for example, transformer chains in CommonsCollections gadgets.
+  This collision-resolution mechanism becomes especially critical in deserialization attacks, where crafted objects override <code>equals()</code> and <code>hashCode()</code> to trigger specific behavior - for example, transformer chains in CommonsCollections gadgets.
 </p>
 
 <h4>With the above knowledge about the Hashtable, let's jump into the CC7 payload.</h4>
@@ -310,7 +309,7 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
   </p>
   
   <p>
-      <i>We discussed <code>LazyMap</code> in CC5 — please read that section if you're unfamiliar with its role in deserialization.</i>
+      <i>We discussed <code>LazyMap</code> in CC5 - please read that section if you're unfamiliar with its role in deserialization.</i>
   </p>
   
   <p>
@@ -477,7 +476,7 @@ ht.<span style="color: #56a8f5;">put</span>(key2, <span style="color: #6aab73;">
   <li>We use two <code>LazyMap</code> instances with colliding hashCodes as keys.</li>
   <li>This forces <code>equals()</code> to be called during the second <code>put()</code>.</li>
   <li>The <code>equals()</code> call triggers <code>LazyMap.get()</code> on a missing key.</li>
-  <li><code>LazyMap</code> uses the transformer chain to generate the value — which leads to RCE.</li>
+  <li><code>LazyMap</code> uses the transformer chain to generate the value - which leads to RCE.</li>
 </ul>
 
 <p>Thats it for Today.</p>

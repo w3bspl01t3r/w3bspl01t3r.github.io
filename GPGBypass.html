@@ -192,7 +192,7 @@
         If you inspect the code above, it uses the <code>gpg</code> binary to verify and decrypt the file.
     </p>
     <p>
-        You might notice there is no <code>--decrypt</code> flag specified — so how does it decrypt?
+        You might notice there is no <code>--decrypt</code> flag specified - so how does it decrypt?
     </p>
     <p>
         Good catch, but not enough. When you pass an encrypted file to <code>gpg</code>, even if you don't supply <code>--decrypt</code>, GPG will try to guess the intended operation. Since you typically won't have the required keys on that system, the decryption normally fails.
@@ -206,7 +206,7 @@
         The first line says: <em>No command supplied, trying to guess what you mean...</em>
     </p>
     <p>
-        That means if you can fool GPG into thinking the file is not an encrypted message but a normal GPG-storable file, GPG will “recover” the embedded data and output the original file — which the upgrade process will then use.
+        That means if you can fool GPG into thinking the file is not an encrypted message but a normal GPG-storable file, GPG will “recover” the embedded data and output the original file - which the upgrade process will then use.
     </p>
     
     <h2>The <code>--store</code> flag</h2>
@@ -214,7 +214,7 @@
         While reading the <code>gpg</code> man page I found the <code>--store</code> flag, which creates a valid GPG file but does not involve any keys.
     </p>
     <p>
-        If I craft the bundle to include a stored (not-encrypted) GPG object and pass it to the application, the filter gets satisfied and the bundle is accepted — allowing my files to overwrite files on the filesystem.
+        If I craft the bundle to include a stored (not-encrypted) GPG object and pass it to the application, the filter gets satisfied and the bundle is accepted - allowing my files to overwrite files on the filesystem.
     </p>
     
     <p>
@@ -238,9 +238,9 @@
         Using this technique, I can craft a bundle that results in Arbitrary File Write and therefore lead to RCE. There are many ways to achieve RCE from AFW: overwrite cron jobs, replace application binaries, drop web shells in the webroot, or overwrite scripts that are later executed by APIs or scheduled tasks.
     </p>
     
-    <p><em><strong>Note:</strong> This technique is not limited to software upgrades — it can apply to backup restores and other flows. If AFW is not achievable, consider trying for file disclosure via symlink attacks.</em></p>
+    <p><em><strong>Note:</strong> This technique is not limited to software upgrades - it can apply to backup restores and other flows. If AFW is not achievable, consider trying for file disclosure via symlink attacks.</em></p>
     
-    <p>That's it for today. Thanks for reading — happy hacking.</p>
+    <p>That's it for today. Thanks for reading - happy hacking.</p>
     
     <p>Connect with me:</p>
     <p><a href="https://www.linkedin.com/in/swagatkumar/">LinkedIn</a></p>

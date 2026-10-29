@@ -4,15 +4,15 @@ Static GitHub Pages site for ZDayLabs security services, engagement models, vuln
 
 ## Site structure
 
-- `index.html` — portfolio landing page
-- `services.html` — security capabilities and deliverables
-- `engagements.html` — representative engagement tracks and delivery process
-- `research.html` — published CVE and vulnerability research
-- `blogs.html` — technical articles and Java gadget-chain notes
-- `contact.html` — privacy-conscious email intake
-- `policy.html` — coordinated vulnerability disclosure policy
-- `style.css` — shared visual system and responsive layout
-- `navigation.html` / `navigation.js` — shared navigation
+- `index.html` - portfolio landing page
+- `services.html` - security capabilities and deliverables
+- `engagements.html` - representative engagement tracks and delivery process
+- `research.html` - published CVE and vulnerability research
+- `blogs.html` - technical articles and Java gadget-chain notes
+- `contact.html` - privacy-conscious email intake
+- `policy.html` - coordinated vulnerability disclosure policy
+- `style.css` - shared visual system and responsive layout
+- `navigation.html` / `navigation.js` - shared navigation
 
 Existing vulnerability write-ups, proof-of-concept files, images, and videos remain in their original locations.
 
@@ -34,4 +34,4 @@ The site has no analytics, external JavaScript, form backend, or build-time depe
 python3 scripts/check_site.py
 ```
 
-The check parses every root HTML page, validates local links and assets, detects duplicate IDs, and confirms the shared shell on portfolio pages.
+The check parses every root HTML page, validates local links and assets, detects duplicate IDs, confirms the shared shell on portfolio and research pages, and rejects em dash or en dash characters.

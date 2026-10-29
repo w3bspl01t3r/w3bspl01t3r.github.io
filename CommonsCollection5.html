@@ -333,7 +333,7 @@
 </p>
 
 <p>
-  The <code>Transformer.transform()</code> call is what actually executes our code — as we discussed earlier.
+  The <code>Transformer.transform()</code> call is what actually executes our code - as we discussed earlier.
 </p>
 
 <p>
@@ -378,7 +378,7 @@
 </p>
 
 <p>
-  This also explains why, in most <code>ysoserial</code> payloads, reflection is used to adjust fields in later stages — allowing payload construction without immediate code execution in the local instance.
+  This also explains why, in most <code>ysoserial</code> payloads, reflection is used to adjust fields in later stages - allowing payload construction without immediate code execution in the local instance.
 </p>
 
 <p>
@@ -438,7 +438,7 @@
   <li><code>TiedMapEntry.toString()</code> calls <code>getValue()</code>, which leads to <code>LazyMap.get()</code>.</li>
   <li>If the key is missing, <code>LazyMap</code> calls <code>transform()</code> using a user-controlled <code>Transformer</code> chain.</li>
   <li>This chain executes arbitrary code via <code>Runtime.getRuntime().exec()</code>.</li>
-  <li>Reflection is used to set the <code>val</code> field after object creation to avoid premature execution — this is critical for payload generation.</li>
+  <li>Reflection is used to set the <code>val</code> field after object creation to avoid premature execution - this is critical for payload generation.</li>
 </ul>
 
 <p>Thats it for Today.</p>

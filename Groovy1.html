@@ -351,7 +351,7 @@
 }</div>
 
         <p>The above code at <b>[1]</b> creates a ConvertedClosure that wraps a MethodClosure.</p>
-        <p>Looking at <b>[2]</b>, it creates a dynamic Proxy using the above Closure with Map.class as the interface (remember, a dynamic proxy requires three things: a ClassLoader, an Interface, and a Handler &mdash; here the Closure is the handler).</p>
+        <p>Looking at <b>[2]</b>, it creates a dynamic Proxy using the above Closure with Map.class as the interface (remember, a dynamic proxy requires three things: a ClassLoader, an Interface, and a Handler - here the Closure is the handler).</p>
 
         <p>But why do we use a Closure as the handler?</p>
 
@@ -451,7 +451,7 @@
             <img src="images/groovy1/image (3).png" alt="MissingMethodException error">
         </div>
 
-        <p>Looking at the error, it says the method signature was not found for <code>String.execute()</code>, which makes sense &mdash; String.class does not have a method called execute(). So why are we calling it this way, and how was it working previously?</p>
+        <p>Looking at the error, it says the method signature was not found for <code>String.execute()</code>, which makes sense - String.class does not have a method called execute(). So why are we calling it this way, and how was it working previously?</p>
 
         <hr class="section-divider">
 
@@ -459,7 +459,7 @@
 
         <p>In Groovy, the <b>GDK (Groovy Development Kit)</b> is how Groovy adds extra methods to existing Java classes <b>without modifying them</b>. Classes like <code>String</code>, <code>List</code>, <code>File</code>, etc. get new convenient methods that don't exist in standard Java.</p>
 
-        <p><b>How it works:</b> Groovy uses <b>extension methods</b> &mdash; static methods in helper classes that act as if they're instance methods on the target class. At runtime, Groovy's meta-object protocol (MOP) intercepts method calls and routes them to the appropriate helper class.</p>
+        <p><b>How it works:</b> Groovy uses <b>extension methods</b> - static methods in helper classes that act as if they're instance methods on the target class. At runtime, Groovy's meta-object protocol (MOP) intercepts method calls and routes them to the appropriate helper class.</p>
 
         <p>In short, in Groovy there are classes like:</p>
 
@@ -533,7 +533,7 @@
 
         <p>The object is not null, so the first condition fails.</p>
         <p>"Calc.exe" is not an instance of a Class, so the second condition fails.</p>
-        <p>The third condition checks if this is not a GroovyObject instance &mdash; this check passes, so <code>invokePojoMethod()</code> gets called.</p>
+        <p>The third condition checks if this is not a GroovyObject instance - this check passes, so <code>invokePojoMethod()</code> gets called.</p>
 
         <div class="codeblock"><span class="keyword">static</span> <span class="type">Object</span> <span class="method">invokePojoMethod</span>(<span class="type">Object</span> object, <span class="type">String</span> methodName, <span class="type">Object</span> arguments) {
     <span class="type">MetaClass</span> metaClass = <span class="type">InvokerHelper</span>.<span class="method">getMetaClass</span>(object);
@@ -580,7 +580,7 @@
 
         <h2>Why Not HashMap?</h2>
 
-        <p>Instead of PriorityQueue, you might think we could use a HashMap, since its methods do not take extra arguments by default &mdash; which might seem to allow code execution.</p>
+        <p>Instead of PriorityQueue, you might think we could use a HashMap, since its methods do not take extra arguments by default - which might seem to allow code execution.</p>
 
         <p>However, this would not succeed. Since hashCode is defined in <code>java.lang.Object</code>, checkMethod() on ConversionHandler will return true, and we will never reach <code>MethodClosure.call</code>.</p>
 
@@ -738,7 +738,7 @@
 
         <p>If we can reach this method, it will lead to code execution. The only restriction is that all argument data types must implement the Serializable interface.</p>
 
-        <p>The data types used are String and File &mdash; and fortunately, both implement Serializable.</p>
+        <p>The data types used are String and File - and fortunately, both implement Serializable.</p>
 
         <div class="codeblock"><span class="keyword">import</span> <span class="type">java.lang.reflect.InvocationHandler</span>;
 <span class="keyword">import</span> <span class="type">java.lang.reflect.Proxy</span>;
