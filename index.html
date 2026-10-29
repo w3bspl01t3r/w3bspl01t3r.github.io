@@ -1,121 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZDayLabs</title>
-  <link rel="stylesheet" href="style.css"/>
-  <style>
-    .section-wrapper {
-      display: flex;
-      justify-content: space-between;
-      gap: 40px; /* Adjust spacing as needed */
-      flex-wrap: wrap;
-    }
-    
-    
-    .section-wrapper .research {
-      flex: 1;
-      min-width: 300px; /* Ensures responsiveness */
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ZDayLabs helps teams find and fix exploitable weaknesses across applications, APIs, cloud, and infrastructure before attackers do.">
+  <meta name="theme-color" content="#060b0d">
+  <title>ZDayLabs | Offensive Security for Applications and Infrastructure</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <div id="navigation-placeholder"></div>
-  <script src="navigation.js"></script>
+  <noscript>
+    <nav class="noscript-nav" aria-label="Fallback navigation">
+      <a href="/services.html">Services</a>
+      <a href="/engagements.html">Engagements</a>
+      <a href="/research.html">Research</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </noscript>
 
-  <main>
-    <section class="intro">
-      <h1>About <span class="highlight">ZDaylabs</span></h1>
-      <p><span class="highlight">ZDaylabs</span> , We exploit, analyze, and document.</p>
-      <p>This blog offers a glimpse into the original research and security insights that drive our continuous learning and exploration.</p>
-    </section>
-
-    <section class="content section-wrapper">
-      <div class="blogs">
-        <h2><a href="blogs.html" style="cursor: pointer; text-decoration: none; color: inherit; display: inline-block;">BLOG POSTS</a></h2>
-        <div id="blog-posts-container">
-          <!-- Blog posts will be dynamically loaded here -->
+  <main id="main-content">
+    <section class="site-container hero">
+      <div>
+        <p class="eyebrow">Independent offensive security</p>
+        <h1>Find the weakness <span>before they do.</span></h1>
+        <p class="hero-lead">ZDayLabs helps teams expose and remove exploitable paths across applications, APIs, cloud, and infrastructure—before they become incidents.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="/contact.html">Request a security review <span class="button-arrow" aria-hidden="true">-&gt;</span></a>
+          <a class="button" href="/services.html">Explore services</a>
         </div>
-        <div class="show-more">
-          <a href="blogs.html" style="color: #36d1dc; text-decoration: none; font-weight: 600;">Show More →</a>
+        <p class="hero-note"><span class="status-dot" aria-hidden="true"></span>Focused, independent assessments with remediation and retesting.</p>
+      </div>
+
+      <div class="signal-panel" aria-label="Illustration of a ZDayLabs security assessment">
+        <div class="panel-bar">
+          <span class="panel-dot"></span>
+          <span class="panel-dot"></span>
+          <span class="panel-dot"></span>
+          <span class="panel-label">assessment.signal</span>
+        </div>
+        <div class="terminal-copy">
+          <div class="terminal-line"><span class="terminal-index">01</span><span class="terminal-command">$ map <strong>attack_surface</strong></span></div>
+          <div class="terminal-line"><span class="terminal-index">02</span><span class="terminal-command">$ trace <strong>trust_boundaries</strong></span></div>
+          <div class="terminal-line"><span class="terminal-index">03</span><span class="terminal-command">$ validate <strong>real_world_impact</strong></span></div>
+          <div class="terminal-line"><span class="terminal-index">04</span><span class="terminal-command">$ prioritize <strong>remediation</strong></span></div>
+          <div class="terminal-output">
+            <div><span>Application layer</span><span>ASSESSED</span></div>
+            <div><span>Identity &amp; access</span><span>ASSESSED</span></div>
+            <div><span>Cloud controls</span><span>ASSESSED</span></div>
+            <div><span>Exploit paths</span><span>VALIDATED</span></div>
+          </div>
         </div>
       </div>
-    
-      <div style="text-align: right;" class="research">
-        <h2> <a href="research.html" style="cursor: pointer; text-decoration: none; color: inherit; display: inline-block;">RESEARCH</a></h2>
-        <div id="research-container">
-          <!-- Research entries will be dynamically loaded here -->
+    </section>
+
+    <section class="trust-strip" aria-label="Areas of focus">
+      <div class="site-container trust-inner">
+        <div class="trust-label">Built for teams shipping critical systems</div>
+        <div class="trust-item">Applications</div>
+        <div class="trust-item">APIs</div>
+        <div class="trust-item">Cloud &amp; infra</div>
+        <div class="trust-item">Secure releases</div>
+      </div>
+    </section>
+
+    <section class="site-container section" id="services">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Security services</p>
+          <h2>Offensive depth. Defensive outcomes.</h2>
         </div>
-        <div class="show-more">
-          <a href="research.html" style="color: #36d1dc; text-decoration: none; font-weight: 600;">Show More →</a>
+        <p>Every engagement is designed around the systems that matter, the attacks most likely to work, and the fixes your team can act on.</p>
+      </div>
+
+      <div class="service-grid">
+        <article class="service-card">
+          <span class="card-number">01 / APP</span>
+          <h3>Application security testing</h3>
+          <p>Manual web, mobile, and thick-client assessment focused on business logic, authorization, injection, and exploitable chains.</p>
+          <a class="card-link" href="/services.html#application-security">View service <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="service-card">
+          <span class="card-number">02 / API</span>
+          <h3>API security assessment</h3>
+          <p>Deep testing of REST, GraphQL, and service-to-service APIs for broken authorization, unsafe data flows, and abuse paths.</p>
+          <a class="card-link" href="/services.html#api-security">View service <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="service-card">
+          <span class="card-number">03 / INFRA</span>
+          <h3>Infrastructure &amp; cloud security</h3>
+          <p>Assess external exposure, identity boundaries, cloud configuration, network paths, and routes to sensitive workloads.</p>
+          <a class="card-link" href="/services.html#infrastructure-security">View service <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="service-card">
+          <span class="card-number">04 / CODE</span>
+          <h3>Secure code &amp; architecture review</h3>
+          <p>Targeted source review and threat-led architecture analysis before high-risk features or major releases reach production.</p>
+          <a class="card-link" href="/services.html#code-review">View service <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="service-card">
+          <span class="card-number">05 / ADV</span>
+          <h3>Adversary simulation</h3>
+          <p>Controlled, objective-driven testing that measures how preventive and detective controls hold up against realistic attack paths.</p>
+          <a class="card-link" href="/services.html#adversary-simulation">View service <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="service-card">
+          <span class="card-number">06 / VALIDATE</span>
+          <h3>Vulnerability validation</h3>
+          <p>Independent exploitability analysis for disputed findings, emerging CVEs, inherited risk, and remediation verification.</p>
+          <a class="card-link" href="/services.html#vulnerability-validation">View service <span aria-hidden="true">-&gt;</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-tinted">
+      <div class="site-container">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">How we work</p>
+            <h2>A clear path from scope to safer systems.</h2>
+          </div>
+          <p>Testing is only useful when your team understands what is exposed, why it matters, and exactly what to do next.</p>
+        </div>
+
+        <div class="process-list">
+          <article class="process-step">
+            <span class="step-number">01</span>
+            <h3>Model the risk</h3>
+            <p>Define critical assets, trust boundaries, likely adversaries, constraints, and the outcomes that would hurt most.</p>
+          </article>
+          <article class="process-step">
+            <span class="step-number">02</span>
+            <h3>Test like an attacker</h3>
+            <p>Combine manual analysis, targeted tooling, code knowledge, and exploit-chain research to uncover meaningful paths.</p>
+          </article>
+          <article class="process-step">
+            <span class="step-number">03</span>
+            <h3>Prove impact safely</h3>
+            <p>Validate findings within agreed rules of engagement, minimize operational risk, and capture evidence your team can trust.</p>
+          </article>
+          <article class="process-step">
+            <span class="step-number">04</span>
+            <h3>Fix and verify</h3>
+            <p>Deliver prioritized remediation guidance, walk engineers through root causes, and retest fixes where included.</p>
+          </article>
         </div>
       </div>
     </section>
-    
+
+    <section class="site-container section">
+      <div class="proof-layout">
+        <div class="proof-copy">
+          <p class="eyebrow">Evidence, not theatre</p>
+          <h2>Research that sharpens every assessment.</h2>
+          <p>ZDayLabs’ public work includes vulnerability discovery and deep technical analysis across Java deserialization, authentication, file handling, JDBC, and enterprise software.</p>
+          <a class="button" href="/research.html">Browse all research</a>
+        </div>
+
+        <div class="proof-list">
+          <article class="proof-item">
+            <span class="proof-icon">RCE</span>
+            <div><h3>CVE-2025-10492 · JasperReports</h3><p>JRLoader deserialization leading to remote code execution.</p></div>
+            <a href="/CVE-2025-10492.html">READ -&gt;</a>
+          </article>
+          <article class="proof-item">
+            <span class="proof-icon">AUTH</span>
+            <div><h3>CVE-2025-6216 · TrackPlus Allegra</h3><p>Authentication bypass with practical impact analysis.</p></div>
+            <a href="/CVE-2025-6216.html">READ -&gt;</a>
+          </article>
+          <article class="proof-item">
+            <span class="proof-icon">RCE</span>
+            <div><h3>CVE-2025-60785 · IceScrum</h3><p>Remote code execution through JDBC injection.</p></div>
+            <a href="/CVE-2025-60785.html">READ -&gt;</a>
+          </article>
+          <article class="proof-item">
+            <span class="proof-icon">ZIP</span>
+            <div><h3>CVE-2025-60786 · IceScrum</h3><p>Zip Slip in project import and unsafe archive handling.</p></div>
+            <a href="/CVE-2025-60786.html">READ -&gt;</a>
+          </article>
+          <article class="proof-item">
+            <span class="proof-icon">FILE</span>
+            <div><h3>CVE-2025-11466 · TrackPlus Allegra</h3><p>Arbitrary file disclosure in an enterprise application.</p></div>
+            <a href="/CVE-2025-11466.html">READ -&gt;</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-container cta-section">
+      <div class="cta-panel">
+        <div>
+          <p class="eyebrow">Ready when you are</p>
+          <h2>Secure the path attackers would take.</h2>
+          <p>Share the system, release, or security question you need assessed. We’ll shape a focused engagement around the risk.</p>
+        </div>
+        <div class="cta-actions">
+          <a class="button button-primary" href="mailto:research@zdaylabs.com?subject=Security%20assessment%20request">research@zdaylabs.com</a>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <script>
-    // Blog posts data from w3bspl01t3r directory
-    const blogPosts = [
-      { title: "Bean Validation To RCE", file: "BeanValidationToRce.html", description: "Exploting  Bean Validation vulnerabilities to Remote Code Execution" },
-      { title: "YSoserial Deep Dive", file: "ysoserial.html", description: "CommonsCollections gadget chains — not just what works, but why it works " },
-      { title: "GPG Bypass", file: "GPGBypass.html", description: "Unique Way to Bypass GPG Verification To achieve RCE(Conditios applied)" }
-    ];
+  <footer class="site-footer">
+    <div class="site-container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true">ZD</span>
+          <span class="brand-name">ZDayLabs</span>
+        </a>
+        <p class="footer-copy">Independent offensive security for teams building and operating critical applications and infrastructure.</p>
+      </div>
+      <div class="footer-column">
+        <h2>Services</h2>
+        <a href="/services.html">Security testing</a>
+        <a href="/engagements.html">Engagement models</a>
+        <a href="/contact.html">Request a review</a>
+      </div>
+      <div class="footer-column">
+        <h2>Work</h2>
+        <a href="/research.html">Vulnerability research</a>
+        <a href="/blogs.html">Technical notes</a>
+        <a href="/policy.html">Disclosure policy</a>
+      </div>
+      <div class="footer-column">
+        <h2>Connect</h2>
+        <a href="https://github.com/w3bspl01t3r" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/swagatkumar/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="https://x.com/webspl01t3r" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+      </div>
+    </div>
+    <div class="site-container footer-bottom">
+      <span>© 2026 ZDayLabs</span>
+      <span>Find it. Prove it. Fix it.</span>
+    </div>
+  </footer>
 
-    const allBlogPosts = [
-      { title: "Bean Validation To RCE", file: "BeanValidationToRce.html", description: "Exploting  Bean Validation vulnerabilities to Remote Code Execution" },
-      { title: "YSoserial Deep Dive", file: "ysoserial.html", description: "CommonsCollections gadget chains — not just what works, but why it works " },
-      { title: "GPG Bypass", file: "GPGBypass.html", description: "Unique Way to Bypass GPG Verification To achieve RCE(Conditios applied)" },
-      { title: "Hacking JWT", file: "HackingJWT.html", description: "JWT vulnerabilities and exploitation techniques" },
-      { title: "Insecure Deserialization", file: "InsecureDeserialization.html", description: "Understanding what why and how Java Deserialization works" },
-      { title: "JDBC Injection", file: "JDBCInjection.html", description: "JDBC Injection To Remote Code Injection" },
-      { title: "JNDI To RCE", file: "JNDIToRCE.html", description: "Exploting JNDI Injection To Remote Code Execution." }
-    ];
-
-    const researchPosts = [
-      { title: "Remote Code Execution in JasperReports", file: "CVE-2025-10492.html", description: "Discovered remote code execution vulnerability in JasperReports Library" },
-      { title: "Authentication Bypass In TrackPlus allegra", file: "CVE-2025-6216.html", description: "Discovered authentication bypass vulnerability in TrackPlus allegra system" },
-      { title: "Remote Code Execution In TrackPlus allegra", file: "CVE-2025-xxxx.html", description: "Discovered Remote Code Execution in TrackPlus allegra system" }
-      
-    ];
-
-    // Function to populate blog posts
-    function populateBlogPosts() {
-      const container = document.getElementById('blog-posts-container');
-      
-      blogPosts.forEach(post => {
-        const article = document.createElement('article');
-        article.innerHTML = `
-          <h3><a href="${post.file}" style="color: #fff; text-decoration: none;">${post.title}</a></h3>
-          <p>${post.description}</p>
-          <span class="date">SECURITY RESEARCH — TECHNICAL DEEP DIVE</span>
-        `;
-        container.appendChild(article);
-      });
-    }
-
-    // Function to populate research posts
-    function populateResearchPosts() {
-      const container = document.getElementById('research-container');
-      
-      researchPosts.forEach(post => {
-        const article = document.createElement('article');
-        article.innerHTML = `
-          <h3><a href="${post.file}" style="color: #fff; text-decoration: none;">${post.title}</a></h3>
-          <p>${post.description}</p>
-          <span class="date">VULNERABILITY RESEARCH — CVE DISCOVERY</span>
-        `;
-        container.appendChild(article);
-      });
-    }
-
-
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      populateBlogPosts();
-      populateResearchPosts();
-    });
-  </script>
+  <script src="/navigation.js"></script>
 </body>
 </html>

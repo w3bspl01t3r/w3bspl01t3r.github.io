@@ -1,154 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>ZDaylabs | Security Research</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #1a1a2e;
-      color: #dcdcdc;
-      line-height: 1.6;
-      padding: 0 2rem;
-      min-height: 100vh;
-    }
-    
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 0 1rem;
-      border-bottom: 1px solid #333;
-    }
-    
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #ffffff;
-    }
-    
-    nav a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: #ccc;
-      font-size: 0.95rem;
-    }
-    
-    nav a:hover {
-      color: #fef200;
-    }
-    
-    .socials a {
-      margin-left: 1rem;
-      color: #999;
-      font-size: 1.2rem;
-    }
-    
-    main {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      color: #fff;
-      margin-bottom: 1rem;
-    }
-    
-    h2, h3, h4 {
-      color: #fff;
-    }
-    
-    .highlight {
-      color: #fef200;
-      font-weight: 600;
-    }
-    
-    .accent {
-      color: #36d1dc;
-    }
-    
-    p {
-      color: #bbb;
-      margin-bottom: 1rem;
-    }
-    
-    /* Unified code block styling */
-    pre {
-      background-color: #0d1117;
-      color: #bcbec4;
-      border: 1px solid #333;
-      border-radius: 6px;
-      padding: 1rem;
-      overflow-x: auto;
-      margin: 1rem 0;
-      font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
-      font-size: 0.95rem;
-    }
-    
-    code {
-      color: #bcbec4;
-      font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
-      font-size: 0.95rem;
-    }
-    
-    pre code {
-      color: inherit;
-      background: transparent;
-      font-family: inherit;
-      font-size: inherit;
-    }
-    
-    a {
-      color: #36d1dc;
-      text-decoration: none;
-    }
-    
-    a:hover {
-      color: #fef200;
-    }
-    
-    ul, ol {
-      color: #bbb;
-    }
-    
-    li {
-      margin-bottom: 0.5rem;
-    }
-    
-    img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 4px;
-      margin: 1rem 0;
-    }
-    
-    .topnav-right {
-      display: none;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#060b0d">
+  <title>{{ page.title | default: "ZDayLabs" }} | Security Research</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header>
-        <div class="logo">⚡ ZDaylabs</div>
-    <nav>
-      <a href="/index.html">Home</a>
-      <a href="/blogs.html">Blogs</a>
-      <a href="/research.html">Research</a>
-      <a href="/policy.html">Disclosure Policy</a>
-      <a href="/contact.html">Contact</a>
-    </nav>
-    <div class="socials">
-      <a href="https://www.linkedin.com/in/swagatkumar/" target="_blank">🔗Linkedin</a>
-      <a href="https://x.com/webspl01t3r" target="_blank">🐦Twitter</a>
-    </div>
-  </header>
-
-  <main>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <div id="navigation-placeholder"></div>
+  <noscript><nav class="noscript-nav"><a href="/index.html">Home</a><a href="/research.html">Research</a><a href="/contact.html">Contact</a></nav></noscript>
+  <main class="article-shell" id="main-content">
     {{ content }}
   </main>
+  <footer class="site-footer">
+    <div class="site-container footer-bottom"><span>© 2026 ZDayLabs</span><span><a href="/policy.html">Disclosure policy</a></span></div>
+  </footer>
+  <script src="/navigation.js"></script>
 </body>
 </html>

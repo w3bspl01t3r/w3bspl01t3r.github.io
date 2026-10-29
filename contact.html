@@ -1,213 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Contact | ZDaylabs</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #1a1a2e;
-      color: #dcdcdc;
-      line-height: 1.6;
-      padding: 0 2rem;
-      min-height: 100vh;
-    }
-    
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 0 1rem;
-      border-bottom: 1px solid #333;
-    }
-    
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #ffffff;
-    }
-    
-    nav a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: #ccc;
-      font-size: 0.95rem;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    
-    nav a:hover {
-      color: #fef200;
-    }
-    
-    .socials a {
-      margin-left: 1rem;
-      color: #999;
-      font-size: 1.2rem;
-      text-decoration: none;
-    }
-    
-    main {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      text-align: center;
-    }
-    
-    h1 {
-      font-size: 2.5rem;
-      color: #fff;
-      margin-bottom: 2rem;
-    }
-    
-    .contact-section {
-      background: rgba(54, 209, 220, 0.1);
-      border: 2px solid #36d1dc;
-      border-radius: 8px;
-      padding: 3rem 2rem;
-      margin: 2rem 0;
-    }
-    
-    .contact-section h2 {
-      color: #36d1dc;
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    
-    .contact-section p {
-      color: #bbb;
-      font-size: 1.1rem;
-      margin-bottom: 1.5rem;
-    }
-    
-    .contact-btn {
-      background: #36d1dc;
-      color: #1a1f2e;
-      border: none;
-      padding: 1rem 2rem;
-      font-size: 1.1rem;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .contact-btn:hover {
-      background: #fef200;
-      transform: translateY(-2px);
-    }
-    
-    .highlight {
-      color: #fef200;
-      font-weight: 600;
-    }
-    
-    /* Popup styles */
-    .popup-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1000;
-    }
-    
-    .popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #2d3748;
-      border: 2px solid #36d1dc;
-      border-radius: 12px;
-      padding: 2rem;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      max-width: 400px;
-      width: 90%;
-    }
-    
-    .popup h3 {
-      color: #36d1dc;
-      margin-bottom: 1rem;
-    }
-    
-    .popup p {
-      color: #dcdcdc;
-      margin-bottom: 1.5rem;
-    }
-    
-    .email-link {
-      color: #fef200;
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 1.1rem;
-    }
-    
-    .close-btn {
-      background: #36d1dc;
-      color: #1a1f2e;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-    
-    .close-btn:hover {
-      background: #fef200;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Contact ZDayLabs about application, API, cloud, infrastructure, or vulnerability-validation security work.">
+  <meta name="theme-color" content="#060b0d">
+  <title>Contact | ZDayLabs</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <div id="navigation-placeholder"></div>
-  <script src="navigation.js"></script>
+  <noscript><nav class="noscript-nav"><a href="/index.html">Home</a><a href="/services.html">Services</a><a href="/research.html">Research</a></nav></noscript>
 
-  <main>
-    <h1>Contact Us</h1>
-    
-    <div class="contact-section">
-      <h2>📧 Get In Touch</h2>
-      <p>Have questions about our research? Want to collaborate? Need to report a security vulnerability?</p>
-      <p>We'd love to hear from you!</p>
-      <button class="contact-btn" onclick="showContactPopup()">Show Contact Information</button>
-    </div>
-    
-    <div style="margin-top: 3rem;">
-      <p>We typically respond to inquiries within <span class="highlight">24-48 hours</span>.</p>
-    </div>
+  <main id="main-content">
+    <header class="site-container page-hero">
+      <p class="eyebrow">Contact</p>
+      <h1>Bring us the system <span>you need to trust.</span></h1>
+      <p class="page-lead">For assessment requests, research collaboration, or coordinated vulnerability disclosure, email is the direct route.</p>
+    </header>
+
+    <section class="site-container section-compact">
+      <div class="contact-grid">
+        <div class="contact-primary">
+          <p class="eyebrow">Start here</p>
+          <h2>Tell us what you are protecting.</h2>
+          <p>A useful first note can be short: what the system is, the risk question, your target timing, and who should be involved.</p>
+          <a class="email-display" href="mailto:research@zdaylabs.com?subject=ZDayLabs%20security%20inquiry">research@zdaylabs.com</a>
+          <div><a class="button button-primary" href="mailto:research@zdaylabs.com?subject=ZDayLabs%20security%20inquiry">Open email</a></div>
+          <div class="contact-meta"><span>Security assessments</span><span>Research</span><span>Disclosure</span></div>
+        </div>
+
+        <div>
+          <article class="content-card content-card-accent">
+            <h2>For a security assessment</h2>
+            <ul>
+              <li>Application, API, infrastructure, or cloud environment</li>
+              <li>Production status and preferred testing window</li>
+              <li>Primary concern or decision the assessment should support</li>
+              <li>Known constraints, compliance needs, or sensitive operations</li>
+              <li>Preferred date for results</li>
+            </ul>
+          </article>
+          <article class="content-card">
+            <h2>For vulnerability disclosure</h2>
+            <p>If you believe you found a security issue affecting ZDayLabs properties, include reproduction steps and impact while avoiding unnecessary access to data.</p>
+            <a class="card-link" href="/policy.html">Read the disclosure policy <span aria-hidden="true">-&gt;</span></a>
+          </article>
+          <article class="content-card">
+            <h2>Public channels</h2>
+            <p>Follow published research and technical work through the existing public profiles.</p>
+            <div class="tag-row">
+              <a class="tag" href="https://github.com/w3bspl01t3r" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a class="tag" href="https://www.linkedin.com/in/swagatkumar/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              <a class="tag" href="https://x.com/webspl01t3r" target="_blank" rel="noopener noreferrer">X / Twitter</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-container section">
+      <div class="content-card">
+        <p class="eyebrow">Privacy by default</p>
+        <h2>No web form. No tracking script. No hidden intake database.</h2>
+        <p>This site uses a direct email link rather than collecting engagement details in the browser. Avoid sending credentials, production secrets, or sensitive customer data in an initial message.</p>
+      </div>
+    </section>
   </main>
 
-  <!-- Popup -->
-  <div class="popup-overlay" id="popupOverlay" onclick="hideContactPopup()">
-    <div class="popup" onclick="event.stopPropagation()">
-      <h3>Contact Information</h3>
-      <p>You can contact us at:</p>
-      <a href="mailto:research@zdaylabs.com" class="email-link">research@zdaylabs.com</a>
-      <br><br>
-      <button class="close-btn" onclick="hideContactPopup()">Close</button>
+  <footer class="site-footer">
+    <div class="site-container footer-grid">
+      <div class="footer-brand"><a class="brand" href="/index.html"><span class="brand-mark">ZD</span><span class="brand-name">ZDayLabs</span></a><p class="footer-copy">Independent offensive security for critical applications and infrastructure.</p></div>
+      <div class="footer-column"><h2>Services</h2><a href="/services.html">Capabilities</a><a href="/engagements.html">Engagement models</a></div>
+      <div class="footer-column"><h2>Evidence</h2><a href="/research.html">Research</a><a href="/blogs.html">Technical notes</a></div>
+      <div class="footer-column"><h2>Policy</h2><a href="/policy.html">Disclosure policy</a><a href="mailto:research@zdaylabs.com">Email</a></div>
     </div>
-  </div>
-
-  <script>
-    function showContactPopup() {
-      document.getElementById('popupOverlay').style.display = 'block';
-    }
-    
-    function hideContactPopup() {
-      document.getElementById('popupOverlay').style.display = 'none';
-    }
-    
-    // Close popup with Escape key
-    document.addEventListener('keydown', function(event) {
-      if (event.key === 'Escape') {
-        hideContactPopup();
-      }
-    });
-  </script>
+    <div class="site-container footer-bottom"><span>© 2026 ZDayLabs</span><span>research@zdaylabs.com</span></div>
+  </footer>
+  <script src="/navigation.js"></script>
 </body>
 </html>

@@ -1,121 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>All Blogs | zdaylabs</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #1a1a2e;
-      color: #dcdcdc;
-      line-height: 1.6;
-      padding: 0 2rem;
-      min-height: 100vh;
-    }
-    
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 0 1rem;
-      border-bottom: 1px solid #333;
-    }
-    
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #ffffff;
-    }
-    
-    nav a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: #ccc;
-      font-size: 0.95rem;
-    }
-    
-    nav a:hover {
-      color: #fef200;
-    }
-    
-    .socials a {
-      margin-left: 1rem;
-      color: #999;
-      font-size: 1.2rem;
-      text-decoration: none;
-    }
-    
-    main {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    
-    
-    .blogs-section {
-      text-align: center;
-    }
-    
-    .blogs-section h2 {
-      color: #fff;
-      font-size: 2rem;
-      margin-bottom: 2rem;
-    }
-    
-    .blog-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .blog-list li {
-      margin-bottom: 1.5rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-      border-left: 4px solid #36d1dc;
-      transition: all 0.3s ease;
-    }
-    
-    .blog-list li:hover {
-      background: rgba(255, 255, 255, 0.08);
-      transform: translateX(5px);
-    }
-    
-    
-    .blog-list a {
-      color: #fff;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 500;
-      display: block;
-    }
-    
-    .blog-list a:hover {
-      color: #fef200;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Technical security notes from ZDayLabs covering Java deserialization, gadget chains, JWT, JDBC, JNDI, and exploitation research.">
+  <meta name="theme-color" content="#060b0d">
+  <title>Technical Security Notes | ZDayLabs</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <div id="navigation-placeholder"></div>
-  <script src="navigation.js"></script>
+  <noscript><nav class="noscript-nav"><a href="/index.html">Home</a><a href="/research.html">Research</a><a href="/contact.html">Contact</a></nav></noscript>
 
-  <main>
-    <section class="blogs-section">
-      <h2>All Blog Posts</h2>
-      <ul class="blog-list">
-        <li><a href="BeanValidationToRce.html">Bean Validation To Remote Code Execution</a></li>
-        <li><a href="ysoserial.html">CommonsCollections gadget chains — not just what works, but why it works</a></li>
-        <li><a href="beyondcommoncollections.html">Beyond CommonsCollections — The Anatomy of Gadget Chains</a></li>
-        <li><a href="GPGBypass.html">GPG Bypass: Unique Way to Bypass GPG Verification To achieve RCE</a></li>
-        <li><a href="HackingJWT.html">Hacking JWT: Approach and Techniques to break into JWT Authentication</a></li>
-        <li><a href="InsecureDeserialization.html">Java Insecure Deserialization</a></li>
-        <li><a href="JDBCInjection.html">JDBC Injection: Exploiting Dynamic JDBC Configuration to Remote Code Execution</a></li>
-        <li><a href="JNDIToRCE.html">JNDI Injection To Remote Code Execution</a></li>
-      </ul>
+  <main id="main-content">
+    <header class="site-container page-hero">
+      <p class="eyebrow">Technical notes</p>
+      <h1>Understand the exploit. <span>Then remove the path.</span></h1>
+      <p class="page-lead">Deep dives into the mechanics behind application vulnerabilities, Java gadget chains, injection, identity, and remote code execution.</p>
+    </header>
+
+    <section class="site-container section-compact">
+      <div class="series-block">
+        <div class="series-heading"><h2>Application exploitation</h2><p>Practical analysis of dangerous trust boundaries and the conditions that turn them into impact.</p></div>
+        <div class="listing">
+          <a class="listing-item" href="/BeanValidationToRce.html"><div><h3>Bean Validation to Remote Code Execution</h3><p>Abusing validation behavior and dangerous object paths in Java applications.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+          <a class="listing-item" href="/GPGBypass.html"><div><h3>GPG verification bypass to RCE</h3><p>A conditional route from trust-verification weakness to code execution.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+          <a class="listing-item" href="/HackingJWT.html"><div><h3>Hacking JWT</h3><p>Approaches and techniques for testing token-based authentication.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+          <a class="listing-item" href="/JDBCInjection.html"><div><h3>JDBC injection to RCE</h3><p>How attacker-controlled database configuration can become a code-execution path.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+          <a class="listing-item" href="/JNDIToRCE.html"><div><h3>JNDI injection to Remote Code Execution</h3><p>Lookup behavior, version constraints, gadget usage, and exploitation flow.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+        </div>
+      </div>
+
+      <div class="series-block">
+        <div class="series-heading"><h2>Java deserialization foundations</h2><p>Start with the object model, then follow the call paths that make gadget chains possible.</p></div>
+        <div class="listing">
+          <a class="listing-item" href="/InsecureDeserialization.html"><div><h3>Insecure Java deserialization</h3><p>Serialization fundamentals, object reconstruction, privilege impact, and gadget chaining.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+          <a class="listing-item" href="/ysoserial.html"><div><h3>ysoserial deep dive</h3><p>CommonsCollections gadget chains—not just what works, but why it works.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+          <a class="listing-item" href="/beyondcommoncollections.html"><div><h3>Beyond CommonsCollections</h3><p>The anatomy of gadget chains and how to reason about new ones.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+          <a class="listing-item" href="/customgadget.html"><div><h3>Building a custom gadget</h3><p>A focused lab note on developing and understanding a custom chain.</p></div><span class="listing-arrow">READ -&gt;</span></a>
+        </div>
+      </div>
+
+      <div class="series-block">
+        <div class="series-heading"><h2>Gadget-chain lab</h2><p>Class-by-class notes for commonly studied Java deserialization chains.</p></div>
+        <div class="listing">
+          <a class="listing-item" href="/CommonsCollection1.html"><div><h3>CommonsCollections1</h3><p>Transformer chains, lazy maps, annotations, and invocation flow.</p></div><span class="listing-arrow">01</span></a>
+          <a class="listing-item" href="/CommonsCollection2.html"><div><h3>CommonsCollections2</h3><p>Priority queues, comparators, and the path into malicious templates.</p></div><span class="listing-arrow">02</span></a>
+          <a class="listing-item" href="/CommonsCollection3.html"><div><h3>CommonsCollections3</h3><p>Factory and transformer behavior in an alternate gadget composition.</p></div><span class="listing-arrow">03</span></a>
+          <a class="listing-item" href="/CommonsCollection4.html"><div><h3>CommonsCollections4</h3><p>Updated collection primitives and execution flow.</p></div><span class="listing-arrow">04</span></a>
+          <a class="listing-item" href="/CommonsCollection5.html"><div><h3>CommonsCollections5</h3><p>Tied map entries, bad attributes, and nested map access.</p></div><span class="listing-arrow">05</span></a>
+          <a class="listing-item" href="/CommonsCollection6.html"><div><h3>CommonsCollections6</h3><p>Hash-based triggering and transformed map values.</p></div><span class="listing-arrow">06</span></a>
+          <a class="listing-item" href="/CommonsCollection7.html"><div><h3>CommonsCollections7</h3><p>Hashtable collision behavior as a deserialization trigger.</p></div><span class="listing-arrow">07</span></a>
+          <a class="listing-item" href="/CommonsBeanUtils1.html"><div><h3>CommonsBeanUtils1</h3><p>Property comparison and template execution through BeanUtils.</p></div><span class="listing-arrow">BU</span></a>
+          <a class="listing-item" href="/BeanShell1.html"><div><h3>BeanShell1</h3><p>Dynamic proxy and interpreter behavior in the BeanShell gadget chain.</p></div><span class="listing-arrow">BS</span></a>
+          <a class="listing-item" href="/Groovy1.html"><div><h3>Groovy1</h3><p>Method closures, converted closures, and proxy invocation in Groovy.</p></div><span class="listing-arrow">GR</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-container cta-section section">
+      <div class="cta-panel">
+        <div><p class="eyebrow">Apply the research</p><h2>Concerned about a similar attack path?</h2><p>Use a focused assessment or code review to find whether the pattern exists in your application.</p></div>
+        <a class="button button-primary" href="/services.html">Explore services</a>
+      </div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <div class="site-container footer-grid">
+      <div class="footer-brand"><a class="brand" href="/index.html"><span class="brand-mark">ZD</span><span class="brand-name">ZDayLabs</span></a><p class="footer-copy">Technical security research translated into practical assessment depth.</p></div>
+      <div class="footer-column"><h2>Navigate</h2><a href="/services.html">Services</a><a href="/engagements.html">Engagements</a><a href="/contact.html">Contact</a></div>
+      <div class="footer-column"><h2>Evidence</h2><a href="/research.html">CVE research</a><a href="/policy.html">Disclosure policy</a></div>
+      <div class="footer-column"><h2>Connect</h2><a href="https://github.com/w3bspl01t3r" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://www.linkedin.com/in/swagatkumar/" target="_blank" rel="noopener noreferrer">LinkedIn</a></div>
+    </div>
+    <div class="site-container footer-bottom"><span>© 2026 ZDayLabs</span><span>Learn the chain. Break the chain.</span></div>
+  </footer>
+  <script src="/navigation.js"></script>
 </body>
 </html>

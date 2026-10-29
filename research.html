@@ -1,122 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Research | ZDaylabs</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #1a1a2e;
-      color: #dcdcdc;
-      line-height: 1.6;
-      padding: 0 2rem;
-      min-height: 100vh;
-    }
-    
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 0 1rem;
-      border-bottom: 1px solid #333;
-    }
-    
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #ffffff;
-    }
-    
-    nav a {
-      margin: 0 1rem;
-      text-decoration: none;
-      color: #ccc;
-      font-size: 0.95rem;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    
-    nav a:hover {
-      color: #fef200;
-    }
-    
-    .socials a {
-      margin-left: 1rem;
-      color: #999;
-      font-size: 1.2rem;
-      text-decoration: none;
-    }
-    
-    main {
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-    
-    
-    .research-section {
-      text-align: left;
-    }
-
-    .research-section h2 {
-      color: #fff;
-      font-size: 2rem;
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-
-    .research-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-
-    .research-list li {
-      margin-bottom: 1.5rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-      border-left: 4px solid #36d1dc;
-      transition: all 0.3s ease;
-    }
-
-    .research-list li:hover {
-      background: rgba(255, 255, 255, 0.08);
-      transform: translateX(5px);
-    }
-
-    .research-list a {
-      color: #fff;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 500;
-      display: block;
-    }
-
-    .research-list a:hover {
-      color: #fef200;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Published vulnerability discoveries and security research from ZDayLabs.">
+  <meta name="theme-color" content="#060b0d">
+  <title>Vulnerability Research | ZDayLabs</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <div id="navigation-placeholder"></div>
-  <script src="navigation.js"></script>
+  <noscript><nav class="noscript-nav"><a href="/index.html">Home</a><a href="/services.html">Services</a><a href="/blogs.html">Technical notes</a><a href="/contact.html">Contact</a></nav></noscript>
 
-  <main>
-    <section class="research-section">
-      <h2>Research Papers & CVE Discoveries</h2>
-      <ul class="research-list">
-        <li><a href="CVE-2025-10492.html">CVE-2025-10492: JasperReports JRLoader Remote Code Execution</a></li>
-        <li><a href="CVE-2025-6216.html">CVE-2025-6216: Authentication Bypass In TrackPlus Allegra</a></li>
-        <li><a href="CVE-2025-xxxx.html">CVE-2025-xxxx: Remote Code Execution In TrackPlus Allegra</a></li>
-        <li><a href="CVE-2025-11466.html">CVE-2025-11466: Arbitrary File Read In TrackPlus Allegra</a></li>
-        <li><a href="CVE-2025-60785.html">CVE-2025-60785: Remote Code Execution Via JDBC Injection On IceScrum</a></li>
-        <li><a href="CVE-2025-60786.html">CVE-2025-60786: Zip Slip In IceScrum Project Import</a></li>
-        
-      </ul>
+  <main id="main-content">
+    <header class="site-container page-hero">
+      <p class="eyebrow">Public research</p>
+      <h1>Original findings. <span>Reproducible depth.</span></h1>
+      <p class="page-lead">Published vulnerability analysis across enterprise Java, authentication, file handling, JDBC injection, and application attack chains.</p>
+    </header>
+
+    <section class="site-container section-compact">
+      <div class="research-grid">
+        <article class="research-card">
+          <p class="card-kicker">CVE-2025-10492 · Remote code execution</p>
+          <h3>JasperReports JRLoader deserialization</h3>
+          <p>Analysis of unsafe deserialization in JasperReports and the path to code execution in the service context.</p>
+          <div class="tag-row"><span class="tag">Java</span><span class="tag">Deserialization</span><span class="tag">RCE</span></div>
+          <a class="card-link" href="/CVE-2025-10492.html">Read disclosure <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="research-card">
+          <p class="card-kicker">CVE-2025-6216 · Authentication bypass</p>
+          <h3>TrackPlus Allegra authentication bypass</h3>
+          <p>Technical breakdown of an authentication weakness affecting the TrackPlus Allegra application.</p>
+          <div class="tag-row"><span class="tag">Auth</span><span class="tag">Enterprise app</span></div>
+          <a class="card-link" href="/CVE-2025-6216.html">Read disclosure <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="research-card">
+          <p class="card-kicker">CVE-2025-11466 · File disclosure</p>
+          <h3>TrackPlus Allegra arbitrary file read</h3>
+          <p>Research into a file-disclosure condition and its impact on sensitive application and system data.</p>
+          <div class="tag-row"><span class="tag">File read</span><span class="tag">Path handling</span></div>
+          <a class="card-link" href="/CVE-2025-11466.html">Read disclosure <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="research-card">
+          <p class="card-kicker">CVE-2025-60785 · Remote code execution</p>
+          <h3>IceScrum JDBC injection to RCE</h3>
+          <p>Exploitation of dynamic JDBC configuration to reach remote code execution in IceScrum.</p>
+          <div class="tag-row"><span class="tag">JDBC</span><span class="tag">Injection</span><span class="tag">RCE</span></div>
+          <a class="card-link" href="/CVE-2025-60785.html">Read disclosure <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="research-card">
+          <p class="card-kicker">CVE-2025-60786 · Zip Slip</p>
+          <h3>IceScrum unsafe project import</h3>
+          <p>Analysis of archive extraction behavior that permits files to escape the intended project-import directory.</p>
+          <div class="tag-row"><span class="tag">Zip Slip</span><span class="tag">File write</span></div>
+          <a class="card-link" href="/CVE-2025-60786.html">Read disclosure <span aria-hidden="true">-&gt;</span></a>
+        </article>
+        <article class="research-card">
+          <p class="card-kicker">Additional research note</p>
+          <h3>TrackPlus Allegra remote code execution</h3>
+          <p>A separate technical note documenting a remote-code-execution path identified during Allegra research.</p>
+          <div class="tag-row"><span class="tag">Enterprise app</span><span class="tag">RCE</span></div>
+          <a class="card-link" href="/CVE-2025-xxxx.html">Read research note <span aria-hidden="true">-&gt;</span></a>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-tinted">
+      <div class="site-container proof-layout">
+        <div class="proof-copy">
+          <p class="eyebrow">Research practice</p>
+          <h2>From root cause to practical impact.</h2>
+          <p>The work goes beyond identifying a vulnerable endpoint. It traces the implementation, establishes preconditions, develops safe proof, and documents how to reduce the risk.</p>
+        </div>
+        <div>
+          <article class="content-card"><h3>Implementation analysis</h3><p>Follow data and control flow through framework, library, and application boundaries.</p></article>
+          <article class="content-card"><h3>Exploit-chain development</h3><p>Test whether isolated weaknesses combine into a credible path with meaningful impact.</p></article>
+          <article class="content-card"><h3>Coordinated disclosure</h3><p>Share reproducible detail with maintainers and publish according to the <a class="card-link" href="/policy.html">disclosure policy</a>.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-container cta-section section">
+      <div class="cta-panel">
+        <div><p class="eyebrow">Need an expert view?</p><h2>Validate the vulnerability—not the headline.</h2><p>ZDayLabs can assess exploitability, environmental preconditions, compensating controls, and remediation for high-risk findings.</p></div>
+        <a class="button button-primary" href="/contact.html">Discuss validation</a>
+      </div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <div class="site-container footer-grid">
+      <div class="footer-brand"><a class="brand" href="/index.html"><span class="brand-mark">ZD</span><span class="brand-name">ZDayLabs</span></a><p class="footer-copy">Independent offensive security informed by original vulnerability research.</p></div>
+      <div class="footer-column"><h2>Navigate</h2><a href="/services.html">Services</a><a href="/engagements.html">Engagements</a><a href="/contact.html">Contact</a></div>
+      <div class="footer-column"><h2>Research</h2><a href="/blogs.html">Technical notes</a><a href="/policy.html">Disclosure policy</a></div>
+      <div class="footer-column"><h2>Connect</h2><a href="https://github.com/w3bspl01t3r" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://x.com/webspl01t3r" target="_blank" rel="noopener noreferrer">X / Twitter</a></div>
+    </div>
+    <div class="site-container footer-bottom"><span>© 2026 ZDayLabs</span><span>Research. Validate. Remediate.</span></div>
+  </footer>
+  <script src="/navigation.js"></script>
 </body>
 </html>
